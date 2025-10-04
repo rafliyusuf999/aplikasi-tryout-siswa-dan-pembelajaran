@@ -19,6 +19,12 @@ login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'login'
 
+@app.template_filter('from_json')
+def from_json_filter(value):
+    if value:
+        return json.loads(value)
+    return {}
+
 BRANCHES = [
     'Inspiranet_Cakrawala 1',
     'Inspiranet_Cakrawala 2',
@@ -755,7 +761,8 @@ def admin_view_essay_answers(exam_id):
 
 @app.route('/uploads/<path:filename>')
 def uploaded_file(filename):
-    return redirect(url_for('static', filename='../uploads/' + filename))
+    from flask import send_from_directory
+    return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)

@@ -33,6 +33,8 @@
                 <td>Rp {{ exam.price if exam.is_premium else 0 }}</td>
                 <td>{{ 'Aktif' if exam.is_active else 'Nonaktif' }}</td>
                 <td>
+                    <a href="{{ url_for('admin_view_essay_answers', exam_id=exam.id) }}" class="btn btn-primary" style="padding: 0.5rem 1rem; text-decoration: none; margin-right: 5px;">Esai</a>
+                    <a href="{{ url_for('leaderboard', exam_id=exam.id) }}" class="btn btn-secondary" style="padding: 0.5rem 1rem; text-decoration: none; margin-right: 5px;">Ranking</a>
                     <form method="POST" action="{{ url_for('admin_delete_exam', id=exam.id) }}" style="display: inline;" data-confirm-delete>
                         <button type="submit" class="btn btn-danger" style="padding: 0.5rem 1rem;">Hapus</button>
                     </form>

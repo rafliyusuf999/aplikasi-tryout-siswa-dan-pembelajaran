@@ -29,7 +29,9 @@
                 <td>{{ exam.total_questions }}</td>
                 <td>{{ 'Premium' if exam.is_premium else 'Gratis' }}</td>
                 <td>
-                    <a href="{{ url_for('teacher_questions', id=exam.id) }}" class="btn btn-primary" style="padding: 0.5rem 1rem; text-decoration: none;">Kelola Soal</a>
+                    <a href="{{ url_for('teacher_questions', id=exam.id) }}" class="btn btn-primary" style="padding: 0.5rem 1rem; text-decoration: none; margin-right: 5px;">Soal</a>
+                    <a href="{{ url_for('admin_view_essay_answers', exam_id=exam.id) }}" class="btn btn-secondary" style="padding: 0.5rem 1rem; text-decoration: none; margin-right: 5px;">Esai</a>
+                    <a href="{{ url_for('leaderboard', exam_id=exam.id) }}" class="btn btn-success" style="padding: 0.5rem 1rem; text-decoration: none;">Ranking</a>
                 </td>
             </tr>
             {% endfor %}
