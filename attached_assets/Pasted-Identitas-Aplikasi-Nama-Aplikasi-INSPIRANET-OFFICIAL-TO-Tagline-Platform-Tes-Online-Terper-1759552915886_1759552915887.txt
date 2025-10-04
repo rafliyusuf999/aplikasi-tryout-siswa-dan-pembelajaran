@@ -1,0 +1,238 @@
+Identitas Aplikasi:
+
+Nama Aplikasi: INSPIRANET OFFICIAL TO
+
+Tagline: "Platform Tes Online Terpercaya untuk Persiapan UTBK"
+
+Target Pengguna: Siswa SMA kelas 10, 11, 12, dan Alumni
+
+🎯 Tujuan Utama Sistem
+
+Inspiranet Official TO memiliki beberapa fitur utama yang akan memudahkan siswa dalam mengikuti tes online yang aman, fair, dan terstruktur dengan baik, serta mudah di-deploy ke Replit.
+
+Mudah Dideploy di Replit: Dapat langsung di-deploy tanpa konfigurasi rumit, menggunakan Flask dan SQLite untuk database lokal.
+
+Anti-Cheating Ketat: Proteksi copy-paste, screenshot, dan pindah tab selama ujian.
+
+Fair Competition: Leaderboard terpisah per cabang.
+
+User-Friendly: Tampilan modern, responsif, dan interaktif.
+
+Scalable: Mampu menampung ribuan siswa dengan performa tetap optimal.
+
+🏢 Konsep Cabang Inspiranet_Cakrawala
+
+Cabang:
+
+Inspiranet_Cakrawala 1
+
+Inspiranet_Cakrawala 2
+
+Inspiranet_Cakrawala 3
+
+Inspiranet_Cakrawala 4
+
+Aturan Kompetisi:
+
+Semua cabang mengerjakan TO yang sama.
+
+Leaderboard terpisah per cabang dan global.
+
+Setiap cabang memiliki leaderboard terpisah.
+
+Admin dapat melihat perbandingan performa antar cabang.
+
+Keuntungan Sistem:
+
+Kompetisi lebih fair: Kompetisi berdasarkan cabang masing-masing.
+
+Motivasi lebih tinggi: Ranking lebih achievable.
+
+Analytics lebih tajam per batch: Setiap cabang memiliki analisisnya sendiri.
+
+Manajemen lebih terorganisir: Pengelolaan siswa, guru, dan TO yang terstruktur.
+
+👥 Jenis Pengguna & Hak Akses
+
+Siswa (Student Role):
+
+Fitur yang Dapat Diakses:
+
+Dashboard personal dengan statistik.
+
+Daftar TO yang tersedia (Premium & Gratis).
+
+Pengerjaan TO dengan proteksi ketat.
+
+Hasil TO dan analisis mendalam.
+
+Leaderboard cabang sendiri.
+
+Fitur yang Tidak Dapat Diakses:
+
+Tidak dapat melihat soal sebelum ujian dimulai.
+
+Tidak dapat copy-paste soal/jawaban.
+
+Tidak dapat berpindah tab saat ujian.
+
+Guru (Teacher Role):
+
+Fitur yang Dapat Diakses:
+
+Semua fitur siswa.
+
+Dashboard guru dengan overview.
+
+Buat dan edit TO.
+
+Buat dan edit soal.
+
+Lihat hasil semua siswa.
+
+Fitur yang Tidak Dapat Diakses:
+
+Tidak dapat mengakses manajemen user.
+
+Tidak dapat menghapus data siswa.
+
+Admin (Admin Role):
+
+Fitur yang Dapat Diakses:
+
+Dashboard super admin.
+
+Manajemen siswa (CRUD).
+
+Manajemen guru (CRUD).
+
+Manajemen TO lengkap (Premium dan Gratis).
+
+Leaderboard SEMUA cabang.
+
+Analytics mendalam per cabang.
+
+Pengaturan sistem.
+
+Fitur yang Tidak Dapat Diakses: Tidak ada.
+
+🔑 Admin User & Password
+
+Akses Admin:
+
+Username: admin
+
+Password: inspiragacor25
+
+📝 Pendaftaran Siswa & Guru
+
+Siswa Mendaftar Sendiri:
+
+Siswa dapat mendaftar langsung melalui halaman pendaftaran tanpa interaksi admin.
+
+Mereka memilih cabang, mengisi data diri, dan langsung mendapatkan akses untuk mengikuti TO.
+
+Guru Ditambahkan oleh Admin:
+
+Admin dapat menambahkan guru melalui panel admin.
+
+Guru yang ditambahkan dapat mengakses fitur untuk membuat dan mengelola TO, mengedit soal, serta melihat hasil siswa.
+
+🗄️ Struktur Database Lengkap
+
+Tabel: users
+Menyimpan semua pengguna sistem dengan kolom seperti id, email, password, role, inspira_branch, class_level, dan lainnya.
+
+Tabel: exams
+Menyimpan data Tes Online, dengan kolom seperti id, title, description, duration_minutes, total_questions, dan lainnya.
+
+Tabel: questions
+Menyimpan soal-soal dalam TO dengan kolom seperti id, exam_id, question_type, category, question_text, dan lainnya.
+
+Tabel: exam_attempts
+Menyimpan riwayat pengerjaan TO, dengan kolom seperti id, user_id, exam_id, started_at, total_score, dan lainnya.
+
+Tabel: payments
+Menyimpan transaksi pembayaran untuk TO premium, dengan kolom seperti id, user_id, exam_id, amount, dan lainnya.
+
+Tabel: leaderboards
+Menyimpan data leaderboard dengan kolom seperti id, exam_id, user_id, rank_in_branch, total_score, percentile, dan lainnya.
+
+🎨 Fitur Keamanan Anti-Cheating
+
+Penambahan Soal Essai & Upload Foto Jawaban:
+
+Admin bisa menambahkan soal tipe esai dan mengatur batas waktu pengerjaan.
+
+Siswa bisa meng-upload gambar untuk jawaban esai, yang terproteksi dari copy-paste dan screenshot.
+
+Proteksi Ketat Terhadap Copy-Paste dan Pindah Tab:
+
+Sistem mendeteksi jika siswa melakukan copy-paste atau berpindah tab selama pengerjaan.
+
+📜 Fitur Revisi dan Penambahan
+
+Bukti Pembayaran & Akses TO:
+
+Setelah siswa mengupload bukti pembayaran, status akan menjadi Pending.
+
+Admin bisa mengonfirmasi atau menolak. Jika ditolak, siswa tidak bisa mengikuti TO.
+
+Harga TO Bisa Ditentukan di Dashboard Admin:
+
+Admin dapat mengatur harga untuk TO reguler dan premium, serta memberikan diskon atau promo.
+
+Leaderboard Cabang & Global:
+
+Leaderboard Cabang hanya menampilkan ranking per cabang.
+
+Leaderboard Global menampilkan gabungan dari semua cabang.
+
+💻 Struktur File untuk Upload ke Replit
+
+Struktur file di Replit untuk aplikasi Flask ini sangat mirip dengan struktur standar Flask, namun dengan penyesuaian untuk digunakan dalam Replit:
+
+myproject/
+├── app.py                # Backend utama Flask
+├── requirements.txt      # Daftar library Python
+├── database.db           # Jika menggunakan SQLite (opsional)
+├── templates/            # Semua file HTML
+│   ├── index.html        # Halaman utama
+│   ├── add.html          # Halaman form tambah data
+│   └── about.html        # Contoh halaman tambahan
+├── static/               # File frontend statis
+│   ├── css/              
+│   │   └── style.css     # CSS untuk style animasi dan tampilan
+│   ├── js/               
+│   │   └── script.js     # JavaScript frontend
+│   └── img/              
+│       └── logo.png      # Logo aplikasi
+└── models/               # (Opsional jika menggunakan ORM)
+    └── user_model.py     # Definisi tabel User pakai SQLAlchemy
+
+Langkah Deploy di Replit:
+
+Buat Project Baru di Replit:
+
+Pilih template Flask.
+
+Upload semua file seperti di atas.
+
+Setup Requirements:
+
+Di requirements.txt, tambahkan dependencies yang dibutuhkan seperti:
+
+Flask==2.0.2
+Flask-SQLAlchemy==2.5.1
+Flask-WTF==0.15.1
+
+
+Database SQLite:
+
+Replit dapat menggunakan database SQLite yang sederhana dengan file database.db.
+
+Run di Replit:
+
+Setelah semua file siap, klik tombol Run di Replit.
+
+Aplikasi akan di-deploy dan dapat diakses melalui URL yang disediakan oleh Replit.
