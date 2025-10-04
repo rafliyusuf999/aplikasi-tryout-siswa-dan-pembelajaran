@@ -484,9 +484,23 @@ body {
     }
 }
 
+@media (max-width: 1024px) {
+    .container {
+        padding: 0 1.5rem;
+    }
+    
+    .exam-grid {
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    }
+}
+
 @media (max-width: 768px) {
     .hero h1 {
         font-size: 2rem;
+    }
+    
+    .hero p {
+        font-size: 1rem;
     }
     
     .stats-grid {
@@ -496,15 +510,101 @@ body {
     .navbar .container {
         flex-direction: column;
         gap: 1rem;
+        padding: 0 1rem;
     }
     
     .navbar-nav {
         flex-direction: column;
         gap: 0.5rem;
+        width: 100%;
+    }
+    
+    .navbar-nav a {
+        display: block;
+        text-align: center;
+        width: 100%;
     }
     
     .timer {
         position: static;
-        margin: 1rem;
+        margin: 1rem auto;
+        max-width: 300px;
+    }
+    
+    .exam-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .card {
+        padding: 1.5rem;
+    }
+    
+    .question-card {
+        padding: 1.5rem;
+    }
+    
+    .option-item {
+        padding: 0.75rem;
+    }
+    
+    .btn {
+        padding: 0.75rem 1.5rem;
+        font-size: 0.95rem;
+    }
+    
+    .container {
+        padding: 0 1rem;
+        margin: 1rem auto;
+    }
+    
+    .modal-content {
+        margin: 10% auto;
+        width: 90%;
+        max-width: 500px;
+    }
+    
+    table {
+        font-size: 0.85rem;
+    }
+    
+    table th,
+    table td {
+        padding: 0.5rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .navbar-brand {
+        font-size: 1.2rem;
+    }
+    
+    .hero h1 {
+        font-size: 1.5rem;
+    }
+    
+    .hero {
+        padding: 2rem 1rem;
+    }
+    
+    .stat-card h3 {
+        font-size: 2rem;
+    }
+    
+    .btn {
+        padding: 0.6rem 1.2rem;
+        font-size: 0.9rem;
+    }
+    
+    .form-control {
+        font-size: 16px;
+    }
+    
+    .question-card h4 {
+        font-size: 1.1rem;
+    }
+    
+    .modal-content {
+        margin: 5% auto;
+        width: 95%;
     }
 }

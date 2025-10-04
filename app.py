@@ -736,5 +736,26 @@ def update_leaderboard(attempt):
     
     db.session.commit()
 
+@app.route('/admin/exams/<int:exam_id>/essay_answers')
+@login_required
+def admin_view_essay_answers(exam_id):
+    if current_user.role not in ['admin', 'teacher']:
+        flash('Akses ditolak!', 'danger')
+        return redirect(url_for('index'))
+    
+    exam = Exam.query.get_or_404(exam_id)
+    attempts = ExamAttempt.query.filter_by(exam_id=exam_id, is_completed=True).all()
+    
+    essay_questions = Question.query.filter_by(exam_id=exam_id, question_type='essay').all()
+    
+    return render_template('essay_answers.html', 
+                         exam=exam, 
+                         attempts=attempts, 
+                         essay_questions=essay_questions)
+
+@app.route('/uploads/<path:filename>')
+def uploaded_file(filename):
+    return redirect(url_for('static', filename='../uploads/' + filename))
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
