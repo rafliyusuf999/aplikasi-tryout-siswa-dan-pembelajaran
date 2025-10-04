@@ -39,13 +39,13 @@ Preferred communication style: Simple, everyday language.
 
 ### Authentication & Authorization
 - Role-based access control (RBAC) with three user types:
-  - **Admin:** Full system control, user management, payment approval
-  - **Teacher:** Exam creation, question management, student result viewing
+  - **Admin:** Full system control, user management, payment approval, complete question management for all exams (add, edit, delete)
+  - **Teacher:** Exam creation, question management (add, edit, delete for own exams), student result viewing
   - **Student:** Exam participation, payment submission, leaderboard access
 - Session-based authentication via Flask-Login
 - Password hashing with Werkzeug's generate_password_hash/check_password_hash
 
-**Design Rationale:** Role-based system ensures proper access segregation. Session-based auth provides security without external dependencies.
+**Design Rationale:** Role-based system ensures proper access segregation. Session-based auth provides security without external dependencies. Admin has full control while teachers can only manage their own exam questions.
 
 ### Branch Competition System
 - **4 Branches:** Inspiranet_Cakrawala 1-4
@@ -79,23 +79,26 @@ Preferred communication style: Simple, everyday language.
 
 ### Frontend Architecture
 - **Jinja2 Templates** - Server-side rendering
-- **Custom CSS** with CSS variables for theming
-- **Vanilla JavaScript** for interactivity and anti-cheat enforcement
+- **Custom CSS** with CSS variables for theming and improved modal scrolling
+- **Vanilla JavaScript** for interactivity, anti-cheat enforcement, and async file uploads
 - **Fully Responsive Design** using CSS Grid and Flexbox with breakpoints:
   - Desktop: 1024px and above
   - Tablet: 768px - 1023px
   - Mobile: Below 768px
+- **Modal Improvements:** Scrollable content with overflow handling to prevent content being cut off
 
-**Design Rationale:** Server-side rendering reduces client complexity. No frontend framework dependencies enable lightweight, fast-loading pages suitable for Replit hosting. Responsive design ensures optimal user experience across all devices.
+**Design Rationale:** Server-side rendering reduces client complexity. No frontend framework dependencies enable lightweight, fast-loading pages suitable for Replit hosting. Responsive design ensures optimal user experience across all devices. Modals with proper scrolling ensure forms are accessible on all screen sizes.
 
 ### File Structure
-- `app.py` - Main application entry with route definitions and automatic database migration
+- `app.py` - Main application entry with route definitions, automatic database migration, and question management endpoints
 - `models.py` - SQLAlchemy database models with essay and profile photo support
 - `templates/` - Jinja2 HTML templates organized by user role
-  - `student_exam.html` - Essay question with photo upload capability
+  - `admin_questions.html` - Admin interface for managing all exam questions (add, edit, delete)
+  - `teacher_questions.html` - Teacher interface for managing own exam questions (add, edit, delete)
+  - `student_exam.html` - Exam interface with essay photo upload and comprehensive error handling
   - `essay_answers.html` - Admin/teacher dashboard for viewing essay submissions
   - `register.html` - Student registration with profile photo upload
-- `static/css/` - Responsive stylesheets with custom theme
+- `static/css/` - Responsive stylesheets with custom theme and improved modal scrolling
 - `static/js/` - Client-side JavaScript with anti-cheat enforcement
 - `uploads/` - File upload directories (profiles, answers, payment proofs)
 
