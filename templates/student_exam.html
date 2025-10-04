@@ -122,34 +122,51 @@ async function submitExam() {
         }
     });
     
-    const uploadPromises = [];
-    for (const [questionId, file] of Object.entries(essayFiles)) {
-        const uploadFormData = new FormData();
-        uploadFormData.append('essay_file', file);
-        uploadFormData.append('question_id', questionId);
-        
-        const promise = fetch('{{ url_for("student_upload_essay", attempt_id=attempt.id) }}', {
-            method: 'POST',
-            body: uploadFormData
-        });
-        uploadPromises.push(promise);
-    }
-    
-    await Promise.all(uploadPromises);
-    
-    const submitData = new FormData();
-    submitData.append('answers', JSON.stringify(answers));
-    
-    fetch('{{ url_for("student_submit_exam", attempt_id=attempt.id) }}', {
-        method: 'POST',
-        body: submitData
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            window.location.href = data.redirect;
+    try {
+        const uploadPromises = [];
+        for (const [questionId, file] of Object.entries(essayFiles)) {
+            const uploadFormData = new FormData();
+            uploadFormData.append('essay_file', file);
+            uploadFormData.append('question_id', questionId);
+            
+            const promise = fetch('{{ url_for("student_upload_essay", attempt_id=attempt.id) }}', {
+                method: 'POST',
+                body: uploadFormData
+            }).then(response => {
+                if (!response.ok) {
+                    throw new Error('Upload foto gagal untuk soal ' + questionId);
+                }
+                return response.json();
+            }).then(data => {
+                if (!data.success) {
+                    throw new Error('Upload foto gagal untuk soal ' + questionId + ': ' + (data.message || 'Error tidak diketahui'));
+                }
+                return data;
+            });
+            uploadPromises.push(promise);
         }
-    });
+        
+        await Promise.all(uploadPromises);
+        
+        const submitData = new FormData();
+        submitData.append('answers', JSON.stringify(answers));
+        
+        const submitResponse = await fetch('{{ url_for("student_submit_exam", attempt_id=attempt.id) }}', {
+            method: 'POST',
+            body: submitData
+        });
+        
+        const submitResult = await submitResponse.json();
+        
+        if (submitResult.success) {
+            window.location.href = submitResult.redirect;
+        } else {
+            alert('Gagal submit jawaban: ' + (submitResult.message || 'Error tidak diketahui'));
+        }
+    } catch (error) {
+        alert('Error: ' + error.message);
+        return;
+    }
 }
 </script>
 {% endblock %}
