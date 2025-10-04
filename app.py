@@ -592,6 +592,34 @@ def student_start_exam(id):
     questions = Question.query.filter_by(exam_id=exam.id).order_by(Question.question_order).all()
     return render_template('student_exam.html', exam=exam, attempt=attempt, questions=questions)
 
+@app.route('/student/exams/<int:attempt_id>/upload_essay', methods=['POST'])
+@login_required
+def student_upload_essay(attempt_id):
+    if current_user.role != 'student':
+        return jsonify({'success': False, 'message': 'Akses ditolak'}), 403
+    
+    attempt = ExamAttempt.query.get_or_404(attempt_id)
+    if attempt.user_id != current_user.id:
+        return jsonify({'success': False, 'message': 'Akses ditolak'}), 403
+    
+    essay_file = request.files.get('essay_file')
+    question_id = request.form.get('question_id')
+    
+    if essay_file and essay_file.filename:
+        os.makedirs(os.path.join(app.config['UPLOAD_FOLDER'], 'answers'), exist_ok=True)
+        filename = secure_filename(f"essay_{attempt_id}_{question_id}_{datetime.now().timestamp()}.jpg")
+        filepath = os.path.join(app.config['UPLOAD_FOLDER'], 'answers', filename)
+        essay_file.save(filepath)
+        
+        essay_answers = json.loads(attempt.essay_answers) if attempt.essay_answers else {}
+        essay_answers[question_id] = filename
+        attempt.essay_answers = json.dumps(essay_answers)
+        db.session.commit()
+        
+        return jsonify({'success': True, 'filename': filename})
+    
+    return jsonify({'success': False, 'message': 'No file uploaded'}), 400
+
 @app.route('/student/exams/<int:attempt_id>/submit', methods=['POST'])
 @login_required
 def student_submit_exam(attempt_id):

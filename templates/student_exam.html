@@ -42,8 +42,10 @@
             </div>
             {% else %}
             <div class="form-group" style="margin-top: 1rem;">
-                <label>Jawaban Esai:</label>
-                <textarea name="q_{{ question.id }}" class="form-control" rows="4" placeholder="Tulis jawaban Anda di sini..."></textarea>
+                <label>Jawaban Esai (Upload Foto):</label>
+                <input type="file" id="essay_{{ question.id }}" accept="image/*" class="form-control" style="margin-top: 10px;">
+                <div id="preview_{{ question.id }}" style="margin-top: 10px;"></div>
+                <small class="text-muted">Upload foto jawaban esai Anda (JPG, PNG, max 5MB)</small>
             </div>
             {% endif %}
         </div>
@@ -54,18 +56,51 @@
 </div>
 
 <script>
-const timer = new ExamTimer({{ exam.duration_minutes }}, function() {
-    alert('Waktu habis! Jawaban Anda akan otomatis disubmit.');
-    submitExam();
-});
-timer.start('timer');
+showSecurityWarningModal();
 
-const antiCheat = new AntiCheat(function(count, message) {
-    console.log('Warning #' + count + ': ' + message);
-});
-antiCheat.enable();
+let timerStarted = false;
+let antiCheatEnabled = false;
 
-function submitExam() {
+function startExamAfterWarning() {
+    if (!timerStarted) {
+        const timer = new ExamTimer({{ exam.duration_minutes }}, function() {
+            alert('Waktu habis! Jawaban Anda akan otomatis disubmit.');
+            submitExam();
+        });
+        timer.start('timer');
+        timerStarted = true;
+    }
+    
+    if (!antiCheatEnabled) {
+        const antiCheat = new AntiCheat(
+            function(count, message) {
+                console.log('Warning #' + count + ': ' + message);
+            },
+            '{{ url_for("logout") }}',
+            '{{ url_for("student_start_exam", id=exam.id) }}'
+        );
+        antiCheat.enable();
+        antiCheatEnabled = true;
+    }
+}
+
+document.querySelectorAll('input[type="file"]').forEach(input => {
+    input.addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        const questionId = this.id.replace('essay_', '');
+        const preview = document.getElementById('preview_' + questionId);
+        
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                preview.innerHTML = `<img src="${e.target.result}" style="max-width: 100%; max-height: 300px; border: 1px solid #ddd; border-radius: 5px;">`;
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+});
+
+async function submitExam() {
     if (!confirm('Apakah Anda yakin ingin submit jawaban?')) {
         return;
     }
@@ -73,11 +108,34 @@ function submitExam() {
     const form = document.getElementById('examForm');
     const formData = new FormData(form);
     const answers = {};
+    const essayFiles = {};
     
     for (let [key, value] of formData.entries()) {
         const questionId = key.replace('q_', '');
         answers[questionId] = value;
     }
+    
+    document.querySelectorAll('input[type="file"]').forEach(input => {
+        const questionId = input.id.replace('essay_', '');
+        if (input.files[0]) {
+            essayFiles[questionId] = input.files[0];
+        }
+    });
+    
+    const uploadPromises = [];
+    for (const [questionId, file] of Object.entries(essayFiles)) {
+        const uploadFormData = new FormData();
+        uploadFormData.append('essay_file', file);
+        uploadFormData.append('question_id', questionId);
+        
+        const promise = fetch('{{ url_for("student_upload_essay", attempt_id=attempt.id) }}', {
+            method: 'POST',
+            body: uploadFormData
+        });
+        uploadPromises.push(promise);
+    }
+    
+    await Promise.all(uploadPromises);
     
     const submitData = new FormData();
     submitData.append('answers', JSON.stringify(answers));
@@ -89,8 +147,6 @@ function submitExam() {
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            timer.stop();
-            antiCheat.disable();
             window.location.href = data.redirect;
         }
     });
