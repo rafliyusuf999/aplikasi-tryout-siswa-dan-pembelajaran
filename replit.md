@@ -28,14 +28,14 @@ Preferred communication style: Simple, everyday language.
 ### Database Schema
 - **SQLite** - Local file-based database (`inspiranet.db`)
 - **Core Models:**
-  - `User` - Multi-role system (admin, teacher, student) with branch assignment
+  - `User` - Multi-role system (admin, teacher, student) with branch assignment and profile photo support
   - `Exam` - Exam metadata including premium status and pricing
-  - `Question` - Supports multiple-choice and essay question types
-  - `ExamAttempt` - Tracks student submissions and cheating warnings
+  - `Question` - Supports multiple-choice and essay question types with photo upload capability
+  - `ExamAttempt` - Tracks student submissions, cheating warnings, and essay answers with photos (stored as JSON)
   - `Payment` - Premium exam payment processing with approval workflow
   - `Leaderboard` - Dual ranking system (branch-specific and global)
 
-**Design Rationale:** SQLite eliminates external database dependencies for easy Replit deployment. The schema supports the branch-based competition model with separate leaderboards while maintaining referential integrity through foreign keys and cascade deletes.
+**Design Rationale:** SQLite eliminates external database dependencies for easy Replit deployment. The schema supports the branch-based competition model with separate leaderboards while maintaining referential integrity through foreign keys and cascade deletes. Automatic migration system ensures existing databases are updated with new columns on startup.
 
 ### Authentication & Authorization
 - Role-based access control (RBAC) with three user types:
@@ -57,14 +57,15 @@ Preferred communication style: Simple, everyday language.
 **Design Rationale:** Separate branch leaderboards ensure fair competition within smaller groups while global leaderboards provide overall achievement visibility. This increases motivation through achievable local rankings.
 
 ### Anti-Cheating Architecture
-- Cheating warnings tracked per exam attempt
-- Frontend monitoring for:
-  - Copy-paste prevention
-  - Screenshot blocking
-  - Tab switching detection
+- **Enhanced Security Measures:**
+  - Auto-logout on copy attempt (immediate session termination)
+  - Auto-restart exam on tab/window switching (all answers cleared)
+  - Security warning modal before exam start (explains rules)
+  - Screenshot blocking and right-click prevention
   - Real-time timer enforcement
+  - Cheating warnings tracked per exam attempt
 
-**Design Rationale:** Multi-layered client-side protection creates barriers to common cheating methods while tracking violations for review.
+**Design Rationale:** Multi-layered client-side protection with strict enforcement (auto-logout and auto-restart) creates strong barriers to common cheating methods. Security modal ensures students are aware of consequences before starting.
 
 ### Payment & Premium Content
 - Two-tier exam system: Free and Premium
@@ -79,17 +80,24 @@ Preferred communication style: Simple, everyday language.
 ### Frontend Architecture
 - **Jinja2 Templates** - Server-side rendering
 - **Custom CSS** with CSS variables for theming
-- **Vanilla JavaScript** for interactivity
-- Responsive design using CSS Grid and Flexbox
+- **Vanilla JavaScript** for interactivity and anti-cheat enforcement
+- **Fully Responsive Design** using CSS Grid and Flexbox with breakpoints:
+  - Desktop: 1024px and above
+  - Tablet: 768px - 1023px
+  - Mobile: Below 768px
 
-**Design Rationale:** Server-side rendering reduces client complexity. No frontend framework dependencies enable lightweight, fast-loading pages suitable for Replit hosting.
+**Design Rationale:** Server-side rendering reduces client complexity. No frontend framework dependencies enable lightweight, fast-loading pages suitable for Replit hosting. Responsive design ensures optimal user experience across all devices.
 
 ### File Structure
-- `app.py` - Main application entry with route definitions
-- `models.py` - SQLAlchemy database models
+- `app.py` - Main application entry with route definitions and automatic database migration
+- `models.py` - SQLAlchemy database models with essay and profile photo support
 - `templates/` - Jinja2 HTML templates organized by user role
-- `static/css/` - Stylesheets with custom theme
-- `static/js/` - Client-side JavaScript including animated logo
+  - `student_exam.html` - Essay question with photo upload capability
+  - `essay_answers.html` - Admin/teacher dashboard for viewing essay submissions
+  - `register.html` - Student registration with profile photo upload
+- `static/css/` - Responsive stylesheets with custom theme
+- `static/js/` - Client-side JavaScript with anti-cheat enforcement
+- `uploads/` - File upload directories (profiles, answers, payment proofs)
 
 ## External Dependencies
 
@@ -100,8 +108,12 @@ Preferred communication style: Simple, everyday language.
 - **Werkzeug** - Security utilities and file handling
 
 ### Storage
-- **SQLite Database** - `inspiranet.db` file stored locally
-- **File Uploads** - Payment proof images stored in `uploads/` directory (max 16MB per file)
+- **SQLite Database** - `inspiranet.db` file stored in `instance/` directory
+- **File Uploads:**
+  - Payment proof images: `uploads/` directory (max 16MB per file)
+  - Student profile photos: `uploads/profiles/` directory
+  - Essay answer photos: `uploads/answers/` directory
+- **Automatic Migration** - Database schema automatically updated on startup using SQLAlchemy URL parsing and instance path resolution
 
 ### Environment Configuration
 - `SESSION_SECRET` - Flask session encryption key (defaults to 'inspiranet-secret-key-2025')
