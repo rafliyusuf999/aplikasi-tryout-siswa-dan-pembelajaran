@@ -35,18 +35,18 @@ def load_user(user_id):
 def init_database():
     with app.app_context():
         db.create_all()
-        admin = User.query.filter_by(email='admin').first()
+        admin = User.query.filter_by(email='admin@gmail.com').first()
         if not admin:
-            admin_password = os.environ.get('ADMIN_PASSWORD', 'inspiragacor25')
+            admin_password = os.environ.get('ADMIN_PASSWORD', 'inspiranetgacor25')
             admin = User(
-                email='admin',
+                email='admin@gmail.com',
                 full_name='Administrator',
                 role='admin'
             )
             admin.set_password(admin_password)
             db.session.add(admin)
             db.session.commit()
-            print(f"Admin user created with email: admin")
+            print(f"Admin user created with email: admin@gmail.com")
 
 @app.before_request
 def ensure_db():
