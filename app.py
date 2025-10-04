@@ -396,6 +396,100 @@ def admin_reject_payment(id):
     flash('Pembayaran ditolak!', 'info')
     return redirect(url_for('admin_payments'))
 
+@app.route('/admin/exams/<int:id>/questions')
+@login_required
+def admin_questions(id):
+    if current_user.role != 'admin':
+        flash('Akses ditolak!', 'danger')
+        return redirect(url_for('index'))
+    
+    exam = Exam.query.get_or_404(id)
+    questions = Question.query.filter_by(exam_id=id).order_by(Question.question_order).all()
+    return render_template('admin_questions.html', exam=exam, questions=questions)
+
+@app.route('/admin/exams/<int:id>/questions/add', methods=['POST'])
+@login_required
+def admin_add_question(id):
+    if current_user.role != 'admin':
+        return jsonify({'success': False, 'message': 'Akses ditolak'}), 403
+    
+    exam = Exam.query.get_or_404(id)
+    
+    question_type = request.form.get('question_type')
+    category = request.form.get('category')
+    question_text = request.form.get('question_text')
+    option_a = request.form.get('option_a')
+    option_b = request.form.get('option_b')
+    option_c = request.form.get('option_c')
+    option_d = request.form.get('option_d')
+    option_e = request.form.get('option_e')
+    correct_answer = request.form.get('correct_answer')
+    points = request.form.get('points', 1)
+    
+    max_order = db.session.query(func.max(Question.question_order)).filter_by(exam_id=id).scalar() or 0
+    
+    question = Question(
+        exam_id=id,
+        question_type=question_type,
+        category=category,
+        question_text=question_text,
+        option_a=option_a,
+        option_b=option_b,
+        option_c=option_c,
+        option_d=option_d,
+        option_e=option_e,
+        correct_answer=correct_answer,
+        question_order=max_order + 1,
+        points=int(points)
+    )
+    db.session.add(question)
+    exam.total_questions = Question.query.filter_by(exam_id=id).count() + 1
+    db.session.commit()
+    
+    flash('Soal berhasil ditambahkan!', 'success')
+    return redirect(url_for('admin_questions', id=id))
+
+@app.route('/admin/questions/<int:id>/edit', methods=['POST'])
+@login_required
+def admin_edit_question(id):
+    if current_user.role != 'admin':
+        return jsonify({'success': False, 'message': 'Akses ditolak'}), 403
+    
+    question = Question.query.get_or_404(id)
+    
+    question.question_type = request.form.get('question_type')
+    question.category = request.form.get('category')
+    question.question_text = request.form.get('question_text')
+    question.option_a = request.form.get('option_a')
+    question.option_b = request.form.get('option_b')
+    question.option_c = request.form.get('option_c')
+    question.option_d = request.form.get('option_d')
+    question.option_e = request.form.get('option_e')
+    question.correct_answer = request.form.get('correct_answer')
+    question.points = int(request.form.get('points', 1))
+    
+    db.session.commit()
+    
+    flash('Soal berhasil diperbarui!', 'success')
+    return redirect(url_for('admin_questions', id=question.exam_id))
+
+@app.route('/admin/questions/<int:id>/delete', methods=['POST'])
+@login_required
+def admin_delete_question(id):
+    if current_user.role != 'admin':
+        return jsonify({'success': False, 'message': 'Akses ditolak'}), 403
+    
+    question = Question.query.get_or_404(id)
+    exam_id = question.exam_id
+    exam = Exam.query.get(exam_id)
+    
+    db.session.delete(question)
+    exam.total_questions = Question.query.filter_by(exam_id=exam_id).count() - 1
+    db.session.commit()
+    
+    flash('Soal berhasil dihapus!', 'success')
+    return redirect(url_for('admin_questions', id=exam_id))
+
 @app.route('/teacher/dashboard')
 @login_required
 def teacher_dashboard():
@@ -506,6 +600,54 @@ def teacher_add_question(id):
     
     flash('Soal berhasil ditambahkan!', 'success')
     return redirect(url_for('teacher_questions', id=id))
+
+@app.route('/teacher/questions/<int:id>/edit', methods=['POST'])
+@login_required
+def teacher_edit_question(id):
+    if current_user.role != 'teacher':
+        return jsonify({'success': False, 'message': 'Akses ditolak'}), 403
+    
+    question = Question.query.get_or_404(id)
+    exam = Exam.query.get(question.exam_id)
+    
+    if exam.created_by != current_user.id:
+        return jsonify({'success': False, 'message': 'Akses ditolak'}), 403
+    
+    question.question_type = request.form.get('question_type')
+    question.category = request.form.get('category')
+    question.question_text = request.form.get('question_text')
+    question.option_a = request.form.get('option_a')
+    question.option_b = request.form.get('option_b')
+    question.option_c = request.form.get('option_c')
+    question.option_d = request.form.get('option_d')
+    question.option_e = request.form.get('option_e')
+    question.correct_answer = request.form.get('correct_answer')
+    question.points = int(request.form.get('points', 1))
+    
+    db.session.commit()
+    
+    flash('Soal berhasil diperbarui!', 'success')
+    return redirect(url_for('teacher_questions', id=question.exam_id))
+
+@app.route('/teacher/questions/<int:id>/delete', methods=['POST'])
+@login_required
+def teacher_delete_question(id):
+    if current_user.role != 'teacher':
+        return jsonify({'success': False, 'message': 'Akses ditolak'}), 403
+    
+    question = Question.query.get_or_404(id)
+    exam_id = question.exam_id
+    exam = Exam.query.get(exam_id)
+    
+    if exam.created_by != current_user.id:
+        return jsonify({'success': False, 'message': 'Akses ditolak'}), 403
+    
+    db.session.delete(question)
+    exam.total_questions = Question.query.filter_by(exam_id=exam_id).count() - 1
+    db.session.commit()
+    
+    flash('Soal berhasil dihapus!', 'success')
+    return redirect(url_for('teacher_questions', id=exam_id))
 
 @app.route('/teacher/students')
 @login_required
