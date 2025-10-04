@@ -33,7 +33,7 @@
             </div>
             <div style="display: flex; gap: 0.5rem; margin-left: 1rem;">
                 <button onclick="editQuestion({{ question.id|tojson }}, {{ question|tojson }})" class="btn btn-primary" style="padding: 0.5rem 1rem;">Edit</button>
-                <form method="POST" action="{{ url_for('teacher_delete_question', id=question.id) }}" style="display: inline;" onsubmit="return confirm('Yakin ingin menghapus soal ini?')">
+                <form method="POST" action="{{ url_for('admin_delete_question', id=question.id) }}" style="display: inline;" onsubmit="return confirm('Yakin ingin menghapus soal ini?')">
                     <button type="submit" class="btn btn-danger" style="padding: 0.5rem 1rem;">Hapus</button>
                 </form>
             </div>
@@ -48,7 +48,7 @@
             <h3>Tambah Soal Baru</h3>
             <span class="close" onclick="closeModal('addQuestionModal')">&times;</span>
         </div>
-        <form method="POST" action="{{ url_for('teacher_add_question', id=exam.id) }}">
+        <form method="POST" action="{{ url_for('admin_add_question', id=exam.id) }}">
             <div class="form-group">
                 <label>Tipe Soal:</label>
                 <select name="question_type" class="form-control" required onchange="toggleQuestionType(this)">
@@ -188,7 +188,7 @@ function toggleEditQuestionType(select) {
 }
 
 function editQuestion(id, question) {
-    document.getElementById('editQuestionForm').action = '/teacher/questions/' + id + '/edit';
+    document.getElementById('editQuestionForm').action = '/admin/questions/' + id + '/edit';
     document.getElementById('edit_question_type').value = question.question_type;
     document.getElementById('edit_category').value = question.category || '';
     document.getElementById('edit_question_text').value = question.question_text || '';
