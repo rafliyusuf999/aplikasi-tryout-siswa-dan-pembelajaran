@@ -32,19 +32,27 @@ CLASS_LEVELS = ['10', '11', '12', 'Alumni']
 def load_user(user_id):
     return User.query.get(int(user_id))
 
+def init_database():
+    with app.app_context():
+        db.create_all()
+        admin = User.query.filter_by(email='admin').first()
+        if not admin:
+            admin_password = os.environ.get('ADMIN_PASSWORD', 'inspiragacor25')
+            admin = User(
+                email='admin',
+                full_name='Administrator',
+                role='admin'
+            )
+            admin.set_password(admin_password)
+            db.session.add(admin)
+            db.session.commit()
+            print(f"Admin user created with email: admin")
+
 @app.before_request
-def create_tables():
-    db.create_all()
-    admin = User.query.filter_by(email='admin').first()
-    if not admin:
-        admin = User(
-            email='admin',
-            full_name='Administrator',
-            role='admin'
-        )
-        admin.set_password('inspiragacor25')
-        db.session.add(admin)
-        db.session.commit()
+def ensure_db():
+    if not hasattr(app, '_db_initialized'):
+        app._db_initialized = True
+        init_database()
 
 @app.route('/')
 def index():
