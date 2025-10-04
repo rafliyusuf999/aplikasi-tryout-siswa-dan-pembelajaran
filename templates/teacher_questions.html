@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+
+{% block title %}Kelola Soal - {{ exam.title }}{% endblock %}
+
+{% block content %}
+<h1 style="color: var(--primary-color); margin-bottom: 2rem;">📋 Kelola Soal: {{ exam.title }}</h1>
+
+<div class="card">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+        <h2>Daftar Soal ({{ questions|length }})</h2>
+        <button onclick="showModal('addQuestionModal')" class="btn btn-primary">+ Tambah Soal</button>
+    </div>
+
+    {% for question in questions %}
+    <div class="question-card">
+        <h4>Soal #{{ question.question_order }} - {{ question.category }}</h4>
+        <p>{{ question.question_text }}</p>
+        {% if question.question_type == 'multiple_choice' %}
+        <div style="margin-top: 1rem;">
+            <p><strong>A.</strong> {{ question.option_a }}</p>
+            <p><strong>B.</strong> {{ question.option_b }}</p>
+            <p><strong>C.</strong> {{ question.option_c }}</p>
+            <p><strong>D.</strong> {{ question.option_d }}</p>
+            {% if question.option_e %}
+            <p><strong>E.</strong> {{ question.option_e }}</p>
+            {% endif %}
+            <p style="color: green; font-weight: bold;">Jawaban: {{ question.correct_answer }}</p>
+        </div>
+        {% else %}
+        <p style="color: green; font-weight: bold;">Soal Esai ({{ question.points }} poin)</p>
+        {% endif %}
+    </div>
+    {% endfor %}
+</div>
+
+<div id="addQuestionModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Tambah Soal Baru</h3>
+            <span class="close" onclick="closeModal('addQuestionModal')">&times;</span>
+        </div>
+        <form method="POST" action="{{ url_for('teacher_add_question', id=exam.id) }}">
+            <div class="form-group">
+                <label>Tipe Soal:</label>
+                <select name="question_type" class="form-control" required onchange="toggleQuestionType(this)">
+                    <option value="multiple_choice">Pilihan Ganda</option>
+                    <option value="essay">Esai</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Kategori:</label>
+                <input type="text" name="category" class="form-control" placeholder="Contoh: Matematika, Fisika" required>
+            </div>
+            <div class="form-group">
+                <label>Pertanyaan:</label>
+                <textarea name="question_text" class="form-control" rows="3" required></textarea>
+            </div>
+            <div id="mcOptions">
+                <div class="form-group">
+                    <label>Opsi A:</label>
+                    <input type="text" name="option_a" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label>Opsi B:</label>
+                    <input type="text" name="option_b" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label>Opsi C:</label>
+                    <input type="text" name="option_c" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label>Opsi D:</label>
+                    <input type="text" name="option_d" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label>Opsi E (Opsional):</label>
+                    <input type="text" name="option_e" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label>Jawaban Benar:</label>
+                    <select name="correct_answer" class="form-control">
+                        <option value="A">A</option>
+                        <option value="B">B</option>
+                        <option value="C">C</option>
+                        <option value="D">D</option>
+                        <option value="E">E</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Poin:</label>
+                <input type="number" name="points" class="form-control" value="1" required>
+            </div>
+            <button type="submit" class="btn btn-primary" style="width: 100%;">Tambah</button>
+        </form>
+    </div>
+</div>
+
+<script>
+function toggleQuestionType(select) {
+    const mcOptions = document.getElementById('mcOptions');
+    if (select.value === 'essay') {
+        mcOptions.style.display = 'none';
+    } else {
+        mcOptions.style.display = 'block';
+    }
+}
+</script>
+{% endblock %}

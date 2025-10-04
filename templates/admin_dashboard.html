@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Dashboard - INSPIRANET{% endblock %}
+
+{% block content %}
+<h1 style="color: var(--primary-color); margin-bottom: 2rem;">👨‍💼 Admin Dashboard</h1>
+
+<div class="stats-grid">
+    <div class="stat-card">
+        <h3>{{ total_students }}</h3>
+        <p>Total Siswa</p>
+    </div>
+    <div class="stat-card">
+        <h3>{{ total_teachers }}</h3>
+        <p>Total Guru</p>
+    </div>
+    <div class="stat-card">
+        <h3>{{ total_exams }}</h3>
+        <p>Total TO</p>
+    </div>
+    <div class="stat-card">
+        <h3>{{ pending_payments }}</h3>
+        <p>Pembayaran Pending</p>
+    </div>
+</div>
+
+<div class="card">
+    <h2>⚡ Quick Access</h2>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-top: 1rem;">
+        <a href="{{ url_for('admin_students') }}" class="btn btn-primary" style="text-decoration: none; text-align: center;">Kelola Siswa</a>
+        <a href="{{ url_for('admin_teachers') }}" class="btn btn-primary" style="text-decoration: none; text-align: center;">Kelola Guru</a>
+        <a href="{{ url_for('admin_exams') }}" class="btn btn-primary" style="text-decoration: none; text-align: center;">Kelola TO</a>
+        <a href="{{ url_for('admin_payments') }}" class="btn btn-primary" style="text-decoration: none; text-align: center;">Konfirmasi Pembayaran</a>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block title %}Konfirmasi Pembayaran - Admin{% endblock %}
+
+{% block content %}
+<h1 style="color: var(--primary-color); margin-bottom: 2rem;">💰 Konfirmasi Pembayaran</h1>
+
+<div class="card">
+    <h2>Daftar Pembayaran</h2>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Siswa</th>
+                <th>TO</th>
+                <th>Jumlah</th>
+                <th>Tanggal</th>
+                <th>Status</th>
+                <th>Aksi</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for payment in payments %}
+            <tr>
+                <td>{{ payment.user.full_name }}</td>
+                <td>{{ payment.exam.title }}</td>
+                <td>Rp {{ payment.amount }}</td>
+                <td>{{ payment.created_at.strftime('%d/%m/%Y %H:%M') }}</td>
+                <td>
+                    {% if payment.status == 'approved' %}
+                        <span style="color: green; font-weight: bold;">✓ Disetujui</span>
+                    {% elif payment.status == 'rejected' %}
+                        <span style="color: red; font-weight: bold;">✗ Ditolak</span>
+                    {% else %}
+                        <span style="color: orange; font-weight: bold;">⏳ Pending</span>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if payment.status == 'pending' %}
+                    <form method="POST" action="{{ url_for('admin_approve_payment', id=payment.id) }}" style="display: inline;">
+                        <button type="submit" class="btn btn-success" style="padding: 0.5rem 1rem;">Setujui</button>
+                    </form>
+                    <form method="POST" action="{{ url_for('admin_reject_payment', id=payment.id) }}" style="display: inline;">
+                        <button type="submit" class="btn btn-danger" style="padding: 0.5rem 1rem;">Tolak</button>
+                    </form>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

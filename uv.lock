@@ -219,6 +219,7 @@ dependencies = [
     { name = "flask" },
     { name = "flask-login" },
     { name = "flask-sqlalchemy" },
+    { name = "sqlalchemy" },
     { name = "werkzeug" },
 ]
 
@@ -227,6 +228,7 @@ requires-dist = [
     { name = "flask", specifier = ">=3.1.2" },
     { name = "flask-login", specifier = ">=0.6.3" },
     { name = "flask-sqlalchemy", specifier = ">=3.1.1" },
+    { name = "sqlalchemy", specifier = ">=2.0.43" },
     { name = "werkzeug", specifier = ">=3.1.3" },
 ]
 

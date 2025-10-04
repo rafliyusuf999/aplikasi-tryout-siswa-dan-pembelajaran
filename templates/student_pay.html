@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block title %}Pembayaran - {{ exam.title }}{% endblock %}
+
+{% block content %}
+<div class="card" style="max-width: 600px; margin: 2rem auto;">
+    <h2 style="text-align: center; margin-bottom: 2rem;">💰 Pembayaran TO</h2>
+    
+    <div style="background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%); color: white; padding: 2rem; border-radius: 10px; margin-bottom: 2rem;">
+        <h3>{{ exam.title }}</h3>
+        <h2 style="margin-top: 1rem;">Rp {{ exam.price }}</h2>
+    </div>
+
+    <form method="POST" enctype="multipart/form-data">
+        <div class="form-group">
+            <label>Upload Bukti Pembayaran:</label>
+            <input type="file" name="payment_proof" class="form-control" accept="image/*" required>
+        </div>
+        <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem;">Upload Bukti</button>
+    </form>
+
+    <div style="margin-top: 2rem; padding: 1rem; background: #f8f9fa; border-radius: 8px;">
+        <h4>Informasi Pembayaran:</h4>
+        <p>Transfer ke rekening berikut:</p>
+        <p><strong>Bank BCA</strong><br>No. Rek: 1234567890<br>A.n. INSPIRANET</p>
+    </div>
+</div>
+{% endblock %}

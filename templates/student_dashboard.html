@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% block title %}Student Dashboard - INSPIRANET{% endblock %}
+
+{% block content %}
+<h1 style="color: var(--primary-color); margin-bottom: 2rem;">👨‍🎓 Dashboard Siswa</h1>
+
+<div class="stats-grid">
+    <div class="stat-card">
+        <h3>{{ total_exams_taken }}</h3>
+        <p>TO yang Dikerjakan</p>
+    </div>
+    <div class="stat-card">
+        <h3>{{ avg_score }}</h3>
+        <p>Rata-rata Nilai</p>
+    </div>
+    <div class="stat-card">
+        <h3>{{ best_rank if best_rank > 0 else '-' }}</h3>
+        <p>Peringkat Terbaik</p>
+    </div>
+</div>
+
+<div class="card">
+    <h2>⚡ Quick Access</h2>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-top: 1rem;">
+        <a href="{{ url_for('student_exams') }}" class="btn btn-primary" style="text-decoration: none; text-align: center;">Lihat Daftar TO</a>
+    </div>
+</div>
+
+<div class="card">
+    <h2>📊 Progres Belajar</h2>
+    <p style="text-align: center; margin-top: 1rem;">Terus berlatih untuk mencapai target PTN impianmu! 💪</p>
+</div>
+{% endblock %}

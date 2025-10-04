@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+
+{% block title %}Ujian - {{ exam.title }}{% endblock %}
+
+{% block content %}
+<div id="timer" class="timer"></div>
+
+<h1 style="color: var(--primary-color); margin-bottom: 2rem;">{{ exam.title }}</h1>
+
+<div class="exam-questions">
+    <form id="examForm">
+        {% for question in questions %}
+        <div class="question-card">
+            <h4>Soal #{{ question.question_order }}</h4>
+            <p><strong>{{ question.category }}</strong></p>
+            <p>{{ question.question_text }}</p>
+            
+            {% if question.question_type == 'multiple_choice' %}
+            <div class="options">
+                <label class="option-item">
+                    <input type="radio" name="q_{{ question.id }}" value="A">
+                    <span>A. {{ question.option_a }}</span>
+                </label>
+                <label class="option-item">
+                    <input type="radio" name="q_{{ question.id }}" value="B">
+                    <span>B. {{ question.option_b }}</span>
+                </label>
+                <label class="option-item">
+                    <input type="radio" name="q_{{ question.id }}" value="C">
+                    <span>C. {{ question.option_c }}</span>
+                </label>
+                <label class="option-item">
+                    <input type="radio" name="q_{{ question.id }}" value="D">
+                    <span>D. {{ question.option_d }}</span>
+                </label>
+                {% if question.option_e %}
+                <label class="option-item">
+                    <input type="radio" name="q_{{ question.id }}" value="E">
+                    <span>E. {{ question.option_e }}</span>
+                </label>
+                {% endif %}
+            </div>
+            {% else %}
+            <div class="form-group" style="margin-top: 1rem;">
+                <label>Jawaban Esai:</label>
+                <textarea name="q_{{ question.id }}" class="form-control" rows="4" placeholder="Tulis jawaban Anda di sini..."></textarea>
+            </div>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </form>
+    
+    <button onclick="submitExam()" class="btn btn-primary" style="width: 100%; padding: 1rem; font-size: 1.2rem; margin-top: 2rem;">Submit Jawaban</button>
+</div>
+
+<script>
+const timer = new ExamTimer({{ exam.duration_minutes }}, function() {
+    alert('Waktu habis! Jawaban Anda akan otomatis disubmit.');
+    submitExam();
+});
+timer.start('timer');
+
+const antiCheat = new AntiCheat(function(count, message) {
+    console.log('Warning #' + count + ': ' + message);
+});
+antiCheat.enable();
+
+function submitExam() {
+    if (!confirm('Apakah Anda yakin ingin submit jawaban?')) {
+        return;
+    }
+    
+    const form = document.getElementById('examForm');
+    const formData = new FormData(form);
+    const answers = {};
+    
+    for (let [key, value] of formData.entries()) {
+        const questionId = key.replace('q_', '');
+        answers[questionId] = value;
+    }
+    
+    const submitData = new FormData();
+    submitData.append('answers', JSON.stringify(answers));
+    
+    fetch('{{ url_for("student_submit_exam", attempt_id=attempt.id) }}', {
+        method: 'POST',
+        body: submitData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            timer.stop();
+            antiCheat.disable();
+            window.location.href = data.redirect;
+        }
+    });
+}
+</script>
+{% endblock %}

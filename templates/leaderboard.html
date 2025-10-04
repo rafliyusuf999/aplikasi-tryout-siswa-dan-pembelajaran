@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block title %}Leaderboard - {{ exam.title }}{% endblock %}
+
+{% block content %}
+<h1 style="color: var(--primary-color); margin-bottom: 2rem;">🏆 Leaderboard: {{ exam.title }}</h1>
+
+{% if branch_leaderboard %}
+<div class="card">
+    <h2>Leaderboard Cabang: {{ current_user.inspira_branch }}</h2>
+    {% for entry in branch_leaderboard %}
+    <div class="leaderboard-item">
+        <div class="rank-badge {% if entry.rank_in_branch == 1 %}rank-1{% elif entry.rank_in_branch == 2 %}rank-2{% elif entry.rank_in_branch == 3 %}rank-3{% else %}rank-other{% endif %}">
+            {{ entry.rank_in_branch }}
+        </div>
+        <div style="flex: 1;">
+            <h3 style="margin: 0;">{{ entry.user.full_name }}</h3>
+            <p style="margin: 0; color: #666;">{{ entry.user.class_level }} - {{ entry.user.school_name }}</p>
+        </div>
+        <div style="text-align: right;">
+            <h3 style="margin: 0; color: var(--primary-color);">{{ entry.total_score }}</h3>
+            <p style="margin: 0; color: #666;">Poin</p>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+
+{% if global_leaderboard %}
+<div class="card">
+    <h2>Leaderboard Global</h2>
+    {% for entry in global_leaderboard %}
+    <div class="leaderboard-item">
+        <div class="rank-badge {% if entry.rank_global == 1 %}rank-1{% elif entry.rank_global == 2 %}rank-2{% elif entry.rank_global == 3 %}rank-3{% else %}rank-other{% endif %}">
+            {{ entry.rank_global }}
+        </div>
+        <div style="flex: 1;">
+            <h3 style="margin: 0;">{{ entry.user.full_name }}</h3>
+            <p style="margin: 0; color: #666;">{{ entry.user.inspira_branch }} - {{ entry.user.class_level }}</p>
+        </div>
+        <div style="text-align: right;">
+            <h3 style="margin: 0; color: var(--primary-color);">{{ entry.total_score }}</h3>
+            <p style="margin: 0; color: #666;">Poin</p>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+{% endblock %}

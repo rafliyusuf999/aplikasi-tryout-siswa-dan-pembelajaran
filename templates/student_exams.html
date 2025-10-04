@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block title %}Daftar TO - Siswa{% endblock %}
+
+{% block content %}
+<h1 style="color: var(--primary-color); margin-bottom: 2rem;">📚 Daftar Tes Online</h1>
+
+<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 1.5rem;">
+    {% for exam in exams %}
+    <div class="card">
+        <h2>{{ exam.title }}</h2>
+        <p>{{ exam.description }}</p>
+        <div style="margin: 1rem 0;">
+            <p><strong>⏱️ Durasi:</strong> {{ exam.duration_minutes }} menit</p>
+            <p><strong>📋 Soal:</strong> {{ exam.total_questions }}</p>
+            <p><strong>💎 Jenis:</strong> {{ 'Premium' if exam.is_premium else 'Gratis' }}</p>
+            {% if exam.is_premium %}
+            <p><strong>💰 Harga:</strong> Rp {{ exam.price }}</p>
+            {% endif %}
+        </div>
+        {% if exam_access[exam.id] %}
+            <a href="{{ url_for('student_start_exam', id=exam.id) }}" class="btn btn-primary" style="width: 100%; text-decoration: none; text-align: center;">Mulai Ujian</a>
+        {% elif exam.is_premium %}
+            <a href="{{ url_for('student_pay_exam', id=exam.id) }}" class="btn btn-secondary" style="width: 100%; text-decoration: none; text-align: center;">Bayar TO</a>
+        {% else %}
+            <button class="btn btn-secondary" style="width: 100%;" disabled>Tidak Tersedia</button>
+        {% endif %}
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

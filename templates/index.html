@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="hero">
+    <h1>🎓 INSPIRANET OFFICIAL TO</h1>
+    <p>Platform Tes Online Terpercaya untuk Persiapan UTBK</p>
+    <div style="display: flex; gap: 1rem; justify-content: center; margin-top: 2rem;">
+        <a href="{{ url_for('register') }}" class="btn btn-primary">Daftar Sekarang</a>
+        <a href="{{ url_for('login') }}" class="btn btn-secondary">Login</a>
+    </div>
+</div>
+
+<div class="stats-grid">
+    <div class="stat-card">
+        <h3>1000+</h3>
+        <p>Siswa Aktif</p>
+    </div>
+    <div class="stat-card">
+        <h3>50+</h3>
+        <p>Tes Online</p>
+    </div>
+    <div class="stat-card">
+        <h3>4</h3>
+        <p>Cabang</p>
+    </div>
+    <div class="stat-card">
+        <h3>100%</h3>
+        <p>Anti-Cheating</p>
+    </div>
+</div>
+
+<div class="card">
+    <h2>✨ Fitur Unggulan</h2>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; margin-top: 1.5rem;">
+        <div style="padding: 1.5rem; background: linear-gradient(135deg, #fff5f7 0%, #ffe5ec 100%); border-radius: 10px;">
+            <h3 style="color: var(--primary-color); margin-bottom: 0.5rem;">🔒 Anti-Cheating Ketat</h3>
+            <p>Proteksi copy-paste, screenshot, dan pindah tab selama ujian</p>
+        </div>
+        <div style="padding: 1.5rem; background: linear-gradient(135deg, #fff5f7 0%, #ffe5ec 100%); border-radius: 10px;">
+            <h3 style="color: var(--primary-color); margin-bottom: 0.5rem;">🏆 Fair Competition</h3>
+            <p>Leaderboard terpisah per cabang untuk kompetisi yang adil</p>
+        </div>
+        <div style="padding: 1.5rem; background: linear-gradient(135deg, #fff5f7 0%, #ffe5ec 100%); border-radius: 10px;">
+            <h3 style="color: var(--primary-color); margin-bottom: 0.5rem;">📊 Analisis Mendalam</h3>
+            <p>Hasil TO dan analisis performa yang detail</p>
+        </div>
+        <div style="padding: 1.5rem; background: linear-gradient(135deg, #fff5f7 0%, #ffe5ec 100%); border-radius: 10px;">
+            <h3 style="color: var(--primary-color); margin-bottom: 0.5rem;">⏱️ Real-time Timer</h3>
+            <p>Timer animasi yang akurat dan menarik</p>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <h2>🏢 Cabang Inspiranet</h2>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-top: 1rem;">
+        <div style="text-align: center; padding: 1.5rem; background: white; border: 2px solid var(--primary-color); border-radius: 10px;">
+            <h3 style="color: var(--primary-color);">Cabang 1</h3>
+            <p>Inspiranet_Cakrawala 1</p>
+        </div>
+        <div style="text-align: center; padding: 1.5rem; background: white; border: 2px solid var(--primary-color); border-radius: 10px;">
+            <h3 style="color: var(--primary-color);">Cabang 2</h3>
+            <p>Inspiranet_Cakrawala 2</p>
+        </div>
+        <div style="text-align: center; padding: 1.5rem; background: white; border: 2px solid var(--primary-color); border-radius: 10px;">
+            <h3 style="color: var(--primary-color);">Cabang 3</h3>
+            <p>Inspiranet_Cakrawala 3</p>
+        </div>
+        <div style="text-align: center; padding: 1.5rem; background: white; border: 2px solid var(--primary-color); border-radius: 10px;">
+            <h3 style="color: var(--primary-color);">Cabang 4</h3>
+            <p>Inspiranet_Cakrawala 4</p>
+        </div>
+    </div>
+</div>
+{% endblock %}
