@@ -102,6 +102,15 @@ def register():
             flash('Email sudah terdaftar!', 'danger')
             return redirect(url_for('register'))
         
+        profile_photo = None
+        photo = request.files.get('profile_photo')
+        if photo and photo.filename:
+            os.makedirs(os.path.join(app.config['UPLOAD_FOLDER'], 'profiles'), exist_ok=True)
+            filename = secure_filename(f"profile_{email}_{datetime.now().timestamp()}.jpg")
+            filepath = os.path.join(app.config['UPLOAD_FOLDER'], 'profiles', filename)
+            photo.save(filepath)
+            profile_photo = filename
+        
         user = User(
             email=email,
             full_name=full_name,
@@ -109,7 +118,8 @@ def register():
             inspira_branch=inspira_branch,
             class_level=class_level,
             school_name=school_name,
-            phone_number=phone_number
+            phone_number=phone_number,
+            profile_photo=profile_photo
         )
         user.set_password(password)
         db.session.add(user)

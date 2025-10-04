@@ -17,6 +17,7 @@ class User(UserMixin, db.Model):
     class_level = db.Column(db.String(20), nullable=True)
     school_name = db.Column(db.String(150), nullable=True)
     phone_number = db.Column(db.String(20), nullable=True)
+    profile_photo = db.Column(db.String(255), nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     
     exam_attempts = db.relationship('ExamAttempt', backref='user', lazy=True, cascade='all, delete-orphan')
@@ -76,6 +77,7 @@ class ExamAttempt(db.Model):
     total_score = db.Column(db.Float, default=0)
     is_completed = db.Column(db.Boolean, default=False)
     answers = db.Column(db.Text, nullable=True)
+    essay_answers = db.Column(db.Text, nullable=True)
     cheating_warnings = db.Column(db.Integer, default=0)
 
 class Payment(db.Model):
