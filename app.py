@@ -41,6 +41,42 @@ def load_user(user_id):
 def init_database():
     with app.app_context():
         db.create_all()
+        
+        import sqlite3
+        from sqlalchemy.engine.url import make_url
+        
+        db_uri = app.config['SQLALCHEMY_DATABASE_URI']
+        if db_uri.startswith('sqlite:///'):
+            db_url = make_url(db_uri)
+            db_path = db_url.database
+            
+            if not os.path.isabs(db_path):
+                db_path = os.path.join(app.instance_path, db_path)
+            
+            if os.path.exists(db_path):
+                conn = sqlite3.connect(db_path)
+                cursor = conn.cursor()
+                try:
+                    cursor.execute("PRAGMA table_info(users)")
+                    columns = [col[1] for col in cursor.fetchall()]
+                    
+                    if 'profile_photo' not in columns:
+                        cursor.execute("ALTER TABLE users ADD COLUMN profile_photo VARCHAR(255)")
+                        conn.commit()
+                        print("✓ Added profile_photo column")
+                    
+                    cursor.execute("PRAGMA table_info(exam_attempts)")
+                    columns = [col[1] for col in cursor.fetchall()]
+                    
+                    if 'essay_answers' not in columns:
+                        cursor.execute("ALTER TABLE exam_attempts ADD COLUMN essay_answers TEXT")
+                        conn.commit()
+                        print("✓ Added essay_answers column")
+                except Exception as e:
+                    print(f"Migration warning: {e}")
+                finally:
+                    conn.close()
+        
         admin = User.query.filter_by(email='admin@gmail.com').first()
         if not admin:
             admin_password = os.environ.get('ADMIN_PASSWORD', 'inspiranetgacor25')
@@ -293,14 +329,14 @@ def admin_add_exam():
     description = request.form.get('description')
     duration_minutes = request.form.get('duration_minutes')
     is_premium = request.form.get('is_premium') == 'true'
-    price = request.form.get('price', 0)
+    price = request.form.get('price', '0')
     
     exam = Exam(
         title=title,
         description=description,
-        duration_minutes=int(duration_minutes),
+        duration_minutes=int(duration_minutes) if duration_minutes else 120,
         is_premium=is_premium,
-        price=int(price),
+        price=int(price) if price else 0,
         created_by=current_user.id
     )
     db.session.add(exam)
@@ -396,14 +432,14 @@ def teacher_add_exam():
     description = request.form.get('description')
     duration_minutes = request.form.get('duration_minutes')
     is_premium = request.form.get('is_premium') == 'true'
-    price = request.form.get('price', 0)
+    price = request.form.get('price', '0')
     
     exam = Exam(
         title=title,
         description=description,
-        duration_minutes=int(duration_minutes),
+        duration_minutes=int(duration_minutes) if duration_minutes else 120,
         is_premium=is_premium,
-        price=int(price),
+        price=int(price) if price else 0,
         created_by=current_user.id
     )
     db.session.add(exam)
