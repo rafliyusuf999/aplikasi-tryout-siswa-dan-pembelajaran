@@ -76,11 +76,15 @@ class LogoAnimation {
 }
 
 class AntiCheat {
-    constructor(onWarning) {
+    constructor(onWarning, logoutUrl = '/logout', restartUrl = null) {
         this.warningCount = 0;
-        this.maxWarnings = 3;
+        this.maxWarnings = 1;
         this.onWarning = onWarning;
         this.enabled = false;
+        this.logoutUrl = logoutUrl;
+        this.restartUrl = restartUrl;
+        this.tabSwitchCount = 0;
+        this.maxTabSwitches = 1;
     }
 
     enable() {
@@ -94,41 +98,48 @@ class AntiCheat {
     }
 
     setupListeners() {
-        document.addEventListener('copy', this.handleCopy.bind(this));
-        document.addEventListener('cut', this.handleCut.bind(this));
-        document.addEventListener('contextmenu', this.handleContextMenu.bind(this));
-        document.addEventListener('keydown', this.handleKeyDown.bind(this));
-        document.addEventListener('visibilitychange', this.handleVisibilityChange.bind(this));
-        window.addEventListener('blur', this.handleWindowBlur.bind(this));
+        this.copyHandler = this.handleCopy.bind(this);
+        this.cutHandler = this.handleCut.bind(this);
+        this.contextHandler = this.handleContextMenu.bind(this);
+        this.keyHandler = this.handleKeyDown.bind(this);
+        this.visibilityHandler = this.handleVisibilityChange.bind(this);
+        this.blurHandler = this.handleWindowBlur.bind(this);
+        
+        document.addEventListener('copy', this.copyHandler);
+        document.addEventListener('cut', this.cutHandler);
+        document.addEventListener('contextmenu', this.contextHandler);
+        document.addEventListener('keydown', this.keyHandler);
+        document.addEventListener('visibilitychange', this.visibilityHandler);
+        window.addEventListener('blur', this.blurHandler);
     }
 
     removeListeners() {
-        document.removeEventListener('copy', this.handleCopy.bind(this));
-        document.removeEventListener('cut', this.handleCut.bind(this));
-        document.removeEventListener('contextmenu', this.handleContextMenu.bind(this));
-        document.removeEventListener('keydown', this.handleKeyDown.bind(this));
-        document.removeEventListener('visibilitychange', this.handleVisibilityChange.bind(this));
-        window.removeEventListener('blur', this.handleWindowBlur.bind(this));
+        document.removeEventListener('copy', this.copyHandler);
+        document.removeEventListener('cut', this.cutHandler);
+        document.removeEventListener('contextmenu', this.contextHandler);
+        document.removeEventListener('keydown', this.keyHandler);
+        document.removeEventListener('visibilitychange', this.visibilityHandler);
+        window.removeEventListener('blur', this.blurHandler);
     }
 
     handleCopy(e) {
         if (this.enabled) {
             e.preventDefault();
-            this.addWarning('Copy-paste tidak diperbolehkan!');
+            this.triggerLogout('Terdeteksi mencoba copy! Anda akan dikeluarkan dari ujian.');
         }
     }
 
     handleCut(e) {
         if (this.enabled) {
             e.preventDefault();
-            this.addWarning('Cut tidak diperbolehkan!');
+            this.triggerLogout('Terdeteksi mencoba cut! Anda akan dikeluarkan dari ujian.');
         }
     }
 
     handleContextMenu(e) {
         if (this.enabled) {
             e.preventDefault();
-            this.addWarning('Klik kanan tidak diperbolehkan!');
+            this.showWarningNotification('Klik kanan tidak diperbolehkan!');
         }
     }
 
@@ -136,26 +147,44 @@ class AntiCheat {
         if (this.enabled) {
             if ((e.ctrlKey || e.metaKey) && (e.key === 'c' || e.key === 'v' || e.key === 'x')) {
                 e.preventDefault();
-                this.addWarning('Shortcut tidak diperbolehkan!');
+                this.triggerLogout('Terdeteksi menggunakan shortcut copy/paste! Anda akan dikeluarkan dari ujian.');
             }
 
             if (e.key === 'PrintScreen' || e.key === 'F12') {
                 e.preventDefault();
-                this.addWarning('Screenshot dan DevTools tidak diperbolehkan!');
+                this.showWarningNotification('Screenshot dan DevTools tidak diperbolehkan!');
             }
         }
     }
 
     handleVisibilityChange() {
         if (this.enabled && document.hidden) {
-            this.addWarning('Jangan pindah tab selama ujian!');
+            this.tabSwitchCount++;
+            
+            if (this.tabSwitchCount >= this.maxTabSwitches && this.restartUrl) {
+                this.triggerRestart('Terdeteksi pindah tab! Ujian akan dimulai ulang.');
+            } else {
+                this.showWarningNotification('Jangan pindah tab selama ujian!');
+            }
         }
     }
 
     handleWindowBlur() {
         if (this.enabled) {
-            this.addWarning('Fokus pada ujian! Jangan pindah window!');
+            this.showWarningNotification('Fokus pada ujian! Jangan pindah window!');
         }
+    }
+
+    triggerLogout(message) {
+        this.disable();
+        alert(message);
+        window.location.href = this.logoutUrl;
+    }
+
+    triggerRestart(message) {
+        this.disable();
+        alert(message);
+        window.location.href = this.restartUrl;
     }
 
     addWarning(message) {
@@ -166,10 +195,6 @@ class AntiCheat {
         }
 
         this.showWarningNotification(message);
-
-        if (this.warningCount >= this.maxWarnings) {
-            this.showMaxWarningsReached();
-        }
     }
 
     showWarningNotification(message) {
@@ -181,8 +206,7 @@ class AntiCheat {
         notification.style.zIndex = '9999';
         notification.style.animation = 'slideDown 0.3s ease';
         notification.innerHTML = `
-            <strong>⚠️ Peringatan #${this.warningCount}:</strong> ${message}
-            <br><small>Maksimal ${this.maxWarnings} peringatan!</small>
+            <strong>⚠️ Peringatan:</strong> ${message}
         `;
         document.body.appendChild(notification);
 
@@ -191,9 +215,61 @@ class AntiCheat {
             setTimeout(() => notification.remove(), 300);
         }, 3000);
     }
+}
 
-    showMaxWarningsReached() {
-        alert('ANDA TELAH MENCAPAI BATAS PERINGATAN!\n\nUjian Anda akan ditandai sebagai mencurigakan.');
+function showSecurityWarningModal() {
+    const modal = document.createElement('div');
+    modal.id = 'securityWarningModal';
+    modal.className = 'modal';
+    modal.style.display = 'block';
+    modal.innerHTML = `
+        <div class="modal-content" style="max-width: 600px;">
+            <div class="modal-header" style="background: linear-gradient(135deg, #dc3545 0%, #c82333 100%); color: white;">
+                <h2>⚠️ PERINGATAN KEAMANAN UJIAN</h2>
+            </div>
+            <div class="modal-body" style="padding: 30px;">
+                <div style="text-align: left; line-height: 1.8;">
+                    <h3 style="color: #dc3545; margin-bottom: 20px;">Peraturan Selama Ujian:</h3>
+                    <ul style="list-style: none; padding: 0;">
+                        <li style="margin-bottom: 15px;">
+                            <strong>🚫 DILARANG COPY-PASTE</strong><br>
+                            <small>Jika terdeteksi mencoba copy, Anda akan OTOMATIS LOGOUT</small>
+                        </li>
+                        <li style="margin-bottom: 15px;">
+                            <strong>🚫 DILARANG PINDAH TAB/WINDOW</strong><br>
+                            <small>Jika pindah tab, ujian akan OTOMATIS RESTART dari awal</small>
+                        </li>
+                        <li style="margin-bottom: 15px;">
+                            <strong>🚫 DILARANG SCREENSHOT</strong><br>
+                            <small>Screenshot dan Developer Tools tidak diperbolehkan</small>
+                        </li>
+                        <li style="margin-bottom: 15px;">
+                            <strong>✅ FOKUS PADA UJIAN</strong><br>
+                            <small>Tetap di halaman ujian sampai selesai</small>
+                        </li>
+                    </ul>
+                    <div style="background: #fff3cd; border: 1px solid #ffc107; padding: 15px; border-radius: 5px; margin-top: 20px;">
+                        <strong>⚡ Penting:</strong> Sistem akan memantau aktivitas Anda selama ujian. Pelanggaran akan mengakibatkan tindakan otomatis.
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer" style="background: #f8f9fa; padding: 20px;">
+                <button onclick="acceptSecurityWarning()" class="btn btn-danger" style="padding: 12px 30px; font-size: 16px; width: 100%;">
+                    Saya Mengerti dan Setuju
+                </button>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(modal);
+}
+
+function acceptSecurityWarning() {
+    const modal = document.getElementById('securityWarningModal');
+    if (modal) {
+        modal.remove();
+    }
+    if (typeof startExamAfterWarning === 'function') {
+        startExamAfterWarning();
     }
 }
 
