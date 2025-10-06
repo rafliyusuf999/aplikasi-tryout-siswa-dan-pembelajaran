@@ -16,7 +16,13 @@
         </div>
         <div class="form-group">
             <label for="password">Password:</label>
-            <input type="password" id="password" name="password" class="form-control" required minlength="6">
+            <div style="position: relative;">
+                <input type="password" id="password" name="password" class="form-control" required minlength="6">
+                <button type="button" onclick="togglePassword('password')" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; font-size: 1.2rem;">
+                    👁️
+                </button>
+            </div>
+            <small class="text-muted">Password minimal 6 karakter</small>
         </div>
         <div class="form-group">
             <label for="inspira_branch">Cabang:</label>
@@ -55,4 +61,15 @@
         <p>Sudah punya akun? <a href="{{ url_for('login') }}" style="color: var(--primary-color); font-weight: 600;">Login di sini</a></p>
     </div>
 </div>
+
+<script>
+function togglePassword(fieldId) {
+    const field = document.getElementById(fieldId);
+    if (field.type === 'password') {
+        field.type = 'text';
+    } else {
+        field.type = 'password';
+    }
+}
+</script>
 {% endblock %}

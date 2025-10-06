@@ -72,6 +72,11 @@ def init_database():
                         cursor.execute("ALTER TABLE exam_attempts ADD COLUMN essay_answers TEXT")
                         conn.commit()
                         print("✓ Added essay_answers column")
+                    
+                    if 'essay_scores' not in columns:
+                        cursor.execute("ALTER TABLE exam_attempts ADD COLUMN essay_scores TEXT")
+                        conn.commit()
+                        print("✓ Added essay_scores column")
                 except Exception as e:
                     print(f"Migration warning: {e}")
                 finally:
@@ -109,7 +114,7 @@ def index():
     total_students = User.query.filter_by(role='student').count()
     total_exams = Exam.query.filter_by(is_active=True).count()
     total_branches = db.session.query(User.inspira_branch).filter(User.inspira_branch.isnot(None)).distinct().count()
-    active_students = db.session.query(ExamAttempt.user_id).distinct().count()
+    active_students = User.query.filter_by(role='student').count()
     
     return render_template('index.html',
                          total_students=total_students,
@@ -237,11 +242,14 @@ def admin_students():
         ).scalar()
         student_cheating_data[student.id] = cheating_count or 0
     
+    exams = Exam.query.filter_by(is_active=True).all()
+    
     return render_template('admin_students.html', 
                          students=students, 
                          branches=BRANCHES, 
                          search_query=search_query,
-                         student_cheating_data=student_cheating_data)
+                         student_cheating_data=student_cheating_data,
+                         exams=exams)
 
 @app.route('/admin/students/add', methods=['POST'])
 @login_required
@@ -293,6 +301,39 @@ def admin_delete_student(id):
     db.session.commit()
     
     flash('Siswa berhasil dihapus!', 'success')
+    return redirect(url_for('admin_students'))
+
+@app.route('/admin/students/delete_all', methods=['POST'])
+@login_required
+def admin_delete_all_students():
+    if current_user.role != 'admin':
+        return jsonify({'success': False, 'message': 'Akses ditolak'}), 403
+    
+    students = User.query.filter_by(role='student').all()
+    count = len(students)
+    
+    for student in students:
+        db.session.delete(student)
+    
+    db.session.commit()
+    
+    flash(f'{count} siswa berhasil dihapus!', 'success')
+    return redirect(url_for('admin_students'))
+
+@app.route('/admin/students/<int:student_id>/clear_cheating/<int:exam_id>', methods=['POST'])
+@login_required
+def admin_clear_cheating(student_id, exam_id):
+    if current_user.role != 'admin':
+        return jsonify({'success': False, 'message': 'Akses ditolak'}), 403
+    
+    attempts = ExamAttempt.query.filter_by(user_id=student_id, exam_id=exam_id).all()
+    
+    for attempt in attempts:
+        attempt.cheating_warnings = 0
+    
+    db.session.commit()
+    
+    flash('Status curang berhasil dihapus! Siswa dapat mengerjakan TO lagi.', 'success')
     return redirect(url_for('admin_students'))
 
 @app.route('/admin/students/reset-password', methods=['POST'])
@@ -880,6 +921,16 @@ def student_start_exam(id):
         flash('⛔ AKSES DITOLAK! Anda terdeteksi melakukan kecurangan pada ujian ini dan tidak diperbolehkan mengerjakan TO ini lagi.', 'danger')
         return redirect(url_for('student_exams'))
     
+    completed_attempt = ExamAttempt.query.filter_by(
+        user_id=current_user.id,
+        exam_id=exam.id,
+        is_completed=True
+    ).first()
+    
+    if completed_attempt:
+        flash('Anda sudah mengerjakan TO ini. Berikut adalah hasil Anda.', 'info')
+        return redirect(url_for('student_result', id=completed_attempt.id))
+    
     if exam.is_premium:
         payment = Payment.query.filter_by(
             user_id=current_user.id,
@@ -1085,6 +1136,38 @@ def admin_view_essay_answers(exam_id):
                          exam=exam, 
                          attempts=attempts, 
                          essay_questions=essay_questions)
+
+@app.route('/admin/essay/grade/<int:attempt_id>', methods=['POST'])
+@login_required
+def admin_grade_essay(attempt_id):
+    if current_user.role not in ['admin', 'teacher']:
+        return jsonify({'success': False, 'message': 'Akses ditolak'}), 403
+    
+    attempt = ExamAttempt.query.get_or_404(attempt_id)
+    question_id = request.form.get('question_id')
+    score = request.form.get('score', 0)
+    
+    essay_scores = json.loads(attempt.essay_scores) if attempt.essay_scores else {}
+    essay_scores[question_id] = float(score)
+    attempt.essay_scores = json.dumps(essay_scores)
+    
+    total_essay_score = sum(essay_scores.values())
+    
+    answers_dict = json.loads(attempt.answers) if attempt.answers else {}
+    mc_score = 0
+    for qid, answer in answers_dict.items():
+        question = Question.query.get(int(qid))
+        if question and question.question_type == 'multiple_choice':
+            if answer == question.correct_answer:
+                mc_score += question.points
+    
+    attempt.total_score = mc_score + total_essay_score
+    
+    db.session.commit()
+    update_leaderboard(attempt)
+    
+    flash('Nilai essay berhasil disimpan!', 'success')
+    return redirect(url_for('admin_view_essay_answers', exam_id=attempt.exam_id))
 
 @app.route('/uploads/<path:filename>')
 def uploaded_file(filename):

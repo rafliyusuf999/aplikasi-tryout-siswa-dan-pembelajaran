@@ -78,6 +78,7 @@ class ExamAttempt(db.Model):
     is_completed = db.Column(db.Boolean, default=False)
     answers = db.Column(db.Text, nullable=True)
     essay_answers = db.Column(db.Text, nullable=True)
+    essay_scores = db.Column(db.Text, nullable=True)
     cheating_warnings = db.Column(db.Integer, default=0)
 
 class Payment(db.Model):

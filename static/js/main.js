@@ -153,26 +153,20 @@ class AntiCheat {
 
             if (e.key === 'PrintScreen' || e.key === 'F12') {
                 e.preventDefault();
-                this.showWarningNotification('Screenshot dan DevTools tidak diperbolehkan!');
+                this.triggerLogout('Screenshot/DevTools terdeteksi! Anda akan dikeluarkan dari ujian.');
             }
         }
     }
 
     handleVisibilityChange() {
         if (this.enabled && document.hidden) {
-            this.tabSwitchCount++;
-            
-            if (this.tabSwitchCount >= this.maxTabSwitches && this.restartUrl) {
-                this.triggerRestart('Terdeteksi pindah tab! Ujian akan dimulai ulang.');
-            } else {
-                this.showWarningNotification('Jangan pindah tab selama ujian!');
-            }
+            this.triggerLogout('Terdeteksi pindah tab! Anda akan dikeluarkan dari ujian.');
         }
     }
 
     handleWindowBlur() {
         if (this.enabled) {
-            this.showWarningNotification('Fokus pada ujian! Jangan pindah window!');
+            this.triggerLogout('Terdeteksi pindah window! Anda akan dikeluarkan dari ujian.');
         }
     }
 
@@ -421,6 +415,7 @@ class ExamTimer {
 
             if (this.remaining <= 0) {
                 this.stop();
+                alert('⏰ WAKTU HABIS!\n\nUjian akan otomatis diselesaikan dan Anda akan keluar.');
                 if (this.onTimeUp) {
                     this.onTimeUp();
                 }

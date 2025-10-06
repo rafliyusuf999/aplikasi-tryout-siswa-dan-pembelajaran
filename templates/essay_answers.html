@@ -28,8 +28,8 @@
         {% set essay_dict = attempt.essay_answers|from_json %}
         
         {% for question in essay_questions %}
-        <div class="question-card" style="margin-top: 1rem;">
-            <h5>Soal #{{ question.question_order }}: {{ question.category }}</h5>
+        <div class="question-card" style="margin-top: 1rem; border: 2px solid #ddd; padding: 1.5rem; border-radius: 10px;">
+            <h5>Soal #{{ question.question_order }}: {{ question.category }} ({{ question.points }} poin)</h5>
             <p><strong>{{ question.question_text }}</strong></p>
             
             {% if essay_dict.get(question.id|string) %}
@@ -37,6 +37,27 @@
                 <p><strong>Jawaban Siswa:</strong></p>
                 <img src="{{ url_for('uploaded_file', filename='answers/' + essay_dict.get(question.id|string)) }}" 
                      style="max-width: 100%; border: 2px solid #ddd; border-radius: 8px; margin-top: 10px;">
+                
+                <form method="POST" action="{{ url_for('admin_grade_essay', attempt_id=attempt.id) }}" style="margin-top: 1.5rem;">
+                    <input type="hidden" name="question_id" value="{{ question.id }}">
+                    <div style="display: flex; gap: 1rem; align-items: center;">
+                        <label><strong>Nilai Essay:</strong></label>
+                        <input type="number" name="score" min="0" max="{{ question.points }}" step="0.5" 
+                               value="{{ attempt.essay_scores|from_json|attr(question.id|string) if attempt.essay_scores else 0 }}"
+                               class="form-control" style="width: 150px;" required>
+                        <span>/ {{ question.points }} poin</span>
+                        <button type="submit" class="btn btn-primary">💾 Simpan Nilai</button>
+                    </div>
+                </form>
+                
+                {% if attempt.essay_scores %}
+                {% set scores = attempt.essay_scores|from_json %}
+                {% if scores.get(question.id|string) %}
+                <p style="margin-top: 1rem; color: green; font-weight: bold;">
+                    ✅ Nilai: {{ scores.get(question.id|string) }} / {{ question.points }}
+                </p>
+                {% endif %}
+                {% endif %}
             </div>
             {% else %}
             <p style="color: #dc3545; margin-top: 1rem;">❌ Tidak ada jawaban</p>

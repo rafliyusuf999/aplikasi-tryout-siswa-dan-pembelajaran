@@ -17,6 +17,9 @@
                 {% endif %}
             </form>
             <button onclick="showModal('addStudentModal')" class="btn btn-primary">+ Tambah Siswa</button>
+            <form method="POST" action="{{ url_for('admin_delete_all_students') }}" style="display: inline;" onsubmit="return confirm('PERINGATAN! Anda akan menghapus SEMUA data siswa. Apakah Anda yakin?');">
+                <button type="submit" class="btn btn-danger">🗑️ Hapus Semua Siswa</button>
+            </form>
         </div>
     </div>
 
@@ -63,7 +66,8 @@
                             data-class="{{ student.class_level }}"
                             data-school="{{ student.school_name }}"
                             data-phone="{{ student.phone_number or '-' }}"
-                            data-created="{{ student.created_at.strftime('%d/%m/%Y %H:%M') }}">
+                            data-created="{{ student.created_at.strftime('%d/%m/%Y %H:%M') }}"
+                            data-has-cheating="{{ '1' if student_cheating_data.get(student.id, 0) > 0 else '0' }}">
                             Detail
                         </button>
                         <button 
@@ -78,6 +82,15 @@
                             data-phone="{{ student.phone_number or '' }}">
                             Edit
                         </button>
+                        {% if student_cheating_data.get(student.id, 0) > 0 %}
+                        <button 
+                            class="btn btn-success student-clear-cheating-btn" 
+                            style="padding: 0.5rem 1rem; margin-right: 0.5rem;"
+                            data-id="{{ student.id }}"
+                            data-name="{{ student.full_name }}">
+                            ✅ Beri Kesempatan
+                        </button>
+                        {% endif %}
                         <form method="POST" action="{{ url_for('admin_delete_student', id=student.id) }}" style="display: inline;" data-confirm-delete>
                             <button type="submit" class="btn btn-danger" style="padding: 0.5rem 1rem;">Hapus</button>
                         </form>
@@ -315,5 +328,46 @@ function showResetPasswordForm() {
     document.getElementById('reset_student_name').value = currentStudentName;
     showModal('resetPasswordModal');
 }
+
+document.querySelectorAll('.student-clear-cheating-btn').forEach(function(button) {
+    button.addEventListener('click', function() {
+        const studentId = this.getAttribute('data-id');
+        const studentName = this.getAttribute('data-name');
+        
+        showModal('clearCheatingModal');
+        document.getElementById('clear_student_id').value = studentId;
+        document.getElementById('clear_student_name').textContent = studentName;
+        
+        document.querySelectorAll('.clear-cheating-form').forEach(form => {
+            if (!form.hasAttribute('data-original-action')) {
+                form.setAttribute('data-original-action', form.action);
+            }
+            const originalAction = form.getAttribute('data-original-action');
+            form.action = originalAction.replace('/0/', '/' + studentId + '/');
+        });
+    });
+});
 </script>
+
+<div id="clearCheatingModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Beri Kesempatan Siswa</h3>
+            <span class="close" onclick="closeModal('clearCheatingModal')">&times;</span>
+        </div>
+        <div class="modal-body">
+            <p>Siswa: <strong id="clear_student_name"></strong></p>
+            <p>Pilih TO yang ingin dibuka kembali:</p>
+            <input type="hidden" id="clear_student_id">
+            <div id="exam_list">
+                {% for exam in exams if exam is defined %}
+                <form method="POST" action="{{ url_for('admin_clear_cheating', student_id=0, exam_id=exam.id) }}" style="margin-bottom: 0.5rem;" class="clear-cheating-form" data-original-action="{{ url_for('admin_clear_cheating', student_id=0, exam_id=exam.id) }}">
+                    <button type="submit" class="btn btn-success" style="width: 100%;">{{ exam.title }}</button>
+                </form>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
 {% endblock %}

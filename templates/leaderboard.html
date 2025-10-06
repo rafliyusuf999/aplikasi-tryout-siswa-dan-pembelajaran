@@ -138,7 +138,9 @@
         {% if branch_leaderboard %}
             {% for entry in branch_leaderboard %}
             <div class="leaderboard-item {% if entry.user_id == current_user.id %}current-user{% endif %}">
-                <div class="rank-badge {% if entry.rank_in_branch == 1 %}rank-1{% elif entry.rank_in_branch == 2 %}rank-2{% elif entry.rank_in_branch == 3 %}rank-3{% else %}rank-other{% endif %}">
+                <div class="rank-badge {% if entry.rank_in_branch == 1 %}rank-1{% elif entry.rank_in_branch == 2 %}rank-2{% elif entry.rank_in_branch == 3 %}rank-3{% else %}rank-other{% endif %}"
+                     onclick="{% if entry.rank_in_branch <= 3 %}playVictorySound({{ entry.rank_in_branch }}){% endif %}"
+                     style="{% if entry.rank_in_branch <= 3 %}cursor: pointer;{% endif %}">
                     {% if entry.rank_in_branch == 1 %}
                         <span style="font-size: 1.5rem;">🏆</span>
                     {% elif entry.rank_in_branch == 2 %}
@@ -180,7 +182,9 @@
         {% if global_leaderboard %}
             {% for entry in global_leaderboard %}
             <div class="leaderboard-item {% if entry.user_id == current_user.id %}current-user{% endif %}">
-                <div class="rank-badge {% if entry.rank_global == 1 %}rank-1{% elif entry.rank_global == 2 %}rank-2{% elif entry.rank_global == 3 %}rank-3{% else %}rank-other{% endif %}">
+                <div class="rank-badge {% if entry.rank_global == 1 %}rank-1{% elif entry.rank_global == 2 %}rank-2{% elif entry.rank_global == 3 %}rank-3{% else %}rank-other{% endif %}"
+                     onclick="{% if entry.rank_global <= 3 %}playVictorySound({{ entry.rank_global }}){% endif %}"
+                     style="{% if entry.rank_global <= 3 %}cursor: pointer;{% endif %}">
                     {% if entry.rank_global == 1 %}
                         <span style="font-size: 1.5rem;">🏆</span>
                     {% elif entry.rank_global == 2 %}
@@ -216,6 +220,8 @@
     </div>
 </div>
 
+<audio id="victoryAudio" src="{{ url_for('static', filename='audio/victory.mp3') }}" preload="auto"></audio>
+
 <script>
 function switchTab(tab) {
     document.querySelectorAll('.tab-button').forEach(btn => {
@@ -231,6 +237,14 @@ function switchTab(tab) {
     } else {
         document.querySelector('.tab-button:nth-child(2)').classList.add('active');
         document.getElementById('globalTab').classList.add('active');
+    }
+}
+
+function playVictorySound(rank) {
+    const audio = document.getElementById('victoryAudio');
+    if (audio) {
+        audio.currentTime = 0;
+        audio.play().catch(e => console.log('Audio play failed:', e));
     }
 }
 </script>
