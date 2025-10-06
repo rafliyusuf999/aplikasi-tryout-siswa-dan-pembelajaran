@@ -374,6 +374,7 @@
 <script>
 let timerStarted = false;
 let antiCheatEnabled = false;
+let antiCheatInstance = null;
 let currentQuestion = 1;
 const totalQuestions = {{ questions|length }};
 const answeredQuestions = new Set();
@@ -397,7 +398,7 @@ function startExamAfterWarning() {
     
     if (!antiCheatEnabled) {
         console.log('Enabling anti-cheat protection...');
-        const antiCheat = new AntiCheat(
+        antiCheatInstance = new AntiCheat(
             function(count, message) {
                 console.log('⚠️ Warning #' + count + ': ' + message);
             },
@@ -405,7 +406,7 @@ function startExamAfterWarning() {
             '{{ url_for("student_start_exam", id=exam.id) }}',
             {{ attempt.id }}
         );
-        antiCheat.enable();
+        antiCheatInstance.enable();
         antiCheatEnabled = true;
         console.log('✓ Anti-cheat ENABLED! Try to copy/paste or switch tabs to test.');
         console.log('Attempt ID:', {{ attempt.id }});
@@ -468,6 +469,18 @@ function initializeNavButtons() {
 }
 
 document.querySelectorAll('input[type="file"]').forEach(input => {
+    input.addEventListener('focus', function() {
+        if (antiCheatInstance) {
+            antiCheatInstance.setUploadingState(true);
+        }
+    });
+    
+    input.addEventListener('click', function() {
+        if (antiCheatInstance) {
+            antiCheatInstance.setUploadingState(true);
+        }
+    });
+    
     input.addEventListener('change', function(e) {
         const file = e.target.files[0];
         const questionId = this.id.replace('essay_', '');
@@ -480,6 +493,20 @@ document.querySelectorAll('input[type="file"]').forEach(input => {
             };
             reader.readAsDataURL(file);
         }
+        
+        setTimeout(function() {
+            if (antiCheatInstance) {
+                antiCheatInstance.setUploadingState(false);
+            }
+        }, 2000);
+    });
+    
+    input.addEventListener('blur', function() {
+        setTimeout(function() {
+            if (antiCheatInstance) {
+                antiCheatInstance.setUploadingState(false);
+            }
+        }, 2000);
     });
 });
 
@@ -504,6 +531,10 @@ async function submitExam() {
     });
     
     try {
+        if (antiCheatInstance) {
+            antiCheatInstance.setUploadingState(true);
+        }
+        
         const uploadPromises = [];
         for (const [questionId, file] of Object.entries(essayFiles)) {
             const uploadFormData = new FormData();
@@ -528,6 +559,10 @@ async function submitExam() {
         }
         
         await Promise.all(uploadPromises);
+        
+        if (antiCheatInstance) {
+            antiCheatInstance.setUploadingState(false);
+        }
         
         const submitData = new FormData();
         submitData.append('answers', JSON.stringify(answers));

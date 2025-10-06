@@ -86,6 +86,8 @@ class AntiCheat {
         this.tabSwitchCount = 0;
         this.maxTabSwitches = 1;
         this.attemptId = attemptId;
+        this.isUploadingFile = false;
+        this.visibilityTimeout = null;
     }
 
     enable() {
@@ -159,14 +161,45 @@ class AntiCheat {
     }
 
     handleVisibilityChange() {
-        if (this.enabled && document.hidden) {
-            this.triggerLogout('Terdeteksi pindah tab! Anda akan dikeluarkan dari ujian.');
+        if (this.enabled && document.hidden && !this.isUploadingFile) {
+            if (this.visibilityTimeout) {
+                clearTimeout(this.visibilityTimeout);
+            }
+            
+            this.visibilityTimeout = setTimeout(() => {
+                if (document.hidden && this.enabled && !this.isUploadingFile) {
+                    this.triggerLogout('Terdeteksi pindah tab terlalu lama! Anda akan dikeluarkan dari ujian.');
+                }
+            }, 3000);
+        } else if (!document.hidden && this.visibilityTimeout) {
+            clearTimeout(this.visibilityTimeout);
+            this.visibilityTimeout = null;
         }
     }
 
     handleWindowBlur() {
-        if (this.enabled) {
-            this.triggerLogout('Terdeteksi pindah window! Anda akan dikeluarkan dari ujian.');
+        if (this.enabled && !this.isUploadingFile) {
+            const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+            
+            if (!isMobile) {
+                if (this.visibilityTimeout) {
+                    clearTimeout(this.visibilityTimeout);
+                }
+                
+                this.visibilityTimeout = setTimeout(() => {
+                    if (!document.hasFocus() && this.enabled && !this.isUploadingFile) {
+                        this.triggerLogout('Terdeteksi pindah window terlalu lama! Anda akan dikeluarkan dari ujian.');
+                    }
+                }, 3000);
+            }
+        }
+    }
+    
+    setUploadingState(isUploading) {
+        this.isUploadingFile = isUploading;
+        if (this.visibilityTimeout) {
+            clearTimeout(this.visibilityTimeout);
+            this.visibilityTimeout = null;
         }
     }
 

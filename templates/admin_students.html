@@ -17,6 +17,7 @@
                 {% endif %}
             </form>
             <button onclick="showModal('addStudentModal')" class="btn btn-primary">+ Tambah Siswa</button>
+            <button onclick="showModal('clearAllCheatingModal')" class="btn btn-success">✅ Beri Kesempatan ke Semua</button>
             <form method="POST" action="{{ url_for('admin_delete_all_students') }}" style="display: inline;" onsubmit="return confirm('PERINGATAN! Anda akan menghapus SEMUA data siswa. Apakah Anda yakin?');">
                 <button type="submit" class="btn btn-danger">🗑️ Hapus Semua Siswa</button>
             </form>
@@ -362,6 +363,26 @@ document.querySelectorAll('.student-clear-cheating-btn').forEach(function(button
             <div id="exam_list">
                 {% for exam in exams if exam is defined %}
                 <form method="POST" action="{{ url_for('admin_clear_cheating', student_id=0, exam_id=exam.id) }}" style="margin-bottom: 0.5rem;" class="clear-cheating-form" data-original-action="{{ url_for('admin_clear_cheating', student_id=0, exam_id=exam.id) }}">
+                    <button type="submit" class="btn btn-success" style="width: 100%;">{{ exam.title }}</button>
+                </form>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="clearAllCheatingModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Beri Kesempatan ke SEMUA Siswa</h3>
+            <span class="close" onclick="closeModal('clearAllCheatingModal')">&times;</span>
+        </div>
+        <div class="modal-body">
+            <p style="color: #28a745; font-weight: bold;">✅ Fitur ini akan menghapus status curang untuk SEMUA siswa pada TO yang dipilih</p>
+            <p>Pilih TO yang ingin dibuka kembali untuk semua siswa:</p>
+            <div id="exam_list_all">
+                {% for exam in exams if exam is defined %}
+                <form method="POST" action="{{ url_for('admin_clear_all_cheating', exam_id=exam.id) }}" style="margin-bottom: 0.5rem;" onsubmit="return confirm('Yakin ingin memberi kesempatan ke SEMUA siswa untuk TO: {{ exam.title }}?');">
                     <button type="submit" class="btn btn-success" style="width: 100%;">{{ exam.title }}</button>
                 </form>
                 {% endfor %}

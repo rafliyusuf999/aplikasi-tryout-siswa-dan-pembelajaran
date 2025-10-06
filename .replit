@@ -21,6 +21,10 @@ author = "agent"
 task = "workflow.run"
 args = "INSPIRANET Server"
 
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "Server"
+
 [[workflows.workflow]]
 name = "INSPIRANET Server"
 author = "agent"
@@ -32,3 +36,15 @@ outputType = "webview"
 task = "shell.exec"
 args = "python app.py"
 waitForPort = 5000
+
+[[workflows.workflow]]
+name = "Server"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "python app.py"
+waitForPort = 5000
+
+[workflows.workflow.metadata]
+outputType = "webview"
