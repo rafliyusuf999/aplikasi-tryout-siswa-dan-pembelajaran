@@ -715,10 +715,27 @@ def student_dashboard():
         user_id=current_user.id
     ).scalar() or 0
     
+    best_premium_score = db.session.query(func.max(ExamAttempt.total_score)).join(Exam).filter(
+        ExamAttempt.user_id == current_user.id,
+        ExamAttempt.is_completed == True,
+        Exam.is_premium == True
+    ).scalar() or 0
+    
+    best_free_score = db.session.query(func.max(ExamAttempt.total_score)).join(Exam).filter(
+        ExamAttempt.user_id == current_user.id,
+        ExamAttempt.is_completed == True,
+        Exam.is_premium == False
+    ).scalar() or 0
+    
+    combined_best_score = best_premium_score + best_free_score
+    
     return render_template('student_dashboard.html',
                          total_exams_taken=total_exams_taken,
                          avg_score=round(avg_score, 2),
-                         best_rank=best_rank)
+                         best_rank=best_rank,
+                         combined_best_score=round(combined_best_score, 2),
+                         best_premium_score=round(best_premium_score, 2),
+                         best_free_score=round(best_free_score, 2))
 
 @app.route('/student/exams')
 @login_required

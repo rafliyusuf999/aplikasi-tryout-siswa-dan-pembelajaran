@@ -89,6 +89,12 @@
     background: var(--primary-color);
 }
 
+.current-user {
+    background: linear-gradient(135deg, #fff3cd 0%, #fff8e1 100%) !important;
+    border: 2px solid var(--primary-color);
+    box-shadow: 0 4px 15px rgba(139, 21, 56, 0.2);
+}
+
 @media (max-width: 768px) {
     .tabs {
         flex-direction: column;
@@ -131,12 +137,23 @@
         <h2 style="margin-bottom: 1.5rem;">Peringkat Cabang: {{ current_user.inspira_branch }}</h2>
         {% if branch_leaderboard %}
             {% for entry in branch_leaderboard %}
-            <div class="leaderboard-item">
+            <div class="leaderboard-item {% if entry.user_id == current_user.id %}current-user{% endif %}">
                 <div class="rank-badge {% if entry.rank_in_branch == 1 %}rank-1{% elif entry.rank_in_branch == 2 %}rank-2{% elif entry.rank_in_branch == 3 %}rank-3{% else %}rank-other{% endif %}">
-                    {{ entry.rank_in_branch }}
+                    {% if entry.rank_in_branch == 1 %}
+                        <span style="font-size: 1.5rem;">🏆</span>
+                    {% elif entry.rank_in_branch == 2 %}
+                        <span style="font-size: 1.5rem;">🥈</span>
+                    {% elif entry.rank_in_branch == 3 %}
+                        <span style="font-size: 1.5rem;">🥉</span>
+                    {% else %}
+                        {{ entry.rank_in_branch }}
+                    {% endif %}
                 </div>
                 <div style="flex: 1;">
-                    <h3 style="margin: 0;">{{ entry.user.full_name }}</h3>
+                    <h3 style="margin: 0;">
+                        {{ entry.user.full_name }}
+                        {% if entry.user_id == current_user.id %}<span style="color: var(--primary-color); font-weight: bold;"> (Anda)</span>{% endif %}
+                    </h3>
                     <p style="margin: 0; color: #666;">{{ entry.user.class_level }} - {{ entry.user.school_name }}</p>
                 </div>
                 <div style="text-align: right;">
@@ -156,12 +173,23 @@
         <h2 style="margin-bottom: 1.5rem;">Peringkat Global (Semua Cabang)</h2>
         {% if global_leaderboard %}
             {% for entry in global_leaderboard %}
-            <div class="leaderboard-item">
+            <div class="leaderboard-item {% if entry.user_id == current_user.id %}current-user{% endif %}">
                 <div class="rank-badge {% if entry.rank_global == 1 %}rank-1{% elif entry.rank_global == 2 %}rank-2{% elif entry.rank_global == 3 %}rank-3{% else %}rank-other{% endif %}">
-                    {{ entry.rank_global }}
+                    {% if entry.rank_global == 1 %}
+                        <span style="font-size: 1.5rem;">🏆</span>
+                    {% elif entry.rank_global == 2 %}
+                        <span style="font-size: 1.5rem;">🥈</span>
+                    {% elif entry.rank_global == 3 %}
+                        <span style="font-size: 1.5rem;">🥉</span>
+                    {% else %}
+                        {{ entry.rank_global }}
+                    {% endif %}
                 </div>
                 <div style="flex: 1;">
-                    <h3 style="margin: 0;">{{ entry.user.full_name }}</h3>
+                    <h3 style="margin: 0;">
+                        {{ entry.user.full_name }}
+                        {% if entry.user_id == current_user.id %}<span style="color: var(--primary-color); font-weight: bold;"> (Anda)</span>{% endif %}
+                    </h3>
                     <p style="margin: 0; color: #666;">{{ entry.user.inspira_branch }} - {{ entry.user.class_level }}</p>
                 </div>
                 <div style="text-align: right;">
