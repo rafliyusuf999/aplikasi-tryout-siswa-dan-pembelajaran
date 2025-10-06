@@ -200,15 +200,37 @@ class AntiCheat {
     showWarningNotification(message) {
         const notification = document.createElement('div');
         notification.className = 'alert alert-danger';
-        notification.style.position = 'fixed';
-        notification.style.top = '100px';
-        notification.style.right = '20px';
-        notification.style.zIndex = '9999';
-        notification.style.animation = 'slideDown 0.3s ease';
+        notification.style.cssText = `
+            position: fixed;
+            top: 100px;
+            right: 20px;
+            left: auto;
+            z-index: 9999;
+            animation: slideDown 0.3s ease;
+            max-width: 400px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            border-radius: 8px;
+            padding: 15px 20px;
+            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+            color: white;
+            border: none;
+            font-size: 0.95rem;
+        `;
         notification.innerHTML = `
-            <strong>⚠️ Peringatan:</strong> ${message}
+            <strong style="display: block; margin-bottom: 5px;">🔒 Peringatan Anti-Cheating:</strong>
+            <span style="opacity: 0.95;">${message}</span>
         `;
         document.body.appendChild(notification);
+
+        const isMobile = window.innerWidth <= 768;
+        if (isMobile) {
+            notification.style.cssText += `
+                left: 10px;
+                right: 10px;
+                top: 80px;
+                max-width: calc(100% - 20px);
+            `;
+        }
 
         setTimeout(() => {
             notification.style.animation = 'fadeOut 0.3s ease';
@@ -223,44 +245,100 @@ function showSecurityWarningModal() {
     modal.className = 'modal';
     modal.style.display = 'block';
     modal.innerHTML = `
-        <div class="modal-content" style="max-width: 600px;">
-            <div class="modal-header" style="background: linear-gradient(135deg, #dc3545 0%, #c82333 100%); color: white;">
-                <h2>⚠️ PERINGATAN KEAMANAN UJIAN</h2>
+        <div class="modal-content" style="max-width: 600px; margin: 20px auto; max-height: 90vh; overflow-y: auto;">
+            <div class="modal-header" style="background: linear-gradient(135deg, #dc3545 0%, #c82333 100%); color: white; padding: 20px;">
+                <h2 style="margin: 0; font-size: 1.5rem; text-align: center;">🔒 Anti-Cheating Ketat</h2>
+                <p style="margin: 8px 0 0 0; font-size: 0.9rem; text-align: center; opacity: 0.95;">Proteksi copy-paste, screenshot, dan pindah tab selama ujian</p>
             </div>
-            <div class="modal-body" style="padding: 30px;">
+            <div class="modal-body" style="padding: 25px;">
                 <div style="text-align: left; line-height: 1.8;">
-                    <h3 style="color: #dc3545; margin-bottom: 20px;">Peraturan Selama Ujian:</h3>
+                    <h3 style="color: #dc3545; margin-bottom: 20px; font-size: 1.2rem;">⚠️ Peraturan Selama Ujian:</h3>
                     <ul style="list-style: none; padding: 0;">
-                        <li style="margin-bottom: 15px;">
-                            <strong>🚫 DILARANG COPY-PASTE</strong><br>
-                            <small>Jika terdeteksi mencoba copy, Anda akan OTOMATIS LOGOUT</small>
+                        <li style="margin-bottom: 15px; padding: 12px; background: #f8f9fa; border-radius: 8px; border-left: 4px solid #dc3545;">
+                            <strong style="font-size: 1rem;">🚫 DILARANG COPY-PASTE</strong><br>
+                            <small style="color: #666; line-height: 1.6;">Jika terdeteksi mencoba copy, Anda akan OTOMATIS LOGOUT</small>
                         </li>
-                        <li style="margin-bottom: 15px;">
-                            <strong>🚫 DILARANG PINDAH TAB/WINDOW</strong><br>
-                            <small>Jika pindah tab, ujian akan OTOMATIS RESTART dari awal</small>
+                        <li style="margin-bottom: 15px; padding: 12px; background: #f8f9fa; border-radius: 8px; border-left: 4px solid #dc3545;">
+                            <strong style="font-size: 1rem;">🚫 DILARANG PINDAH TAB/WINDOW</strong><br>
+                            <small style="color: #666; line-height: 1.6;">Jika pindah tab, ujian akan OTOMATIS RESTART dari awal</small>
                         </li>
-                        <li style="margin-bottom: 15px;">
-                            <strong>🚫 DILARANG SCREENSHOT</strong><br>
-                            <small>Screenshot dan Developer Tools tidak diperbolehkan</small>
+                        <li style="margin-bottom: 15px; padding: 12px; background: #f8f9fa; border-radius: 8px; border-left: 4px solid #dc3545;">
+                            <strong style="font-size: 1rem;">🚫 DILARANG SCREENSHOT</strong><br>
+                            <small style="color: #666; line-height: 1.6;">Screenshot dan Developer Tools tidak diperbolehkan</small>
                         </li>
-                        <li style="margin-bottom: 15px;">
-                            <strong>✅ FOKUS PADA UJIAN</strong><br>
-                            <small>Tetap di halaman ujian sampai selesai</small>
+                        <li style="margin-bottom: 15px; padding: 12px; background: #d4edda; border-radius: 8px; border-left: 4px solid #28a745;">
+                            <strong style="font-size: 1rem;">✅ FOKUS PADA UJIAN</strong><br>
+                            <small style="color: #155724; line-height: 1.6;">Tetap di halaman ujian sampai selesai</small>
                         </li>
                     </ul>
-                    <div style="background: #fff3cd; border: 1px solid #ffc107; padding: 15px; border-radius: 5px; margin-top: 20px;">
-                        <strong>⚡ Penting:</strong> Sistem akan memantau aktivitas Anda selama ujian. Pelanggaran akan mengakibatkan tindakan otomatis.
+                    <div style="background: #fff3cd; border: 2px solid #ffc107; padding: 15px; border-radius: 8px; margin-top: 20px;">
+                        <strong style="color: #856404;">⚡ Penting:</strong> <span style="color: #856404;">Sistem akan memantau aktivitas Anda selama ujian. Pelanggaran akan mengakibatkan tindakan otomatis.</span>
                     </div>
                 </div>
             </div>
-            <div class="modal-footer" style="background: #f8f9fa; padding: 20px;">
-                <button onclick="acceptSecurityWarning()" class="btn btn-danger" style="padding: 12px 30px; font-size: 16px; width: 100%;">
+            <div class="modal-footer" style="background: #f8f9fa; padding: 20px; border-top: 1px solid #dee2e6;">
+                <button onclick="acceptSecurityWarning()" class="btn btn-danger" style="padding: 15px 30px; font-size: 1.1rem; font-weight: bold; width: 100%; border-radius: 8px; border: none; cursor: pointer; transition: all 0.3s ease;">
                     Saya Mengerti dan Setuju
                 </button>
             </div>
         </div>
     `;
     document.body.appendChild(modal);
+    
+    const style = document.createElement('style');
+    style.textContent = `
+        @media (max-width: 768px) {
+            #securityWarningModal .modal-content {
+                max-width: 95% !important;
+                margin: 10px auto !important;
+            }
+            #securityWarningModal .modal-header h2 {
+                font-size: 1.3rem !important;
+            }
+            #securityWarningModal .modal-header p {
+                font-size: 0.85rem !important;
+            }
+            #securityWarningModal .modal-body {
+                padding: 20px 15px !important;
+            }
+            #securityWarningModal .modal-body h3 {
+                font-size: 1.1rem !important;
+            }
+            #securityWarningModal .modal-body li {
+                padding: 10px !important;
+                margin-bottom: 12px !important;
+            }
+            #securityWarningModal .modal-body strong {
+                font-size: 0.95rem !important;
+            }
+            #securityWarningModal .modal-footer button {
+                padding: 12px 20px !important;
+                font-size: 1rem !important;
+            }
+        }
+        @media (max-width: 480px) {
+            #securityWarningModal .modal-content {
+                max-width: 98% !important;
+                margin: 5px auto !important;
+            }
+            #securityWarningModal .modal-header {
+                padding: 15px !important;
+            }
+            #securityWarningModal .modal-header h2 {
+                font-size: 1.1rem !important;
+            }
+            #securityWarningModal .modal-header p {
+                font-size: 0.8rem !important;
+            }
+            #securityWarningModal .modal-body {
+                padding: 15px 12px !important;
+            }
+            #securityWarningModal .modal-body li {
+                padding: 8px !important;
+            }
+        }
+    `;
+    document.head.appendChild(style);
 }
 
 function acceptSecurityWarning() {
