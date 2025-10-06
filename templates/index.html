@@ -12,19 +12,19 @@
 
 <div class="stats-grid">
     <div class="stat-card">
-        <h3>1000+</h3>
+        <h3>{{ active_students if active_students > 0 else total_students }}</h3>
         <p>Siswa Aktif</p>
     </div>
     <div class="stat-card">
-        <h3>50+</h3>
+        <h3>{{ total_exams }}</h3>
         <p>Tes Online</p>
     </div>
     <div class="stat-card">
-        <h3>4</h3>
+        <h3>{{ total_branches if total_branches > 0 else 4 }}</h3>
         <p>Cabang</p>
     </div>
     <div class="stat-card">
-        <h3>100%</h3>
+        <h3>44</h3>
         <p>Anti-Cheating</p>
     </div>
 </div>

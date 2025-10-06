@@ -540,8 +540,15 @@ async function submitExam() {
 
 initializeNavButtons();
 
-if (typeof showSecurityWarningModal === 'function') {
-    showSecurityWarningModal();
-}
+window.addEventListener('DOMContentLoaded', function() {
+    setTimeout(function() {
+        if (typeof showSecurityWarningModal === 'function') {
+            showSecurityWarningModal();
+        } else {
+            console.error('showSecurityWarningModal function not found!');
+            startExamAfterWarning();
+        }
+    }, 500);
+});
 </script>
 {% endblock %}

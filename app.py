@@ -105,7 +105,17 @@ def index():
             return redirect(url_for('teacher_dashboard'))
         else:
             return redirect(url_for('student_dashboard'))
-    return render_template('index.html')
+    
+    total_students = User.query.filter_by(role='student').count()
+    total_exams = Exam.query.filter_by(is_active=True).count()
+    total_branches = db.session.query(User.inspira_branch).filter(User.inspira_branch.isnot(None)).distinct().count()
+    active_students = db.session.query(ExamAttempt.user_id).distinct().count()
+    
+    return render_template('index.html',
+                         total_students=total_students,
+                         total_exams=total_exams,
+                         total_branches=total_branches,
+                         active_students=active_students)
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
