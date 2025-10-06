@@ -41,6 +41,8 @@ class Exam(db.Model):
     is_premium = db.Column(db.Boolean, default=False)
     price = db.Column(db.Integer, default=0)
     is_active = db.Column(db.Boolean, default=True)
+    start_time = db.Column(db.DateTime, nullable=True)
+    end_time = db.Column(db.DateTime, nullable=True)
     created_by = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     
@@ -48,6 +50,29 @@ class Exam(db.Model):
     attempts = db.relationship('ExamAttempt', backref='exam', lazy=True, cascade='all, delete-orphan')
     payments = db.relationship('Payment', backref='exam', lazy=True, cascade='all, delete-orphan')
     leaderboard_entries = db.relationship('Leaderboard', backref='exam', lazy=True, cascade='all, delete-orphan')
+    
+    def get_status(self):
+        now = datetime.utcnow()
+        if self.start_time and now < self.start_time:
+            return 'belum_dimulai'
+        elif self.end_time and now > self.end_time:
+            return 'selesai'
+        elif self.start_time and self.end_time and self.start_time <= now <= self.end_time:
+            return 'berlangsung'
+        else:
+            return 'berlangsung'
+    
+    def get_local_start_time(self):
+        if self.start_time:
+            from datetime import timedelta
+            return self.start_time + timedelta(hours=7)
+        return None
+    
+    def get_local_end_time(self):
+        if self.end_time:
+            from datetime import timedelta
+            return self.end_time + timedelta(hours=7)
+        return None
 
 class Question(db.Model):
     __tablename__ = 'questions'

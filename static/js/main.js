@@ -162,16 +162,20 @@ class AntiCheat {
 
     handleVisibilityChange() {
         if (this.enabled && document.hidden && !this.isUploadingFile) {
+            console.log('⚠️ Tab/Window tidak terlihat - menunggu 3 detik...');
+            
             if (this.visibilityTimeout) {
                 clearTimeout(this.visibilityTimeout);
             }
             
             this.visibilityTimeout = setTimeout(() => {
                 if (document.hidden && this.enabled && !this.isUploadingFile) {
-                    this.triggerLogout('Terdeteksi pindah tab terlalu lama! Anda akan dikeluarkan dari ujian.');
+                    console.log('❌ Masih tidak terlihat setelah 3 detik - LOGOUT!');
+                    this.triggerLogout('Terdeteksi pindah tab/aplikasi terlalu lama! Anda akan dikeluarkan dari ujian.');
                 }
             }, 3000);
         } else if (!document.hidden && this.visibilityTimeout) {
+            console.log('✓ Tab kembali terlihat - batalkan timeout');
             clearTimeout(this.visibilityTimeout);
             this.visibilityTimeout = null;
         }
@@ -179,19 +183,18 @@ class AntiCheat {
 
     handleWindowBlur() {
         if (this.enabled && !this.isUploadingFile) {
-            const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+            console.log('⚠️ Window blur terdeteksi - menunggu 3 detik...');
             
-            if (!isMobile) {
-                if (this.visibilityTimeout) {
-                    clearTimeout(this.visibilityTimeout);
-                }
-                
-                this.visibilityTimeout = setTimeout(() => {
-                    if (!document.hasFocus() && this.enabled && !this.isUploadingFile) {
-                        this.triggerLogout('Terdeteksi pindah window terlalu lama! Anda akan dikeluarkan dari ujian.');
-                    }
-                }, 3000);
+            if (this.visibilityTimeout) {
+                clearTimeout(this.visibilityTimeout);
             }
+            
+            this.visibilityTimeout = setTimeout(() => {
+                if (!document.hasFocus() && this.enabled && !this.isUploadingFile) {
+                    console.log('❌ Window masih blur setelah 3 detik - LOGOUT!');
+                    this.triggerLogout('Terdeteksi pindah window/aplikasi terlalu lama! Anda akan dikeluarkan dari ujian.');
+                }
+            }, 3000);
         }
     }
     

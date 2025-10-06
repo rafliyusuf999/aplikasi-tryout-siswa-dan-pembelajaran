@@ -77,6 +77,19 @@ def init_database():
                         cursor.execute("ALTER TABLE exam_attempts ADD COLUMN essay_scores TEXT")
                         conn.commit()
                         print("✓ Added essay_scores column")
+                    
+                    cursor.execute("PRAGMA table_info(exams)")
+                    columns = [col[1] for col in cursor.fetchall()]
+                    
+                    if 'start_time' not in columns:
+                        cursor.execute("ALTER TABLE exams ADD COLUMN start_time DATETIME")
+                        conn.commit()
+                        print("✓ Added start_time column to exams")
+                    
+                    if 'end_time' not in columns:
+                        cursor.execute("ALTER TABLE exams ADD COLUMN end_time DATETIME")
+                        conn.commit()
+                        print("✓ Added end_time column to exams")
                 except Exception as e:
                     print(f"Migration warning: {e}")
                 finally:
@@ -478,6 +491,27 @@ def admin_add_exam():
     duration_minutes = request.form.get('duration_minutes')
     is_premium = request.form.get('is_premium') == 'true'
     price = request.form.get('price', '0')
+    start_time_str = request.form.get('start_time')
+    end_time_str = request.form.get('end_time')
+    
+    start_time = None
+    end_time = None
+    
+    if start_time_str:
+        try:
+            from datetime import timedelta
+            local_time = datetime.strptime(start_time_str, '%Y-%m-%dT%H:%M')
+            start_time = local_time - timedelta(hours=7)
+        except:
+            pass
+    
+    if end_time_str:
+        try:
+            from datetime import timedelta
+            local_time = datetime.strptime(end_time_str, '%Y-%m-%dT%H:%M')
+            end_time = local_time - timedelta(hours=7)
+        except:
+            pass
     
     exam = Exam(
         title=title,
@@ -485,6 +519,8 @@ def admin_add_exam():
         duration_minutes=int(duration_minutes) if duration_minutes else 120,
         is_premium=is_premium,
         price=int(price) if price else 0,
+        start_time=start_time,
+        end_time=end_time,
         created_by=current_user.id
     )
     db.session.add(exam)
@@ -931,6 +967,19 @@ def student_start_exam(id):
     
     exam = Exam.query.get_or_404(id)
     
+    now = datetime.utcnow()
+    if exam.start_time and now < exam.start_time:
+        from datetime import timedelta
+        local_start = exam.start_time + timedelta(hours=7)
+        flash(f'⏰ TO ini belum dimulai! TO akan dimulai pada {local_start.strftime("%d %B %Y pukul %H:%M")} WIB', 'warning')
+        return redirect(url_for('student_exams'))
+    
+    if exam.end_time and now > exam.end_time:
+        from datetime import timedelta
+        local_end = exam.end_time + timedelta(hours=7)
+        flash(f'⏰ TO ini sudah selesai! TO berakhir pada {local_end.strftime("%d %B %Y pukul %H:%M")} WIB', 'warning')
+        return redirect(url_for('student_exams'))
+    
     cheated_attempt = ExamAttempt.query.filter_by(
         user_id=current_user.id,
         exam_id=exam.id
@@ -1075,8 +1124,17 @@ def student_result(id):
 @app.route("/peringkat")
 @login_required
 def all_leaderboards():
-    exams = Exam.query.filter_by(is_active=True).all()
-    return render_template("all_leaderboards.html", exams=exams)
+    all_exams = Exam.query.filter_by(is_active=True).all()
+    now = datetime.utcnow()
+    
+    finished_exams = []
+    for exam in all_exams:
+        if exam.end_time and now > exam.end_time:
+            finished_exams.append(exam)
+        elif not exam.end_time:
+            finished_exams.append(exam)
+    
+    return render_template("all_leaderboards.html", exams=finished_exams)
 
 @app.route('/leaderboard/<int:exam_id>')
 @login_required
