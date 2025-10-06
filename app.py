@@ -890,6 +890,12 @@ def student_result(id):
     
     return render_template('student_result.html', attempt=attempt, leaderboard=leaderboard_entry)
 
+@app.route("/peringkat")
+@login_required
+def all_leaderboards():
+    exams = Exam.query.filter_by(is_active=True).all()
+    return render_template("all_leaderboards.html", exams=exams)
+
 @app.route('/leaderboard/<int:exam_id>')
 @login_required
 def leaderboard(exam_id):

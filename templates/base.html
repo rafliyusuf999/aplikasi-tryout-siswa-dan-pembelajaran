@@ -36,6 +36,7 @@
                         <li><a href="{{ url_for('student_dashboard') }}" onclick="closeMobileMenu()">Dashboard</a></li>
                         <li><a href="{{ url_for('student_exams') }}" onclick="closeMobileMenu()">Daftar TO</a></li>
                     {% endif %}
+                    <li><a href="{{ url_for('all_leaderboards') }}" onclick="closeMobileMenu()">Peringkat</a></li>
                     <li><a href="{{ url_for('logout') }}" onclick="closeMobileMenu()">Logout ({{ current_user.full_name }})</a></li>
                 {% else %}
                     <li><a href="{{ url_for('login') }}" onclick="closeMobileMenu()">Login</a></li>

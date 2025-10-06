@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block title %}Peringkat Terbaik{% endblock %}
+
+{% block content %}
+<h1 style="color: var(--primary-color); margin-bottom: 2rem;">🏆 Peringkat Terbaik</h1>
+
+<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 1.5rem;">
+    {% for exam in exams %}
+    <div class="card">
+        <h2>{{ exam.title }}</h2>
+        <p>{{ exam.description }}</p>
+        <div style="margin: 1rem 0;">
+            <p><strong>⏱️ Durasi:</strong> {{ exam.duration_minutes }} menit</p>
+            <p><strong>📋 Soal:</strong> {{ exam.total_questions }}</p>
+        </div>
+        <a href="{{ url_for('leaderboard', exam_id=exam.id) }}" class="btn btn-primary" style="width: 100%; text-decoration: none; text-align: center;">
+            📊 Lihat Peringkat
+        </a>
+    </div>
+    {% endfor %}
+</div>
+
+{% if not exams %}
+<div class="card" style="text-align: center; padding: 3rem;">
+    <h3 style="color: #666;">Belum ada TO yang tersedia</h3>
+</div>
+{% endif %}
+{% endblock %}
