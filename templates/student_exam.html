@@ -152,17 +152,23 @@
     border-color: #28a745;
 }
 
-.question-nav-btn.current {
-    background: var(--primary-color);
-    color: white;
-    border-color: var(--primary-color);
-    transform: scale(1.15);
-}
-
 .question-nav-btn.unanswered {
     background: #6c757d;
     color: white;
     border-color: #6c757d;
+}
+
+.question-nav-btn.doubtful {
+    background: #ffc107;
+    color: white;
+    border-color: #ffc107;
+}
+
+.question-nav-btn.current {
+    background: var(--primary-color) !important;
+    color: white !important;
+    border-color: var(--primary-color) !important;
+    transform: scale(1.15);
 }
 
 .legend {
@@ -245,7 +251,10 @@
 
 <div class="exam-container">
     <div class="exam-main">
-        <div class="timer-display" id="timer"></div>
+        <div class="timer-display" id="timer">
+            <h3>{{ exam.duration_minutes }} Menit</h3>
+            <p>Sisa Waktu</p>
+        </div>
         
         <div id="questionContainer">
             {% for question in questions %}
@@ -424,17 +433,17 @@ function updateNavButton(questionNumber) {
     btn.classList.remove('answered', 'unanswered', 'doubtful');
     
     if (doubtfulQuestions.has(questionNumber)) {
-        btn.style.background = '#ffc107';
-        btn.style.borderColor = '#ffc107';
-        btn.style.color = 'white';
+        btn.classList.add('doubtful');
     } else if (answeredQuestions.has(questionNumber)) {
         btn.classList.add('answered');
-        btn.style.background = '#28a745';
-        btn.style.borderColor = '#28a745';
     } else {
         btn.classList.add('unanswered');
-        btn.style.background = '#6c757d';
-        btn.style.borderColor = '#6c757d';
+    }
+}
+
+function initializeNavButtons() {
+    for (let i = 1; i <= totalQuestions; i++) {
+        updateNavButton(i);
     }
 }
 
@@ -520,5 +529,7 @@ async function submitExam() {
         return;
     }
 }
+
+initializeNavButtons();
 </script>
 {% endblock %}
