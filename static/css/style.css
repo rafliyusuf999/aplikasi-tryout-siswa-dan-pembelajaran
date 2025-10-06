@@ -650,6 +650,24 @@ body {
         border-bottom: 1px solid rgba(255, 255, 255, 0.1);
     }
     
+    .navbar-nav li:has(a[href*="logout"]) {
+        background: rgba(255, 0, 0, 0.1);
+    }
+    
+    div[style*="grid-template-columns"] {
+        grid-template-columns: 1fr !important;
+    }
+    
+    div[style*="display: flex"][style*="justify-content: space-between"] {
+        flex-direction: column !important;
+        gap: 1rem;
+        align-items: flex-start !important;
+    }
+    
+    div[style*="display: flex"][style*="justify-content: space-between"] > * {
+        width: 100%;
+    }
+    
     .timer {
         position: static;
         margin: 1rem auto;
@@ -754,6 +772,27 @@ body {
     
     h2 {
         font-size: 1.25rem;
+    }
+    
+    .btn {
+        width: 100%;
+        margin-bottom: 0.5rem;
+    }
+    
+    form[style*="display: inline"] {
+        display: block !important;
+        width: 100%;
+    }
+    
+    .profile-photo-nav {
+        width: 32px;
+        height: 32px;
+    }
+    
+    .profile-photo-placeholder {
+        width: 32px;
+        height: 32px;
+        font-size: 0.85rem;
     }
 }
 
