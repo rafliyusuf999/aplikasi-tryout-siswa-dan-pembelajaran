@@ -591,6 +591,11 @@ body {
         padding: 2rem 1rem;
     }
     
+    .stats-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    
     .stat-card h3 {
         font-size: 2rem;
     }
@@ -611,5 +616,38 @@ body {
     .modal-content {
         margin: 5% auto;
         width: 95%;
+    }
+    
+    table {
+        font-size: 0.8rem;
+    }
+    
+    table th,
+    table td {
+        padding: 0.5rem 0.25rem;
+        word-wrap: break-word;
+    }
+    
+    h1 {
+        font-size: 1.5rem;
+    }
+    
+    h2 {
+        font-size: 1.25rem;
+    }
+}
+
+.table-responsive {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.table-responsive table {
+    min-width: 600px;
+}
+
+@media (max-width: 768px) {
+    .table-responsive table {
+        min-width: 100%;
     }
 }

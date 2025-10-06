@@ -3,56 +3,358 @@
 {% block title %}Ujian - {{ exam.title }}{% endblock %}
 
 {% block content %}
-<div id="timer" class="timer"></div>
+<style>
+.exam-container {
+    display: flex;
+    gap: 1.5rem;
+    margin-top: 1rem;
+}
 
-<h1 style="color: var(--primary-color); margin-bottom: 2rem;">{{ exam.title }}</h1>
+.exam-main {
+    flex: 1;
+    min-width: 0;
+}
 
-<div class="exam-questions">
-    <form id="examForm">
-        {% for question in questions %}
-        <div class="question-card">
-            <h4>Soal #{{ question.question_order }}</h4>
-            <p><strong>{{ question.category }}</strong></p>
-            <p>{{ question.question_text }}</p>
-            
-            {% if question.question_type == 'multiple_choice' %}
-            <div class="options">
-                <label class="option-item">
-                    <input type="radio" name="q_{{ question.id }}" value="A">
-                    <span>A. {{ question.option_a }}</span>
-                </label>
-                <label class="option-item">
-                    <input type="radio" name="q_{{ question.id }}" value="B">
-                    <span>B. {{ question.option_b }}</span>
-                </label>
-                <label class="option-item">
-                    <input type="radio" name="q_{{ question.id }}" value="C">
-                    <span>C. {{ question.option_c }}</span>
-                </label>
-                <label class="option-item">
-                    <input type="radio" name="q_{{ question.id }}" value="D">
-                    <span>D. {{ question.option_d }}</span>
-                </label>
-                {% if question.option_e %}
-                <label class="option-item">
-                    <input type="radio" name="q_{{ question.id }}" value="E">
-                    <span>E. {{ question.option_e }}</span>
-                </label>
-                {% endif %}
-            </div>
-            {% else %}
-            <div class="form-group" style="margin-top: 1rem;">
-                <label>Jawaban Esai (Upload Foto):</label>
-                <input type="file" id="essay_{{ question.id }}" accept="image/*" class="form-control" style="margin-top: 10px;">
-                <div id="preview_{{ question.id }}" style="margin-top: 10px;"></div>
-                <small class="text-muted">Upload foto jawaban esai Anda (JPG, PNG, max 5MB)</small>
-            </div>
-            {% endif %}
-        </div>
-        {% endfor %}
-    </form>
+.exam-sidebar {
+    width: 280px;
+    flex-shrink: 0;
+}
+
+.question-display {
+    background: white;
+    border-radius: 15px;
+    padding: 2rem;
+    box-shadow: var(--shadow);
+    margin-bottom: 1.5rem;
+}
+
+.question-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid #f0f0f0;
+}
+
+.question-number {
+    background: var(--primary-color);
+    color: white;
+    padding: 0.5rem 1.5rem;
+    border-radius: 25px;
+    font-weight: bold;
+    font-size: 1rem;
+}
+
+.question-text {
+    font-size: 1.1rem;
+    line-height: 1.8;
+    margin-bottom: 1.5rem;
+    color: var(--text-dark);
+}
+
+.options-container {
+    margin-top: 1.5rem;
+}
+
+.option-item {
+    display: block;
+    background: #f8f9fa;
+    padding: 1rem 1.5rem;
+    margin-bottom: 0.75rem;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+}
+
+.option-item:hover {
+    background: #e9ecef;
+    transform: translateX(5px);
+}
+
+.option-item input[type="radio"] {
+    margin-right: 1rem;
+    transform: scale(1.2);
+}
+
+.option-item input[type="radio"]:checked + span {
+    font-weight: bold;
+    color: var(--primary-color);
+}
+
+.option-item:has(input:checked) {
+    background: var(--light-color);
+    border-color: var(--primary-color);
+}
+
+.navigation-buttons {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-top: 2rem;
+}
+
+.sidebar-card {
+    background: white;
+    border-radius: 15px;
+    padding: 1.5rem;
+    box-shadow: var(--shadow);
+    margin-bottom: 1.5rem;
+    position: sticky;
+    top: 1rem;
+}
+
+.timer-display {
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+    color: white;
+    padding: 1.5rem;
+    border-radius: 15px;
+    text-align: center;
+    margin-bottom: 1.5rem;
+}
+
+.timer-display h3 {
+    margin: 0;
+    font-size: 2rem;
+}
+
+.timer-display p {
+    margin: 0.5rem 0 0 0;
+    font-size: 0.9rem;
+    opacity: 0.9;
+}
+
+.question-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 0.5rem;
+}
+
+.question-nav-btn {
+    aspect-ratio: 1;
+    border: 2px solid #ddd;
+    background: white;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+}
+
+.question-nav-btn:hover {
+    transform: scale(1.1);
+}
+
+.question-nav-btn.answered {
+    background: #28a745;
+    color: white;
+    border-color: #28a745;
+}
+
+.question-nav-btn.current {
+    background: var(--primary-color);
+    color: white;
+    border-color: var(--primary-color);
+    transform: scale(1.15);
+}
+
+.question-nav-btn.unanswered {
+    background: #6c757d;
+    color: white;
+    border-color: #6c757d;
+}
+
+.legend {
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid #ddd;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0.5rem;
+    font-size: 0.85rem;
+}
+
+.legend-box {
+    width: 20px;
+    height: 20px;
+    border-radius: 4px;
+    margin-right: 0.5rem;
+}
+
+@media (max-width: 1024px) {
+    .exam-sidebar {
+        width: 220px;
+    }
     
-    <button onclick="submitExam()" class="btn btn-primary" style="width: 100%; padding: 1rem; font-size: 1.2rem; margin-top: 2rem;">Submit Jawaban</button>
+    .question-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .exam-container {
+        flex-direction: column;
+    }
+    
+    .exam-sidebar {
+        width: 100%;
+        position: static;
+    }
+    
+    .sidebar-card {
+        position: static;
+    }
+    
+    .question-grid {
+        grid-template-columns: repeat(5, 1fr);
+    }
+    
+    .question-display {
+        padding: 1.5rem;
+    }
+    
+    .option-item {
+        padding: 0.75rem 1rem;
+        font-size: 0.95rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .question-grid {
+        grid-template-columns: repeat(5, 1fr);
+        gap: 0.4rem;
+    }
+    
+    .question-nav-btn {
+        font-size: 0.8rem;
+    }
+    
+    .navigation-buttons {
+        flex-direction: column;
+    }
+    
+    .navigation-buttons button {
+        width: 100%;
+    }
+}
+</style>
+
+<div class="exam-container">
+    <div class="exam-main">
+        <div class="timer-display" id="timer"></div>
+        
+        <div id="questionContainer">
+            {% for question in questions %}
+            <div class="question-display" data-question-id="{{ question.id }}" style="display: {% if loop.first %}block{% else %}none{% endif %};">
+                <div class="question-header">
+                    <div class="question-number">SOAL NO. {{ question.question_order }}</div>
+                    <div style="color: #666; font-size: 0.9rem;">
+                        <strong>{{ question.category }}</strong>
+                    </div>
+                </div>
+                
+                <div class="question-text">
+                    {{ question.question_text }}
+                </div>
+                
+                {% if question.question_type == 'multiple_choice' %}
+                <div class="options-container">
+                    <label class="option-item">
+                        <input type="radio" name="q_{{ question.id }}" value="A" onchange="markAnswered({{ question.question_order }})">
+                        <span>{{ question.option_a }}</span>
+                    </label>
+                    <label class="option-item">
+                        <input type="radio" name="q_{{ question.id }}" value="B" onchange="markAnswered({{ question.question_order }})">
+                        <span>{{ question.option_b }}</span>
+                    </label>
+                    <label class="option-item">
+                        <input type="radio" name="q_{{ question.id }}" value="C" onchange="markAnswered({{ question.question_order }})">
+                        <span>{{ question.option_c }}</span>
+                    </label>
+                    <label class="option-item">
+                        <input type="radio" name="q_{{ question.id }}" value="D" onchange="markAnswered({{ question.question_order }})">
+                        <span>{{ question.option_d }}</span>
+                    </label>
+                    {% if question.option_e %}
+                    <label class="option-item">
+                        <input type="radio" name="q_{{ question.id }}" value="E" onchange="markAnswered({{ question.question_order }})">
+                        <span>{{ question.option_e }}</span>
+                    </label>
+                    {% endif %}
+                </div>
+                {% else %}
+                <div class="form-group" style="margin-top: 1rem;">
+                    <label>Jawaban Esai (Upload Foto):</label>
+                    <input type="file" id="essay_{{ question.id }}" accept="image/*" class="form-control" style="margin-top: 10px;" onchange="markAnswered({{ question.question_order }})">
+                    <div id="preview_{{ question.id }}" style="margin-top: 10px;"></div>
+                    <small class="text-muted">Upload foto jawaban esai Anda (JPG, PNG, max 5MB)</small>
+                </div>
+                {% endif %}
+                
+                <div class="navigation-buttons">
+                    {% if not loop.first %}
+                    <button type="button" class="btn btn-secondary" onclick="showQuestion({{ question.question_order - 1 }})">
+                        ← Soal Sebelumnya
+                    </button>
+                    {% else %}
+                    <div></div>
+                    {% endif %}
+                    
+                    <button type="button" class="btn btn-warning" onclick="markDoubtful({{ question.question_order }})">
+                        🤔 Ragu-ragu
+                    </button>
+                    
+                    {% if not loop.last %}
+                    <button type="button" class="btn btn-primary" onclick="showQuestion({{ question.question_order + 1 }})">
+                        Soal Selanjutnya →
+                    </button>
+                    {% else %}
+                    <div></div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    
+    <div class="exam-sidebar">
+        <div class="sidebar-card">
+            <h3 style="margin: 0 0 1rem 0; color: var(--primary-color); text-align: center;">NOMOR SOAL</h3>
+            
+            <div class="question-grid">
+                {% for question in questions %}
+                <button type="button" class="question-nav-btn {% if loop.first %}current{% endif %}" 
+                        id="nav-{{ question.question_order }}" 
+                        onclick="showQuestion({{ question.question_order }})">
+                    {{ question.question_order }}
+                </button>
+                {% endfor %}
+            </div>
+            
+            <div class="legend">
+                <div class="legend-item">
+                    <div class="legend-box" style="background: #28a745;"></div>
+                    <span>= Sudah dijawab</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-box" style="background: #6c757d;"></div>
+                    <span>= Belum dijawab</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-box" style="background: #ffc107;"></div>
+                    <span>= Ragu-ragu</span>
+                </div>
+            </div>
+            
+            <button onclick="submitExam()" class="btn btn-danger" style="width: 100%; margin-top: 1.5rem; padding: 1rem; font-weight: bold;">
+                HENTIKAN UJIAN
+            </button>
+        </div>
+    </div>
 </div>
 
 <script>
@@ -60,6 +362,10 @@ showSecurityWarningModal();
 
 let timerStarted = false;
 let antiCheatEnabled = false;
+let currentQuestion = 1;
+const totalQuestions = {{ questions|length }};
+const answeredQuestions = new Set();
+const doubtfulQuestions = new Set();
 
 function startExamAfterWarning() {
     if (!timerStarted) {
@@ -84,6 +390,54 @@ function startExamAfterWarning() {
     }
 }
 
+function showQuestion(questionNumber) {
+    document.querySelectorAll('.question-display').forEach(q => q.style.display = 'none');
+    document.querySelectorAll('.question-nav-btn').forEach(btn => btn.classList.remove('current'));
+    
+    const questionDiv = document.querySelector(`[data-question-id]`);
+    const allQuestions = document.querySelectorAll('.question-display');
+    allQuestions[questionNumber - 1].style.display = 'block';
+    
+    document.getElementById('nav-' + questionNumber).classList.add('current');
+    currentQuestion = questionNumber;
+    
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function markAnswered(questionNumber) {
+    answeredQuestions.add(questionNumber);
+    doubtfulQuestions.delete(questionNumber);
+    updateNavButton(questionNumber);
+}
+
+function markDoubtful(questionNumber) {
+    if (doubtfulQuestions.has(questionNumber)) {
+        doubtfulQuestions.delete(questionNumber);
+    } else {
+        doubtfulQuestions.add(questionNumber);
+    }
+    updateNavButton(questionNumber);
+}
+
+function updateNavButton(questionNumber) {
+    const btn = document.getElementById('nav-' + questionNumber);
+    btn.classList.remove('answered', 'unanswered', 'doubtful');
+    
+    if (doubtfulQuestions.has(questionNumber)) {
+        btn.style.background = '#ffc107';
+        btn.style.borderColor = '#ffc107';
+        btn.style.color = 'white';
+    } else if (answeredQuestions.has(questionNumber)) {
+        btn.classList.add('answered');
+        btn.style.background = '#28a745';
+        btn.style.borderColor = '#28a745';
+    } else {
+        btn.classList.add('unanswered');
+        btn.style.background = '#6c757d';
+        btn.style.borderColor = '#6c757d';
+    }
+}
+
 document.querySelectorAll('input[type="file"]').forEach(input => {
     input.addEventListener('change', function(e) {
         const file = e.target.files[0];
@@ -105,15 +459,13 @@ async function submitExam() {
         return;
     }
     
-    const form = document.getElementById('examForm');
-    const formData = new FormData(form);
     const answers = {};
     const essayFiles = {};
     
-    for (let [key, value] of formData.entries()) {
-        const questionId = key.replace('q_', '');
-        answers[questionId] = value;
-    }
+    document.querySelectorAll('input[type="radio"]:checked').forEach(input => {
+        const questionId = input.name.replace('q_', '');
+        answers[questionId] = input.value;
+    });
     
     document.querySelectorAll('input[type="file"]').forEach(input => {
         const questionId = input.id.replace('essay_', '');

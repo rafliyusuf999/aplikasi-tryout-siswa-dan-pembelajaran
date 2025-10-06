@@ -6,39 +6,50 @@
 <h1 style="color: var(--primary-color); margin-bottom: 2rem;">👨‍🎓 Kelola Siswa</h1>
 
 <div class="card">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
         <h2>Daftar Siswa</h2>
-        <button onclick="showModal('addStudentModal')" class="btn btn-primary">+ Tambah Siswa</button>
+        <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+            <form method="GET" action="{{ url_for('admin_students') }}" style="display: flex; gap: 0.5rem;">
+                <input type="text" name="search" class="form-control" placeholder="Cari nama siswa..." value="{{ search_query or '' }}" style="min-width: 200px;">
+                <button type="submit" class="btn btn-primary">Cari</button>
+                {% if search_query %}
+                <a href="{{ url_for('admin_students') }}" class="btn btn-secondary">Reset</a>
+                {% endif %}
+            </form>
+            <button onclick="showModal('addStudentModal')" class="btn btn-primary">+ Tambah Siswa</button>
+        </div>
     </div>
 
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Nama</th>
-                <th>Email</th>
-                <th>Cabang</th>
-                <th>Kelas</th>
-                <th>Sekolah</th>
-                <th>Aksi</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for student in students %}
-            <tr>
-                <td>{{ student.full_name }}</td>
-                <td>{{ student.email }}</td>
-                <td>{{ student.inspira_branch }}</td>
-                <td>{{ student.class_level }}</td>
-                <td>{{ student.school_name }}</td>
-                <td>
-                    <form method="POST" action="{{ url_for('admin_delete_student', id=student.id) }}" style="display: inline;" data-confirm-delete>
-                        <button type="submit" class="btn btn-danger" style="padding: 0.5rem 1rem;">Hapus</button>
-                    </form>
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+    <div class="table-responsive">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Nama</th>
+                    <th>Email</th>
+                    <th>Cabang</th>
+                    <th>Kelas</th>
+                    <th>Sekolah</th>
+                    <th>Aksi</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for student in students %}
+                <tr>
+                    <td>{{ student.full_name }}</td>
+                    <td>{{ student.email }}</td>
+                    <td>{{ student.inspira_branch }}</td>
+                    <td>{{ student.class_level }}</td>
+                    <td>{{ student.school_name }}</td>
+                    <td>
+                        <form method="POST" action="{{ url_for('admin_delete_student', id=student.id) }}" style="display: inline;" data-confirm-delete>
+                            <button type="submit" class="btn btn-danger" style="padding: 0.5rem 1rem;">Hapus</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 </div>
 
 <div id="addStudentModal" class="modal">

@@ -144,6 +144,10 @@ def register():
             flash('Email sudah terdaftar!', 'danger')
             return redirect(url_for('register'))
         
+        if User.query.filter(func.lower(User.full_name) == func.lower(full_name)).first():
+            flash('Nama sudah terdaftar! Gunakan nama yang berbeda.', 'danger')
+            return redirect(url_for('register'))
+        
         profile_photo = None
         photo = request.files.get('profile_photo')
         if photo and photo.filename:
@@ -188,11 +192,13 @@ def admin_dashboard():
     
     total_students = User.query.filter_by(role='student').count()
     total_teachers = User.query.filter_by(role='teacher').count()
-    total_exams = Exam.query.count()
+    total_exams = Exam.query.filter_by(is_active=True).count()
+    active_students = db.session.query(ExamAttempt.user_id).distinct().count()
     pending_payments = Payment.query.filter_by(status='pending').count()
     
     return render_template('admin_dashboard.html',
                          total_students=total_students,
+                         active_students=active_students,
                          total_teachers=total_teachers,
                          total_exams=total_exams,
                          pending_payments=pending_payments)
@@ -204,8 +210,16 @@ def admin_students():
         flash('Akses ditolak!', 'danger')
         return redirect(url_for('index'))
     
-    students = User.query.filter_by(role='student').all()
-    return render_template('admin_students.html', students=students, branches=BRANCHES)
+    search_query = request.args.get('search', '')
+    if search_query:
+        students = User.query.filter(
+            User.role == 'student',
+            User.full_name.ilike(f'%{search_query}%')
+        ).all()
+    else:
+        students = User.query.filter_by(role='student').all()
+    
+    return render_template('admin_students.html', students=students, branches=BRANCHES, search_query=search_query)
 
 @app.route('/admin/students/add', methods=['POST'])
 @login_required
@@ -223,6 +237,9 @@ def admin_add_student():
     
     if User.query.filter_by(email=email).first():
         return jsonify({'success': False, 'message': 'Email sudah terdaftar'}), 400
+    
+    if User.query.filter(func.lower(User.full_name) == func.lower(full_name)).first():
+        return jsonify({'success': False, 'message': 'Nama sudah terdaftar! Gunakan nama yang berbeda'}), 400
     
     user = User(
         email=email,
@@ -361,17 +378,18 @@ def admin_delete_exam(id):
 @app.route('/admin/payments')
 @login_required
 def admin_payments():
-    if current_user.role != 'admin':
+    if current_user.role not in ['admin', 'teacher']:
         flash('Akses ditolak!', 'danger')
         return redirect(url_for('index'))
     
     payments = Payment.query.order_by(Payment.created_at.desc()).all()
-    return render_template('admin_payments.html', payments=payments)
+    pending_count = Payment.query.filter_by(status='pending').count()
+    return render_template('admin_payments.html', payments=payments, pending_count=pending_count)
 
 @app.route('/admin/payments/<int:id>/approve', methods=['POST'])
 @login_required
 def admin_approve_payment(id):
-    if current_user.role != 'admin':
+    if current_user.role not in ['admin', 'teacher']:
         return jsonify({'success': False, 'message': 'Akses ditolak'}), 403
     
     payment = Payment.query.get_or_404(id)
@@ -383,10 +401,27 @@ def admin_approve_payment(id):
     flash('Pembayaran berhasil disetujui!', 'success')
     return redirect(url_for('admin_payments'))
 
+@app.route('/admin/payments/approve_all', methods=['POST'])
+@login_required
+def admin_approve_all_payments():
+    if current_user.role not in ['admin', 'teacher']:
+        return jsonify({'success': False, 'message': 'Akses ditolak'}), 403
+    
+    pending_payments = Payment.query.filter_by(status='pending').all()
+    for payment in pending_payments:
+        payment.status = 'approved'
+        payment.approved_at = datetime.utcnow()
+        payment.approved_by = current_user.id
+    
+    db.session.commit()
+    
+    flash(f'{len(pending_payments)} pembayaran berhasil disetujui!', 'success')
+    return redirect(url_for('admin_payments'))
+
 @app.route('/admin/payments/<int:id>/reject', methods=['POST'])
 @login_required
 def admin_reject_payment(id):
-    if current_user.role != 'admin':
+    if current_user.role not in ['admin', 'teacher']:
         return jsonify({'success': False, 'message': 'Akses ditolak'}), 403
     
     payment = Payment.query.get_or_404(id)
@@ -860,18 +895,14 @@ def student_result(id):
 def leaderboard(exam_id):
     exam = Exam.query.get_or_404(exam_id)
     
-    if current_user.role == 'student':
-        branch_leaderboard = Leaderboard.query.join(User).filter(
-            Leaderboard.exam_id == exam_id,
-            User.inspira_branch == current_user.inspira_branch
-        ).order_by(Leaderboard.rank_in_branch).limit(50).all()
-        
-        global_leaderboard = []
-    else:
-        branch_leaderboard = []
-        global_leaderboard = Leaderboard.query.filter_by(
-            exam_id=exam_id
-        ).order_by(Leaderboard.rank_global).limit(50).all()
+    branch_leaderboard = Leaderboard.query.join(User).filter(
+        Leaderboard.exam_id == exam_id,
+        User.inspira_branch == current_user.inspira_branch
+    ).order_by(Leaderboard.rank_in_branch).limit(50).all()
+    
+    global_leaderboard = Leaderboard.query.filter_by(
+        exam_id=exam_id
+    ).order_by(Leaderboard.rank_global).limit(50).all()
     
     return render_template('leaderboard.html',
                          exam=exam,

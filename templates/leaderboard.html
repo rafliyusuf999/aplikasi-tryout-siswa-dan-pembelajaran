@@ -5,9 +5,9 @@
 {% block content %}
 <h1 style="color: var(--primary-color); margin-bottom: 2rem;">🏆 Leaderboard: {{ exam.title }}</h1>
 
-{% if branch_leaderboard %}
 <div class="card">
     <h2>Leaderboard Cabang: {{ current_user.inspira_branch }}</h2>
+    {% if branch_leaderboard %}
     {% for entry in branch_leaderboard %}
     <div class="leaderboard-item">
         <div class="rank-badge {% if entry.rank_in_branch == 1 %}rank-1{% elif entry.rank_in_branch == 2 %}rank-2{% elif entry.rank_in_branch == 3 %}rank-3{% else %}rank-other{% endif %}">
@@ -22,13 +22,14 @@
             <p style="margin: 0; color: #666;">Poin</p>
         </div>
     </div>
-    {% endfor %}
+    {% else %}
+    <p style="text-align: center; color: #666; padding: 2rem;">Belum ada peserta dari cabang ini.</p>
+    {% endif %}
 </div>
-{% endif %}
 
-{% if global_leaderboard %}
-<div class="card">
-    <h2>Leaderboard Global</h2>
+<div class="card" style="margin-top: 2rem;">
+    <h2>Leaderboard Global (Semua Cabang)</h2>
+    {% if global_leaderboard %}
     {% for entry in global_leaderboard %}
     <div class="leaderboard-item">
         <div class="rank-badge {% if entry.rank_global == 1 %}rank-1{% elif entry.rank_global == 2 %}rank-2{% elif entry.rank_global == 3 %}rank-3{% else %}rank-other{% endif %}">
@@ -43,7 +44,8 @@
             <p style="margin: 0; color: #666;">Poin</p>
         </div>
     </div>
-    {% endfor %}
+    {% else %}
+    <p style="text-align: center; color: #666; padding: 2rem;">Belum ada peserta.</p>
+    {% endif %}
 </div>
-{% endif %}
 {% endblock %}
