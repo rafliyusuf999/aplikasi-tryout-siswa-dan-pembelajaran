@@ -75,6 +75,47 @@ body {
     transform: translateY(-2px);
 }
 
+.user-profile {
+    display: flex;
+    align-items: center;
+}
+
+.profile-info {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.3rem 0.8rem;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 25px;
+}
+
+.profile-photo-nav {
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid white;
+}
+
+.profile-photo-placeholder {
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    color: white;
+    border: 2px solid white;
+}
+
+.profile-name {
+    color: white;
+    font-weight: 500;
+    font-size: 0.95rem;
+}
+
 .navbar-toggle {
     display: none;
     flex-direction: column;

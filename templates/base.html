@@ -37,7 +37,17 @@
                         <li><a href="{{ url_for('student_exams') }}" onclick="closeMobileMenu()">Daftar TO</a></li>
                     {% endif %}
                     <li><a href="{{ url_for('all_leaderboards') }}" onclick="closeMobileMenu()">Peringkat</a></li>
-                    <li><a href="{{ url_for('logout') }}" onclick="closeMobileMenu()">Logout ({{ current_user.full_name }})</a></li>
+                    <li class="user-profile">
+                        <div class="profile-info">
+                            {% if current_user.profile_photo %}
+                            <img src="{{ url_for('uploaded_file', filename='profiles/' + current_user.profile_photo) }}" alt="{{ current_user.full_name }}" class="profile-photo-nav">
+                            {% else %}
+                            <div class="profile-photo-placeholder">{{ current_user.full_name[0].upper() }}</div>
+                            {% endif %}
+                            <span class="profile-name">{{ current_user.full_name }}</span>
+                        </div>
+                    </li>
+                    <li><a href="{{ url_for('logout') }}" onclick="closeMobileMenu()">Logout</a></li>
                 {% else %}
                     <li><a href="{{ url_for('login') }}" onclick="closeMobileMenu()">Login</a></li>
                     <li><a href="{{ url_for('register') }}" onclick="closeMobileMenu()">Daftar</a></li>
