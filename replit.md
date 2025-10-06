@@ -28,12 +28,13 @@ Preferred communication style: Simple, everyday language.
 ### Database Schema
 - **SQLite** - Local file-based database (`inspiranet.db`)
 - **Core Models:**
-  - `User` - Multi-role system (admin, teacher, student) with branch assignment and profile photo support
+  - `User` - Multi-role system (admin, teacher, student) with branch assignment and profile photo support (displayed in navbar)
   - `Exam` - Exam metadata including premium status and pricing
   - `Question` - Supports multiple-choice and essay question types with photo upload capability
   - `ExamAttempt` - Tracks student submissions, cheating warnings, and essay answers with photos (stored as JSON)
-  - `Payment` - Premium exam payment processing with approval workflow
+  - `Payment` - Premium exam payment processing with manual admin approval or admin-initiated payment
   - `Leaderboard` - Dual ranking system (branch-specific and global)
+  - `PaymentSettings` - Stores QRIS image, payment instructions, and bank account details for student payment display
 
 **Design Rationale:** SQLite eliminates external database dependencies for easy Replit deployment. The schema supports the branch-based competition model with separate leaderboards while maintaining referential integrity through foreign keys and cascade deletes. Automatic migration system ensures existing databases are updated with new columns on startup.
 
@@ -69,13 +70,16 @@ Preferred communication style: Simple, everyday language.
 
 ### Payment & Premium Content
 - Two-tier exam system: Free and Premium
-- Payment workflow:
-  1. Student uploads payment proof (image)
-  2. Admin reviews and approves/rejects
-  3. Access granted upon approval
+- **Dual Payment Workflows:**
+  1. **Student-Initiated:** Student uploads payment proof → Admin reviews and approves/rejects → Access granted
+  2. **Admin-Initiated:** Admin directly creates approved payment for any student and premium exam
+- **Payment Settings Management:**
+  - Admin can configure QRIS payment image
+  - Customizable payment instructions and bank account details
+  - Settings displayed dynamically on student payment page
 - File upload handling with Werkzeug's secure_filename
 
-**Design Rationale:** Manual approval workflow provides payment verification without third-party payment gateway integration, reducing deployment complexity.
+**Design Rationale:** Flexible payment system supports both student uploads and direct admin management for scholarships or special cases. Configurable payment settings eliminate hardcoded payment details and allow easy updates via admin interface.
 
 ### Frontend Architecture
 - **Jinja2 Templates** - Server-side rendering
@@ -86,13 +90,15 @@ Preferred communication style: Simple, everyday language.
   - Tablet: 768px - 1023px
   - Mobile: Below 768px
 - **Modal Improvements:** Scrollable content with overflow handling to prevent content being cut off
-- **Enhanced Exam Interface:**
+- **Enhanced User Interface:**
+  - **Navbar Profile Display:** User profile photo and name shown in navigation bar with responsive design
   - Complete countdown timer with HH:MM:SS format updating every second
   - Visual question status indicators with color coding (grey=unanswered, green=answered, yellow=doubtful)
   - Question navigation buttons with scale effect for current question while preserving status colors
   - Leaderboard with trophy icons (🥇🥈🥉) for top 3 ranks and user highlighting
   - Combined highest score display from premium and free exams in student dashboard
   - Secure admin student management with password reset capability (without exposing password hashes)
+  - Admin payment management with manual payment creation and settings configuration
 
 **Design Rationale:** Server-side rendering reduces client complexity. No frontend framework dependencies enable lightweight, fast-loading pages suitable for Replit hosting. Responsive design ensures optimal user experience across all devices. Modals with proper scrolling ensure forms are accessible on all screen sizes. Visual indicators and countdown timer improve user experience and exam time management.
 
@@ -101,8 +107,11 @@ Preferred communication style: Simple, everyday language.
 - `models.py` - SQLAlchemy database models with essay and profile photo support
 - `templates/` - Jinja2 HTML templates organized by user role
   - `admin_questions.html` - Admin interface for managing all exam questions (add, edit, delete)
+  - `admin_payments.html` - Payment management with manual payment creation
+  - `admin_payment_settings.html` - Configure QRIS, payment instructions, and bank details
   - `teacher_questions.html` - Teacher interface for managing own exam questions (add, edit, delete)
   - `student_exam.html` - Exam interface with essay photo upload and comprehensive error handling
+  - `student_pay.html` - Payment page displaying QRIS and dynamic payment instructions
   - `essay_answers.html` - Admin/teacher dashboard for viewing essay submissions
   - `register.html` - Student registration with profile photo upload
 - `static/css/` - Responsive stylesheets with custom theme and improved modal scrolling
@@ -120,8 +129,9 @@ Preferred communication style: Simple, everyday language.
 ### Storage
 - **SQLite Database** - `inspiranet.db` file stored in `instance/` directory
 - **File Uploads:**
-  - Payment proof images: `uploads/` directory (max 16MB per file)
-  - Student profile photos: `uploads/profiles/` directory
+  - Payment proof images: `uploads/payments/` directory (max 16MB per file)
+  - QRIS payment image: `uploads/payment/` directory (admin-configurable)
+  - Student profile photos: `uploads/profiles/` directory (displayed in navbar)
   - Essay answer photos: `uploads/answers/` directory
 - **Automatic Migration** - Database schema automatically updated on startup using SQLAlchemy URL parsing and instance path resolution
 

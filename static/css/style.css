@@ -635,6 +635,21 @@ body {
         transform: none;
     }
     
+    .user-profile {
+        width: 100%;
+    }
+    
+    .profile-info {
+        width: 100%;
+        justify-content: flex-start;
+        padding: 1rem 1.5rem;
+        border-radius: 0;
+    }
+    
+    .navbar-nav li.user-profile {
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
     .timer {
         position: static;
         margin: 1rem auto;
