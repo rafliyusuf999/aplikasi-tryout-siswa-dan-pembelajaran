@@ -3,7 +3,10 @@
 {% block title %}Konfirmasi Pembayaran - Admin{% endblock %}
 
 {% block content %}
-<h1 style="color: var(--primary-color); margin-bottom: 2rem;">💰 Konfirmasi Pembayaran</h1>
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+    <h1 style="color: var(--primary-color); margin: 0;">💰 Konfirmasi Pembayaran</h1>
+    <a href="{{ url_for('admin_payment_settings') }}" class="btn btn-primary">⚙️ Pengaturan Pembayaran</a>
+</div>
 
 <div class="card" style="margin-bottom: 2rem;">
     <h2>➕ Tambah Pembayaran Manual</h2>

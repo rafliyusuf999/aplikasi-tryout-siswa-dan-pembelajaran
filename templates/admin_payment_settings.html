@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block title %}Pengaturan Pembayaran - Admin{% endblock %}
+
+{% block content %}
+<h1 style="color: var(--primary-color); margin-bottom: 2rem;">⚙️ Pengaturan Pembayaran</h1>
+
+<div class="card">
+    <form method="POST" enctype="multipart/form-data">
+        <div class="form-group">
+            <label>Instruksi Pembayaran:</label>
+            <textarea name="payment_instructions" class="form-control" rows="3" placeholder="Masukkan instruksi pembayaran untuk siswa">{{ settings.payment_instructions if settings else '' }}</textarea>
+        </div>
+
+        <div class="form-group">
+            <label>Nama Bank:</label>
+            <input type="text" name="bank_name" class="form-control" value="{{ settings.bank_name if settings else '' }}" placeholder="Contoh: Bank BCA">
+        </div>
+
+        <div class="form-group">
+            <label>Nomor Rekening:</label>
+            <input type="text" name="account_number" class="form-control" value="{{ settings.account_number if settings else '' }}" placeholder="Contoh: 1234567890">
+        </div>
+
+        <div class="form-group">
+            <label>Nama Pemilik Rekening:</label>
+            <input type="text" name="account_name" class="form-control" value="{{ settings.account_name if settings else '' }}" placeholder="Contoh: INSPIRANET">
+        </div>
+
+        <div class="form-group">
+            <label>Upload QRIS:</label>
+            {% if settings and settings.qris_image %}
+            <div style="margin-bottom: 1rem;">
+                <p>QRIS saat ini:</p>
+                <img src="{{ url_for('uploaded_file', filename='payment/' + settings.qris_image) }}" style="max-width: 300px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.2);">
+            </div>
+            {% endif %}
+            <input type="file" name="qris_image" class="form-control" accept="image/*">
+            <small style="color: #666;">Upload gambar baru untuk mengganti QRIS yang ada</small>
+        </div>
+
+        <div style="margin-top: 2rem;">
+            <button type="submit" class="btn btn-primary">Simpan Pengaturan</button>
+            <a href="{{ url_for('admin_payments') }}" class="btn btn-secondary">Kembali</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

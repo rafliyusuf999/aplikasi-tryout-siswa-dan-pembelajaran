@@ -1,7 +1,7 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, jsonify, session
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 from werkzeug.utils import secure_filename
-from models import db, User, Exam, Question, ExamAttempt, Payment, Leaderboard
+from models import db, User, Exam, Question, ExamAttempt, Payment, Leaderboard, PaymentSettings
 from datetime import datetime
 import os
 import json
@@ -581,6 +581,41 @@ def admin_add_payment():
     flash(f'Pembayaran berhasil ditambahkan untuk {student.full_name}!', 'success')
     return redirect(url_for('admin_payments'))
 
+@app.route('/admin/payment-settings', methods=['GET', 'POST'])
+@login_required
+def admin_payment_settings():
+    if current_user.role not in ['admin', 'teacher']:
+        flash('Akses ditolak!', 'danger')
+        return redirect(url_for('index'))
+    
+    settings = PaymentSettings.query.first()
+    if not settings:
+        settings = PaymentSettings()
+        db.session.add(settings)
+        db.session.commit()
+    
+    if request.method == 'POST':
+        settings.payment_instructions = request.form.get('payment_instructions')
+        settings.bank_name = request.form.get('bank_name')
+        settings.account_number = request.form.get('account_number')
+        settings.account_name = request.form.get('account_name')
+        
+        qris_file = request.files.get('qris_image')
+        if qris_file and qris_file.filename:
+            os.makedirs(os.path.join(app.config['UPLOAD_FOLDER'], 'payment'), exist_ok=True)
+            filename = secure_filename(f"qris_{datetime.now().timestamp()}.jpg")
+            filepath = os.path.join(app.config['UPLOAD_FOLDER'], 'payment', filename)
+            qris_file.save(filepath)
+            settings.qris_image = filename
+        
+        settings.updated_at = datetime.utcnow()
+        db.session.commit()
+        
+        flash('Pengaturan pembayaran berhasil diperbarui!', 'success')
+        return redirect(url_for('admin_payment_settings'))
+    
+    return render_template('admin_payment_settings.html', settings=settings)
+
 @app.route('/admin/exams/<int:id>/questions')
 @login_required
 def admin_questions(id):
@@ -939,7 +974,8 @@ def student_pay_exam(id):
             flash('Bukti pembayaran berhasil diupload! Menunggu konfirmasi admin.', 'success')
             return redirect(url_for('student_exams'))
     
-    return render_template('student_pay.html', exam=exam)
+    payment_settings = PaymentSettings.query.first()
+    return render_template('student_pay.html', exam=exam, payment_settings=payment_settings)
 
 @app.route('/student/exams/<int:id>/start')
 @login_required

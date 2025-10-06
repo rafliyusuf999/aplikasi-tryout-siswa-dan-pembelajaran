@@ -106,3 +106,14 @@ class Leaderboard(db.Model):
     completion_time = db.Column(db.Integer, nullable=True)
     percentile = db.Column(db.Float, nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+class PaymentSettings(db.Model):
+    __tablename__ = 'payment_settings'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    qris_image = db.Column(db.String(255), nullable=True)
+    payment_instructions = db.Column(db.Text, nullable=True)
+    bank_name = db.Column(db.String(100), nullable=True)
+    account_number = db.Column(db.String(50), nullable=True)
+    account_name = db.Column(db.String(100), nullable=True)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
