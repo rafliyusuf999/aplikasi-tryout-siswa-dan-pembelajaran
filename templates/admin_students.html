@@ -51,9 +51,20 @@
                             data-class="{{ student.class_level }}"
                             data-school="{{ student.school_name }}"
                             data-phone="{{ student.phone_number or '-' }}"
-                            data-created="{{ student.created_at.strftime('%d/%m/%Y %H:%M') }}"
-                            data-password="{{ student.password_hash }}">
+                            data-created="{{ student.created_at.strftime('%d/%m/%Y %H:%M') }}">
                             Detail
+                        </button>
+                        <button 
+                            class="btn btn-warning student-edit-btn" 
+                            style="padding: 0.5rem 1rem; margin-right: 0.5rem;"
+                            data-id="{{ student.id }}"
+                            data-name="{{ student.full_name }}"
+                            data-email="{{ student.email }}"
+                            data-branch="{{ student.inspira_branch }}"
+                            data-class="{{ student.class_level }}"
+                            data-school="{{ student.school_name }}"
+                            data-phone="{{ student.phone_number or '' }}">
+                            Edit
                         </button>
                         <form method="POST" action="{{ url_for('admin_delete_student', id=student.id) }}" style="display: inline;" data-confirm-delete>
                             <button type="submit" class="btn btn-danger" style="padding: 0.5rem 1rem;">Hapus</button>
@@ -189,6 +200,51 @@
     </div>
 </div>
 
+<div id="editStudentModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Edit Data Siswa</h3>
+            <span class="close" onclick="closeModal('editStudentModal')">&times;</span>
+        </div>
+        <form method="POST" id="editStudentForm">
+            <div class="form-group">
+                <label>Nama Lengkap:</label>
+                <input type="text" id="edit_full_name" name="full_name" class="form-control" required>
+            </div>
+            <div class="form-group">
+                <label>Email:</label>
+                <input type="email" id="edit_email" name="email" class="form-control" required>
+            </div>
+            <div class="form-group">
+                <label>Cabang:</label>
+                <select id="edit_branch" name="inspira_branch" class="form-control" required>
+                    {% for branch in branches %}
+                    <option value="{{ branch }}">{{ branch }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Kelas:</label>
+                <select id="edit_class" name="class_level" class="form-control" required>
+                    <option value="10">10</option>
+                    <option value="11">11</option>
+                    <option value="12">12</option>
+                    <option value="Alumni">Alumni</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Nama Sekolah:</label>
+                <input type="text" id="edit_school" name="school_name" class="form-control" required>
+            </div>
+            <div class="form-group">
+                <label>Nomor HP:</label>
+                <input type="tel" id="edit_phone" name="phone_number" class="form-control" required>
+            </div>
+            <button type="submit" class="btn btn-primary" style="width: 100%;">Simpan Perubahan</button>
+        </form>
+    </div>
+</div>
+
 <script>
 let currentStudentId = null;
 let currentStudentName = null;
@@ -214,6 +270,29 @@ document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('detail_created').textContent = created;
             
             showModal('studentDetailsModal');
+        });
+    });
+    
+    document.querySelectorAll('.student-edit-btn').forEach(function(button) {
+        button.addEventListener('click', function() {
+            const id = this.getAttribute('data-id');
+            const name = this.getAttribute('data-name');
+            const email = this.getAttribute('data-email');
+            const branch = this.getAttribute('data-branch');
+            const classLevel = this.getAttribute('data-class');
+            const school = this.getAttribute('data-school');
+            const phone = this.getAttribute('data-phone');
+            
+            document.getElementById('edit_full_name').value = name;
+            document.getElementById('edit_email').value = email;
+            document.getElementById('edit_branch').value = branch;
+            document.getElementById('edit_class').value = classLevel;
+            document.getElementById('edit_school').value = school;
+            document.getElementById('edit_phone').value = phone;
+            
+            document.getElementById('editStudentForm').action = '{{ url_for("admin_edit_student", id=0) }}'.replace('/0', '/' + id);
+            
+            showModal('editStudentModal');
         });
     });
 });

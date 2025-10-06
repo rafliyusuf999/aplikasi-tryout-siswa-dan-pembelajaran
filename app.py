@@ -273,6 +273,55 @@ def admin_delete_student(id):
     flash('Siswa berhasil dihapus!', 'success')
     return redirect(url_for('admin_students'))
 
+@app.route('/admin/students/reset-password', methods=['POST'])
+@login_required
+def admin_reset_student_password():
+    if current_user.role != 'admin':
+        flash('Akses ditolak!', 'danger')
+        return redirect(url_for('index'))
+    
+    student_id = request.form.get('student_id')
+    new_password = request.form.get('new_password')
+    
+    if not new_password or len(new_password) < 6:
+        flash('Password minimal 6 karakter!', 'danger')
+        return redirect(url_for('admin_students'))
+    
+    student = User.query.get_or_404(student_id)
+    if student.role != 'student':
+        flash('Hanya bisa mereset password siswa!', 'danger')
+        return redirect(url_for('admin_students'))
+    
+    student.set_password(new_password)
+    db.session.commit()
+    
+    flash(f'Password untuk {student.full_name} berhasil direset!', 'success')
+    return redirect(url_for('admin_students'))
+
+@app.route('/admin/students/edit/<int:id>', methods=['POST'])
+@login_required
+def admin_edit_student(id):
+    if current_user.role != 'admin':
+        flash('Akses ditolak!', 'danger')
+        return redirect(url_for('index'))
+    
+    student = User.query.get_or_404(id)
+    if student.role != 'student':
+        flash('Hanya bisa mengedit siswa!', 'danger')
+        return redirect(url_for('admin_students'))
+    
+    student.full_name = request.form.get('full_name')
+    student.email = request.form.get('email')
+    student.inspira_branch = request.form.get('inspira_branch')
+    student.class_level = request.form.get('class_level')
+    student.school_name = request.form.get('school_name')
+    student.phone_number = request.form.get('phone_number')
+    
+    db.session.commit()
+    
+    flash(f'Data {student.full_name} berhasil diupdate!', 'success')
+    return redirect(url_for('admin_students'))
+
 @app.route('/admin/teachers')
 @login_required
 def admin_teachers():
