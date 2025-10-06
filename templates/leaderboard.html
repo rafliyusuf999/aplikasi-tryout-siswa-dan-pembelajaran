@@ -154,7 +154,13 @@
                         {{ entry.user.full_name }}
                         {% if entry.user_id == current_user.id %}<span style="color: var(--primary-color); font-weight: bold;"> (Anda)</span>{% endif %}
                     </h3>
-                    <p style="margin: 0; color: #666;">{{ entry.user.class_level }} - {{ entry.user.school_name }}</p>
+                    <p style="margin: 0; color: #666; font-size: 0.9rem;">
+                        <strong>Kelas:</strong> {{ entry.user.class_level or '-' }} | 
+                        <strong>Sekolah:</strong> {{ entry.user.school_name or '-' }}
+                    </p>
+                    <p style="margin: 0; color: #999; font-size: 0.85rem;">
+                        📍 {{ entry.user.inspira_branch or '-' }}
+                    </p>
                 </div>
                 <div style="text-align: right;">
                     <h3 style="margin: 0; color: var(--primary-color);">{{ entry.total_score }}</h3>
@@ -190,7 +196,13 @@
                         {{ entry.user.full_name }}
                         {% if entry.user_id == current_user.id %}<span style="color: var(--primary-color); font-weight: bold;"> (Anda)</span>{% endif %}
                     </h3>
-                    <p style="margin: 0; color: #666;">{{ entry.user.inspira_branch }} - {{ entry.user.class_level }}</p>
+                    <p style="margin: 0; color: #666; font-size: 0.9rem;">
+                        <strong>Kelas:</strong> {{ entry.user.class_level or '-' }} | 
+                        <strong>Sekolah:</strong> {{ entry.user.school_name or '-' }}
+                    </p>
+                    <p style="margin: 0; color: #999; font-size: 0.85rem;">
+                        📍 {{ entry.user.inspira_branch or '-' }}
+                    </p>
                 </div>
                 <div style="text-align: right;">
                     <h3 style="margin: 0; color: var(--primary-color);">{{ entry.total_score }}</h3>

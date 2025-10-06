@@ -86,8 +86,15 @@ Preferred communication style: Simple, everyday language.
   - Tablet: 768px - 1023px
   - Mobile: Below 768px
 - **Modal Improvements:** Scrollable content with overflow handling to prevent content being cut off
+- **Enhanced Exam Interface:**
+  - Complete countdown timer with HH:MM:SS format updating every second
+  - Visual question status indicators with color coding (grey=unanswered, green=answered, yellow=doubtful)
+  - Question navigation buttons with scale effect for current question while preserving status colors
+  - Leaderboard with trophy icons (🥇🥈🥉) for top 3 ranks and user highlighting
+  - Combined highest score display from premium and free exams in student dashboard
+  - Secure admin student management with password reset capability (without exposing password hashes)
 
-**Design Rationale:** Server-side rendering reduces client complexity. No frontend framework dependencies enable lightweight, fast-loading pages suitable for Replit hosting. Responsive design ensures optimal user experience across all devices. Modals with proper scrolling ensure forms are accessible on all screen sizes.
+**Design Rationale:** Server-side rendering reduces client complexity. No frontend framework dependencies enable lightweight, fast-loading pages suitable for Replit hosting. Responsive design ensures optimal user experience across all devices. Modals with proper scrolling ensure forms are accessible on all screen sizes. Visual indicators and countdown timer improve user experience and exam time management.
 
 ### File Structure
 - `app.py` - Main application entry with route definitions, automatic database migration, and question management endpoints
