@@ -496,7 +496,9 @@ def admin_payments():
     
     payments = Payment.query.order_by(Payment.created_at.desc()).all()
     pending_count = Payment.query.filter_by(status='pending').count()
-    return render_template('admin_payments.html', payments=payments, pending_count=pending_count)
+    students = User.query.filter_by(role='student').order_by(User.full_name).all()
+    exams = Exam.query.filter_by(is_premium=True, is_active=True).all()
+    return render_template('admin_payments.html', payments=payments, pending_count=pending_count, students=students, exams=exams)
 
 @app.route('/admin/payments/<int:id>/approve', methods=['POST'])
 @login_required
@@ -541,6 +543,42 @@ def admin_reject_payment(id):
     db.session.commit()
     
     flash('Pembayaran ditolak!', 'info')
+    return redirect(url_for('admin_payments'))
+
+@app.route('/admin/payments/add', methods=['POST'])
+@login_required
+def admin_add_payment():
+    if current_user.role not in ['admin', 'teacher']:
+        return jsonify({'success': False, 'message': 'Akses ditolak'}), 403
+    
+    student_id = request.form.get('student_id')
+    exam_id = request.form.get('exam_id')
+    
+    student = User.query.get_or_404(student_id)
+    exam = Exam.query.get_or_404(exam_id)
+    
+    existing_payment = Payment.query.filter_by(
+        user_id=student_id,
+        exam_id=exam_id,
+        status='approved'
+    ).first()
+    
+    if existing_payment:
+        flash('Siswa sudah memiliki pembayaran yang disetujui untuk TO ini!', 'warning')
+        return redirect(url_for('admin_payments'))
+    
+    payment = Payment(
+        user_id=student_id,
+        exam_id=exam_id,
+        amount=exam.price,
+        status='approved',
+        approved_at=datetime.utcnow(),
+        approved_by=current_user.id
+    )
+    db.session.add(payment)
+    db.session.commit()
+    
+    flash(f'Pembayaran berhasil ditambahkan untuk {student.full_name}!', 'success')
     return redirect(url_for('admin_payments'))
 
 @app.route('/admin/exams/<int:id>/questions')
