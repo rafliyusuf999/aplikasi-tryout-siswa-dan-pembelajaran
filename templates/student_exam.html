@@ -164,11 +164,16 @@
     border-color: #ffc107;
 }
 
-.question-nav-btn.current {
+.question-nav-btn.current:not(.answered):not(.doubtful):not(.unanswered) {
     background: var(--primary-color) !important;
     color: white !important;
     border-color: var(--primary-color) !important;
     transform: scale(1.15);
+}
+
+.question-nav-btn.current {
+    transform: scale(1.15);
+    box-shadow: 0 4px 15px rgba(139, 21, 56, 0.3);
 }
 
 .legend {
@@ -252,8 +257,8 @@
 <div class="exam-container">
     <div class="exam-main">
         <div class="timer-display" id="timer">
-            <h3>{{ exam.duration_minutes }} Menit</h3>
-            <p>Sisa Waktu</p>
+            <p style="font-size: 0.9rem; margin: 0 0 0.5rem 0; opacity: 0.9;">Sisa Waktu</p>
+            <h3 style="margin: 0; font-size: 2.5rem;" id="timer-display">00:00:00</h3>
         </div>
         
         <div id="questionContainer">
@@ -336,7 +341,7 @@
             
             <div class="question-grid">
                 {% for question in questions %}
-                <button type="button" class="question-nav-btn {% if loop.first %}current{% endif %}" 
+                <button type="button" class="question-nav-btn unanswered {% if loop.first %}current{% endif %}" 
                         id="nav-{{ question.question_order }}" 
                         onclick="showQuestion({{ question.question_order }})">
                     {{ question.question_order }}
@@ -367,8 +372,6 @@
 </div>
 
 <script>
-showSecurityWarningModal();
-
 let timerStarted = false;
 let antiCheatEnabled = false;
 let currentQuestion = 1;
@@ -443,7 +446,12 @@ function updateNavButton(questionNumber) {
 
 function initializeNavButtons() {
     for (let i = 1; i <= totalQuestions; i++) {
-        updateNavButton(i);
+        const btn = document.getElementById('nav-' + i);
+        if (!btn.classList.contains('answered') && !btn.classList.contains('doubtful')) {
+            if (!btn.classList.contains('unanswered')) {
+                btn.classList.add('unanswered');
+            }
+        }
     }
 }
 
@@ -531,5 +539,9 @@ async function submitExam() {
 }
 
 initializeNavButtons();
+
+if (typeof showSecurityWarningModal === 'function') {
+    showSecurityWarningModal();
+}
 </script>
 {% endblock %}

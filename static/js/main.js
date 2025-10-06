@@ -286,28 +286,41 @@ class ExamTimer {
         this.element = document.getElementById(elementId);
         if (!this.element) return;
 
-        this.interval = setInterval(() => {
-            this.remaining--;
-
+        const updateTimer = () => {
             const hours = Math.floor(this.remaining / 3600);
             const minutes = Math.floor((this.remaining % 3600) / 60);
             const seconds = this.remaining % 60;
+            const timeString = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
 
-            this.element.innerHTML = `
-                <div style="text-align: center;">
-                    <div style="font-size: 0.8rem; opacity: 0.9;">Sisa Waktu</div>
-                    <div style="font-size: 2rem;">${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}</div>
-                </div>
-            `;
+            const timerDisplay = document.getElementById('timer-display');
+            if (timerDisplay) {
+                timerDisplay.textContent = timeString;
+            } else {
+                this.element.innerHTML = `
+                    <div style="text-align: center;">
+                        <div style="font-size: 0.8rem; opacity: 0.9;">Sisa Waktu</div>
+                        <div style="font-size: 2rem;">${timeString}</div>
+                    </div>
+                `;
+            }
+
+            if (this.remaining <= 300) {
+                this.element.style.background = 'linear-gradient(135deg, #dc3545 0%, #c82333 100%)';
+                this.element.style.animation = 'pulse 1s infinite';
+            }
+        };
+
+        updateTimer();
+
+        this.interval = setInterval(() => {
+            this.remaining--;
+            updateTimer();
 
             if (this.remaining <= 0) {
                 this.stop();
                 if (this.onTimeUp) {
                     this.onTimeUp();
                 }
-            } else if (this.remaining <= 300) {
-                this.element.style.background = 'linear-gradient(135deg, #dc3545 0%, #c82333 100%)';
-                this.element.style.animation = 'pulse 1s infinite';
             }
         }, 1000);
     }
