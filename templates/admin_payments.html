@@ -44,6 +44,9 @@
                         {% endif %}
                     </td>
                     <td>
+                        {% if payment.payment_proof %}
+                        <button onclick="showPaymentProof('{{ url_for('uploaded_file', filename='payments/' + payment.payment_proof) }}')" class="btn btn-primary" style="padding: 0.5rem 1rem; margin-right: 0.5rem;">Lihat Bukti</button>
+                        {% endif %}
                         {% if payment.status == 'pending' %}
                         <form method="POST" action="{{ url_for('admin_approve_payment', id=payment.id) }}" style="display: inline;">
                             <button type="submit" class="btn btn-success" style="padding: 0.5rem 1rem;">Setujui</button>
@@ -59,4 +62,26 @@
         </table>
     </div>
 </div>
+
+<div id="paymentProofModal" class="modal">
+    <div class="modal-content" style="max-width: 800px;">
+        <div class="modal-header">
+            <h3>Bukti Pembayaran</h3>
+            <span class="close" onclick="closeModal('paymentProofModal')">&times;</span>
+        </div>
+        <div class="modal-body" style="text-align: center;">
+            <img id="proofImage" src="" style="max-width: 100%; max-height: 600px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.2);">
+        </div>
+        <div class="modal-footer">
+            <button onclick="closeModal('paymentProofModal')" class="btn btn-secondary">Tutup</button>
+        </div>
+    </div>
+</div>
+
+<script>
+function showPaymentProof(imageUrl) {
+    document.getElementById('proofImage').src = imageUrl;
+    showModal('paymentProofModal');
+}
+</script>
 {% endblock %}

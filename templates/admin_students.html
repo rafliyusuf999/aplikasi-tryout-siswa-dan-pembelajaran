@@ -41,6 +41,20 @@
                     <td>{{ student.class_level }}</td>
                     <td>{{ student.school_name }}</td>
                     <td>
+                        <button 
+                            class="btn btn-primary student-detail-btn" 
+                            style="padding: 0.5rem 1rem; margin-right: 0.5rem;"
+                            data-id="{{ student.id }}"
+                            data-name="{{ student.full_name }}"
+                            data-email="{{ student.email }}"
+                            data-branch="{{ student.inspira_branch }}"
+                            data-class="{{ student.class_level }}"
+                            data-school="{{ student.school_name }}"
+                            data-phone="{{ student.phone_number or '-' }}"
+                            data-created="{{ student.created_at.strftime('%d/%m/%Y %H:%M') }}"
+                            data-password="{{ student.password_hash }}">
+                            Detail
+                        </button>
                         <form method="POST" action="{{ url_for('admin_delete_student', id=student.id) }}" style="display: inline;" data-confirm-delete>
                             <button type="submit" class="btn btn-danger" style="padding: 0.5rem 1rem;">Hapus</button>
                         </form>
@@ -100,4 +114,87 @@
         </form>
     </div>
 </div>
+
+<div id="studentDetailsModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Biodata Siswa</h3>
+            <span class="close" onclick="closeModal('studentDetailsModal')">&times;</span>
+        </div>
+        <div class="modal-body">
+            <table style="width: 100%; border-collapse: collapse;">
+                <tr style="border-bottom: 1px solid #ddd;">
+                    <td style="padding: 1rem; font-weight: bold; width: 40%;">Nama Lengkap:</td>
+                    <td id="detail_name" style="padding: 1rem;"></td>
+                </tr>
+                <tr style="border-bottom: 1px solid #ddd;">
+                    <td style="padding: 1rem; font-weight: bold;">Email:</td>
+                    <td id="detail_email" style="padding: 1rem;"></td>
+                </tr>
+                <tr style="border-bottom: 1px solid #ddd;">
+                    <td style="padding: 1rem; font-weight: bold;">Cabang:</td>
+                    <td id="detail_branch" style="padding: 1rem;"></td>
+                </tr>
+                <tr style="border-bottom: 1px solid #ddd;">
+                    <td style="padding: 1rem; font-weight: bold;">Kelas:</td>
+                    <td id="detail_class" style="padding: 1rem;"></td>
+                </tr>
+                <tr style="border-bottom: 1px solid #ddd;">
+                    <td style="padding: 1rem; font-weight: bold;">Sekolah:</td>
+                    <td id="detail_school" style="padding: 1rem;"></td>
+                </tr>
+                <tr style="border-bottom: 1px solid #ddd;">
+                    <td style="padding: 1rem; font-weight: bold;">Nomor HP:</td>
+                    <td id="detail_phone" style="padding: 1rem;"></td>
+                </tr>
+                <tr style="border-bottom: 1px solid #ddd;">
+                    <td style="padding: 1rem; font-weight: bold;">Tanggal Daftar:</td>
+                    <td id="detail_created" style="padding: 1rem;"></td>
+                </tr>
+                <tr style="border-bottom: 1px solid #ddd;">
+                    <td style="padding: 1rem; font-weight: bold;">Password Hash:</td>
+                    <td id="detail_password" style="padding: 1rem; font-size: 0.75rem; word-break: break-all; color: #666;"></td>
+                </tr>
+                <tr>
+                    <td colspan="2" style="padding: 1rem;">
+                        <small style="color: #dc3545; font-style: italic;">
+                            ⚠️ Catatan: Password tersimpan dalam bentuk hash (enkripsi satu arah) yang tidak dapat dikembalikan ke bentuk asli. Ini untuk keamanan data.
+                        </small>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="modal-footer">
+            <button onclick="closeModal('studentDetailsModal')" class="btn btn-secondary">Tutup</button>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.student-detail-btn').forEach(function(button) {
+        button.addEventListener('click', function() {
+            const name = this.getAttribute('data-name');
+            const email = this.getAttribute('data-email');
+            const branch = this.getAttribute('data-branch');
+            const classLevel = this.getAttribute('data-class');
+            const school = this.getAttribute('data-school');
+            const phone = this.getAttribute('data-phone');
+            const created = this.getAttribute('data-created');
+            const passwordHash = this.getAttribute('data-password');
+            
+            document.getElementById('detail_name').textContent = name;
+            document.getElementById('detail_email').textContent = email;
+            document.getElementById('detail_branch').textContent = branch;
+            document.getElementById('detail_class').textContent = classLevel;
+            document.getElementById('detail_school').textContent = school;
+            document.getElementById('detail_phone').textContent = phone;
+            document.getElementById('detail_created').textContent = created;
+            document.getElementById('detail_password').textContent = passwordHash;
+            
+            showModal('studentDetailsModal');
+        });
+    });
+});
+</script>
 {% endblock %}
