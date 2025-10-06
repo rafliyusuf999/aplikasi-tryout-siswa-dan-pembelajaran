@@ -229,7 +229,19 @@ def admin_students():
     else:
         students = User.query.filter_by(role='student').all()
     
-    return render_template('admin_students.html', students=students, branches=BRANCHES, search_query=search_query)
+    student_cheating_data = {}
+    for student in students:
+        cheating_count = db.session.query(func.count(ExamAttempt.id)).filter(
+            ExamAttempt.user_id == student.id,
+            ExamAttempt.cheating_warnings > 0
+        ).scalar()
+        student_cheating_data[student.id] = cheating_count or 0
+    
+    return render_template('admin_students.html', 
+                         students=students, 
+                         branches=BRANCHES, 
+                         search_query=search_query,
+                         student_cheating_data=student_cheating_data)
 
 @app.route('/admin/students/add', methods=['POST'])
 @login_required
@@ -859,6 +871,15 @@ def student_start_exam(id):
     
     exam = Exam.query.get_or_404(id)
     
+    cheated_attempt = ExamAttempt.query.filter_by(
+        user_id=current_user.id,
+        exam_id=exam.id
+    ).filter(ExamAttempt.cheating_warnings > 0).first()
+    
+    if cheated_attempt:
+        flash('⛔ AKSES DITOLAK! Anda terdeteksi melakukan kecurangan pada ujian ini dan tidak diperbolehkan mengerjakan TO ini lagi.', 'danger')
+        return redirect(url_for('student_exams'))
+    
     if exam.is_premium:
         payment = Payment.query.filter_by(
             user_id=current_user.id,
@@ -886,6 +907,21 @@ def student_start_exam(id):
     
     questions = Question.query.filter_by(exam_id=exam.id).order_by(Question.question_order).all()
     return render_template('student_exam.html', exam=exam, attempt=attempt, questions=questions)
+
+@app.route('/student/exams/<int:attempt_id>/mark_cheating', methods=['POST'])
+@login_required
+def mark_cheating(attempt_id):
+    if current_user.role != 'student':
+        return jsonify({'success': False}), 403
+    
+    attempt = ExamAttempt.query.get_or_404(attempt_id)
+    if attempt.user_id != current_user.id:
+        return jsonify({'success': False}), 403
+    
+    attempt.cheating_warnings = (attempt.cheating_warnings or 0) + 1
+    db.session.commit()
+    
+    return jsonify({'success': True, 'warnings': attempt.cheating_warnings})
 
 @app.route('/student/exams/<int:attempt_id>/upload_essay', methods=['POST'])
 @login_required

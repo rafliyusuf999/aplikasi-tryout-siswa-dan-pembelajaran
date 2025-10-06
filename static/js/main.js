@@ -76,7 +76,7 @@ class LogoAnimation {
 }
 
 class AntiCheat {
-    constructor(onWarning, logoutUrl = '/logout', restartUrl = null) {
+    constructor(onWarning, logoutUrl = '/logout', restartUrl = null, attemptId = null) {
         this.warningCount = 0;
         this.maxWarnings = 1;
         this.onWarning = onWarning;
@@ -85,6 +85,7 @@ class AntiCheat {
         this.restartUrl = restartUrl;
         this.tabSwitchCount = 0;
         this.maxTabSwitches = 1;
+        this.attemptId = attemptId;
     }
 
     enable() {
@@ -175,16 +176,35 @@ class AntiCheat {
         }
     }
 
+    async markCheating() {
+        if (this.attemptId) {
+            try {
+                await fetch(`/student/exams/${this.attemptId}/mark_cheating`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+            } catch (error) {
+                console.error('Failed to mark cheating:', error);
+            }
+        }
+    }
+
     triggerLogout(message) {
         this.disable();
-        alert(message);
-        window.location.href = this.logoutUrl;
+        this.markCheating().then(() => {
+            alert(message + '\n\n⛔ ANDA TERDETEKSI CURANG!\nAnda tidak akan bisa mengerjakan TO ini lagi.');
+            window.location.href = this.logoutUrl;
+        });
     }
 
     triggerRestart(message) {
         this.disable();
-        alert(message);
-        window.location.href = this.restartUrl;
+        this.markCheating().then(() => {
+            alert(message + '\n\n⛔ ANDA TERDETEKSI CURANG!\nAnda tidak akan bisa mengerjakan TO ini lagi.');
+            window.location.href = this.restartUrl;
+        });
     }
 
     addWarning(message) {
@@ -342,12 +362,17 @@ function showSecurityWarningModal() {
 }
 
 function acceptSecurityWarning() {
+    console.log('✓ User clicked "Saya Mengerti dan Setuju"');
     const modal = document.getElementById('securityWarningModal');
     if (modal) {
         modal.remove();
+        console.log('✓ Modal removed');
     }
     if (typeof startExamAfterWarning === 'function') {
+        console.log('✓ Calling startExamAfterWarning()...');
         startExamAfterWarning();
+    } else {
+        console.error('❌ startExamAfterWarning function not found!');
     }
 }
 

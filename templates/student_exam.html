@@ -380,26 +380,38 @@ const answeredQuestions = new Set();
 const doubtfulQuestions = new Set();
 
 function startExamAfterWarning() {
+    console.log('=== STARTING EXAM ===');
+    console.log('Timer started:', timerStarted);
+    console.log('AntiCheat enabled:', antiCheatEnabled);
+    
     if (!timerStarted) {
+        console.log('Starting timer for {{ exam.duration_minutes }} minutes...');
         const timer = new ExamTimer({{ exam.duration_minutes }}, function() {
             alert('Waktu habis! Jawaban Anda akan otomatis disubmit.');
             submitExam();
         });
         timer.start('timer');
         timerStarted = true;
+        console.log('✓ Timer started!');
     }
     
     if (!antiCheatEnabled) {
+        console.log('Enabling anti-cheat protection...');
         const antiCheat = new AntiCheat(
             function(count, message) {
-                console.log('Warning #' + count + ': ' + message);
+                console.log('⚠️ Warning #' + count + ': ' + message);
             },
             '{{ url_for("logout") }}',
-            '{{ url_for("student_start_exam", id=exam.id) }}'
+            '{{ url_for("student_start_exam", id=exam.id) }}',
+            {{ attempt.id }}
         );
         antiCheat.enable();
         antiCheatEnabled = true;
+        console.log('✓ Anti-cheat ENABLED! Try to copy/paste or switch tabs to test.');
+        console.log('Attempt ID:', {{ attempt.id }});
     }
+    
+    console.log('=== EXAM STARTED SUCCESSFULLY ===');
 }
 
 function showQuestion(questionNumber) {
@@ -539,16 +551,25 @@ async function submitExam() {
 }
 
 initializeNavButtons();
+</script>
+{% endblock %}
 
-window.addEventListener('DOMContentLoaded', function() {
+{% block extra_js %}
+<script>
+window.addEventListener('load', function() {
+    console.log('Window loaded, checking for security modal...');
+    
     setTimeout(function() {
         if (typeof showSecurityWarningModal === 'function') {
+            console.log('Showing security warning modal...');
             showSecurityWarningModal();
         } else {
-            console.error('showSecurityWarningModal function not found!');
-            startExamAfterWarning();
+            console.error('showSecurityWarningModal function not found! Starting exam anyway...');
+            if (typeof startExamAfterWarning === 'function') {
+                startExamAfterWarning();
+            }
         }
-    }, 500);
+    }, 300);
 });
 </script>
 {% endblock %}

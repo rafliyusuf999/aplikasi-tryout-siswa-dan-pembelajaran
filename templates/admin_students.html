@@ -29,17 +29,29 @@
                     <th>Cabang</th>
                     <th>Kelas</th>
                     <th>Sekolah</th>
+                    <th>Status</th>
                     <th>Aksi</th>
                 </tr>
             </thead>
             <tbody>
                 {% for student in students %}
-                <tr>
+                <tr {% if student_cheating_data.get(student.id, 0) > 0 %}style="background-color: #fff3f3;"{% endif %}>
                     <td>{{ student.full_name }}</td>
                     <td>{{ student.email }}</td>
                     <td>{{ student.inspira_branch }}</td>
                     <td>{{ student.class_level }}</td>
                     <td>{{ student.school_name }}</td>
+                    <td>
+                        {% if student_cheating_data.get(student.id, 0) > 0 %}
+                        <span style="background: linear-gradient(135deg, #dc3545 0%, #c82333 100%); color: white; padding: 0.3rem 0.8rem; border-radius: 15px; font-size: 0.85rem; font-weight: bold; display: inline-block;">
+                            ⛔ TERDETEKSI CURANG ({{ student_cheating_data.get(student.id) }}x)
+                        </span>
+                        {% else %}
+                        <span style="background: linear-gradient(135deg, #28a745 0%, #20c997 100%); color: white; padding: 0.3rem 0.8rem; border-radius: 15px; font-size: 0.85rem; font-weight: bold; display: inline-block;">
+                            ✅ Bersih
+                        </span>
+                        {% endif %}
+                    </td>
                     <td>
                         <button 
                             class="btn btn-primary student-detail-btn" 
