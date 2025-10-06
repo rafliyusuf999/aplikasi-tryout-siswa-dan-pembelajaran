@@ -220,6 +220,25 @@
     </div>
 </div>
 
+<div style="position: fixed; bottom: 20px; right: 20px; z-index: 9999;">
+    <button onclick="playVictorySound(0)" 
+            style="background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%); 
+                   color: white; 
+                   border: none; 
+                   width: 60px; 
+                   height: 60px; 
+                   border-radius: 50%; 
+                   cursor: pointer; 
+                   font-size: 1.5rem; 
+                   box-shadow: 0 4px 15px rgba(139, 21, 56, 0.3);
+                   transition: all 0.3s ease;"
+            onmouseover="this.style.transform='scale(1.1)'"
+            onmouseout="this.style.transform='scale(1)'">
+        🔊
+    </button>
+    <p style="text-align: center; margin-top: 0.5rem; font-size: 0.75rem; color: #666;">Putar Musik</p>
+</div>
+
 <audio id="victoryAudio" src="{{ url_for('static', filename='audio/victory.mp3') }}" preload="auto"></audio>
 
 <script>
@@ -241,10 +260,48 @@ function switchTab(tab) {
 }
 
 function playVictorySound(rank) {
+    console.log('🎵 Attempting to play victory sound for rank:', rank);
     const audio = document.getElementById('victoryAudio');
     if (audio) {
         audio.currentTime = 0;
-        audio.play().catch(e => console.log('Audio play failed:', e));
+        audio.volume = 0.7;
+        
+        const playPromise = audio.play();
+        
+        if (playPromise !== undefined) {
+            playPromise
+                .then(() => {
+                    console.log('✓ Audio playing successfully!');
+                    
+                    const notification = document.createElement('div');
+                    notification.style.cssText = `
+                        position: fixed;
+                        top: 20px;
+                        right: 20px;
+                        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+                        color: white;
+                        padding: 1rem 1.5rem;
+                        border-radius: 10px;
+                        box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+                        z-index: 10000;
+                        animation: slideDown 0.3s ease;
+                        font-weight: bold;
+                    `;
+                    notification.innerHTML = '🎵 Musik victory sedang diputar!';
+                    document.body.appendChild(notification);
+                    
+                    setTimeout(() => {
+                        notification.style.animation = 'fadeOut 0.3s ease';
+                        setTimeout(() => notification.remove(), 300);
+                    }, 2000);
+                })
+                .catch(error => {
+                    console.error('❌ Audio play failed:', error);
+                    alert('⚠️ Tidak bisa memutar musik.\n\nSilakan klik icon speaker 🔊 di pojok kanan atas untuk memutar musik victory!');
+                });
+        }
+    } else {
+        console.error('❌ Audio element not found!');
     }
 }
 </script>
