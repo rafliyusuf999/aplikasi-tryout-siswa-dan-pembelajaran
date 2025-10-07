@@ -1,9 +1,10 @@
-modules = ["python-3.11", "php-8.2"]
+modules = ["python-3.11", "php-8.2", "postgresql-16"]
 [agent]
 expertMode = true
 
 [nix]
 channel = "stable-25_05"
+packages = ["mysql80"]
 
 [[ports]]
 localPort = 5000
