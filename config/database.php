@@ -5,7 +5,7 @@ function getDB() {
     
     if ($pdo === null) {
         try {
-            $database_url = getenv('DATABASE_URL');
+            $database_url = $_ENV['DATABASE_URL'] ?? $_SERVER['DATABASE_URL'] ?? getenv('DATABASE_URL');
             
             if ($database_url && trim($database_url) !== '') {
                 $url_parts = parse_url($database_url);
@@ -31,11 +31,11 @@ function getDB() {
                     PDO::ATTR_EMULATE_PREPARES => false,
                 ]);
             } else {
-                $host = getenv('PGHOST');
-                $user = getenv('PGUSER');
-                $pass = getenv('PGPASSWORD');
-                $name = getenv('PGDATABASE');
-                $port = getenv('PGPORT');
+                $host = $_ENV['PGHOST'] ?? $_SERVER['PGHOST'] ?? getenv('PGHOST');
+                $user = $_ENV['PGUSER'] ?? $_SERVER['PGUSER'] ?? getenv('PGUSER');
+                $pass = $_ENV['PGPASSWORD'] ?? $_SERVER['PGPASSWORD'] ?? getenv('PGPASSWORD');
+                $name = $_ENV['PGDATABASE'] ?? $_SERVER['PGDATABASE'] ?? getenv('PGDATABASE');
+                $port = $_ENV['PGPORT'] ?? $_SERVER['PGPORT'] ?? getenv('PGPORT');
                 
                 if (!$host || trim($host) === '') $host = 'localhost';
                 if (!$user || trim($user) === '') $user = 'postgres';
