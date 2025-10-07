@@ -18,40 +18,44 @@ Preferred communication style: Simple, everyday language.
 ## System Architecture
 
 ### Web Framework & Backend
-- **Flask** - Python web framework serving the entire application
-- **SQLAlchemy** - ORM for database interactions
-- **Flask-Login** - User session and authentication management
-- **Werkzeug Security** - Password hashing and security utilities
+- **PHP** - Native PHP untuk backend dan server-side logic
+- **MySQL/PDO** - Database dengan prepared statements untuk security
+- **PHP Session** - Native session management dengan security hardening
+- **BCrypt** - Password hashing dengan cost 12
 
-**Design Rationale:** Flask provides a lightweight, flexible framework suitable for rapid deployment on Replit while maintaining scalability for thousands of users.
+**Design Rationale:** PHP native cocok untuk shared hosting, mudah di-deploy, dan mendukung semua fitur yang dibutuhkan tanpa dependency kompleks.
 
 ### Database Schema
-- **SQLite** - Local file-based database (`inspiranet.db`)
-- **Core Models:**
-  - `User` - Multi-role system (admin, teacher, student) with branch assignment and profile photo support (displayed in navbar)
-  - `Exam` - Exam metadata including premium status and pricing
-  - `Question` - Supports multiple-choice and essay question types with photo upload capability
-  - `ExamAttempt` - Tracks student submissions, cheating warnings, and essay answers with photos (stored as JSON)
-  - `Payment` - Premium exam payment processing with manual admin approval or admin-initiated payment
-  - `Leaderboard` - Dual ranking system (branch-specific and global)
-  - `PaymentSettings` - Stores QRIS image, payment instructions, and bank account details for student payment display
+- **MySQL** - Production-ready database dengan InnoDB engine
+- **Core Tables:**
+  - `users` - Multi-role system (admin, teacher, student) dengan branch assignment dan profile photo
+  - `exams` - Metadata TO termasuk premium status dan pricing
+  - `questions` - Soal multiple-choice dan essay dengan foto
+  - `exam_attempts` - Tracking submissions, cheating warnings, dan essay answers (JSON)
+  - `payments` - Payment processing dengan admin approval
+  - `leaderboards` - Dual ranking (branch-specific dan global)
+  - `payment_settings` - QRIS image, payment instructions, bank account details
 
-**Design Rationale:** SQLite eliminates external database dependencies for easy Replit deployment. The schema supports the branch-based competition model with separate leaderboards while maintaining referential integrity through foreign keys and cascade deletes. Automatic migration system ensures existing databases are updated with new columns on startup.
+**Design Rationale:** MySQL cocok untuk shared hosting, mendukung concurrent access, dan memiliki foreign key constraints dengan cascade delete. PDO prepared statements memastikan security dari SQL injection.
 
 ### Authentication & Authorization
 - Role-based access control (RBAC) with three user types:
-  - **Admin:** Full system control, user management (students and teachers with edit capability), payment approval, complete question management for all exams (add, edit, delete), exam editing with schedule management
-  - **Teacher:** Exam creation, question management (add, edit, delete for own exams), student result viewing, visibility to all exams (both admin and teacher-created)
+  - **Admin:** Full system control, user management, payment approval, question management
+  - **Teacher:** Exam creation, question management untuk TO sendiri, view hasil siswa
   - **Student:** Exam participation, payment submission, leaderboard access, profile management
-- Session-based authentication via Flask-Login
-- Password hashing with Werkzeug's generate_password_hash/check_password_hash
-- **Admin Capabilities:**
-  - Edit teacher information (name, email, phone, password with validation)
-  - Edit student information with profile photo management
-  - Reset passwords for teachers and students (minimum 6 characters)
-  - Email uniqueness validation when editing users
+- **PHP Session Management dengan Security Hardening:**
+  - Session regeneration saat login (prevent session fixation)
+  - Session token untuk extra security
+  - IP address validation (detect session hijacking)
+  - Secure cookie settings (httponly, samesite=Lax, secure on HTTPS)
+- **CSRF Protection:**
+  - CSRF token di semua form POST
+  - Verification sebelum proses data
+- **Password Security:**
+  - BCrypt hashing dengan cost 12
+  - password_hash() dan password_verify()
 
-**Design Rationale:** Role-based system ensures proper access segregation. Session-based auth provides security without external dependencies. Admin has full control over users and exams while teachers can manage their own content and view all exams for comprehensive access. Email uniqueness and password validation ensure data integrity and security.
+**Design Rationale:** PHP native session dengan hardening lengkap, CSRF protection di semua form, dan strong password hashing memastikan aplikasi aman dari common web vulnerabilities.
 
 ### Branch Competition System
 - **4 Branches:** Inspiranet_Cakrawala 1-4
@@ -87,67 +91,74 @@ Preferred communication style: Simple, everyday language.
 **Design Rationale:** Flexible payment system supports both student uploads and direct admin management for scholarships or special cases. Configurable payment settings eliminate hardcoded payment details and allow easy updates via admin interface.
 
 ### Frontend Architecture
-- **Jinja2 Templates** - Server-side rendering
-- **Custom CSS** with CSS variables for theming and improved modal scrolling
-- **Vanilla JavaScript** for interactivity, anti-cheat enforcement, and async file uploads
-- **Fully Responsive Design** using CSS Grid and Flexbox with breakpoints:
+- **PHP Templates** - Server-side rendering dengan include system
+- **Custom CSS** dengan CSS variables untuk theming dan responsive design
+- **Vanilla JavaScript** untuk interactivity, anti-cheat enforcement, dan async file uploads
+- **Fully Responsive Design** using CSS Grid dan Flexbox:
   - Desktop: 1024px and above
   - Tablet: 768px - 1023px
   - Mobile: Below 768px
-- **Modal Improvements:** Scrollable content with overflow handling to prevent content being cut off
 - **Enhanced User Interface:**
-  - **Navbar Profile Display:** User profile photo and name shown in navigation bar with responsive design
-  - **User Profile Management:** Dedicated profile page where all users can view and update their personal information, including email, name, password, photo, and role-specific details (branch, class, school for students)
-  - Complete countdown timer with HH:MM:SS format updating every second
-  - Visual question status indicators with color coding (grey=unanswered, green=answered, yellow=doubtful)
-  - Question navigation buttons with scale effect for current question while preserving status colors
-  - Leaderboard with trophy icons (🥇🥈🥉) for top 3 ranks and user highlighting
-  - Combined highest score display from premium and free exams in student dashboard
-  - Secure admin student management with password reset capability (without exposing password hashes)
-  - Admin payment management with manual payment creation and settings configuration
+  - Navbar dengan profile photo dan user name
+  - Profile management page untuk semua user
+  - Countdown timer dengan format HH:MM:SS
+  - Visual question status indicators (grey=unanswered, green=answered, yellow=doubtful)
+  - Leaderboard dengan trophy icons untuk top 3
+  - Combined highest score dari premium dan free exams
 
-**Design Rationale:** Server-side rendering reduces client complexity. No frontend framework dependencies enable lightweight, fast-loading pages suitable for Replit hosting. Responsive design ensures optimal user experience across all devices. Modals with proper scrolling ensure forms are accessible on all screen sizes. Visual indicators and countdown timer improve user experience and exam time management.
+**Design Rationale:** PHP includes untuk reusable components (header, navbar, footer). Vanilla JS mengurangi dependency. Responsive design optimal untuk semua device.
 
 ### File Structure
-- `app.py` - Main application entry with route definitions, automatic database migration, and question management endpoints
-- `models.py` - SQLAlchemy database models with essay and profile photo support
-- `templates/` - Jinja2 HTML templates organized by user role
-  - `admin_questions.html` - Admin interface for managing all exam questions (add, edit, delete)
-  - `admin_payments.html` - Payment management with manual payment creation
-  - `admin_payment_settings.html` - Configure QRIS, payment instructions, and bank details
-  - `admin_teachers.html` - Admin interface for managing teachers (add, edit with email validation, delete)
-  - `admin_exams.html` - Admin exam management with edit capability for schedules and settings
-  - `teacher_questions.html` - Teacher interface for managing own exam questions (add, edit, delete)
-  - `student_exam.html` - Exam interface with essay photo upload and comprehensive error handling
-  - `student_pay.html` - Payment page displaying QRIS and dynamic payment instructions
-  - `essay_answers.html` - Admin/teacher dashboard for viewing essay submissions
-  - `register.html` - Student registration with profile photo upload
-  - `profile.html` - User profile management page for viewing and updating personal information
-- `static/css/` - Responsive stylesheets with custom theme and improved modal scrolling
-- `static/js/` - Client-side JavaScript with anti-cheat enforcement
-- `uploads/` - File upload directories (profiles, answers, payment proofs)
+- `config/` - Konfigurasi aplikasi
+  - `database.php` - PDO database connection
+  - `auth.php` - Session management & authentication helpers
+  - `helpers.php` - Utility functions (flash, upload, sanitize, dll)
+  - `config.php` - Main config dengan session hardening
+  - `schema.sql` - MySQL database schema
+- `app/Views/includes/` - Reusable template components
+  - `header.php` - HTML head dan opening tags
+  - `navbar.php` - Navigation bar dengan profile photo
+  - `footer.php` - Footer dan closing tags
+- `public/` - Document root (web accessible)
+  - `index.php` - Homepage
+  - `login.php`, `register.php`, `logout.php` - Auth pages
+  - `profile.php` - User profile management
+  - `admin/` - Admin pages (dashboard, students, teachers, exams, dll)
+  - `teacher/` - Teacher pages (dashboard, exams, questions, dll)
+  - `student/` - Student pages (dashboard, exams, payment, dll)
+  - `api/` - API endpoints untuk AJAX
+  - `static/` - CSS, JS, images
+  - `.htaccess` - Apache routing & security
+- `storage/uploads/` - File uploads (profiles, payments, answers, payment)
 
 ## External Dependencies
 
-### Python Packages
-- **Flask** - Web framework
-- **Flask-SQLAlchemy** - Database ORM
-- **Flask-Login** - Authentication management
-- **Werkzeug** - Security utilities and file handling
+### PHP Requirements
+- **PHP 7.4+** - Core language
+- **PDO MySQL Extension** - Database connectivity
+- **GD atau Imagick** - Image processing (optional)
+- **Apache/Nginx** - Web server
 
 ### Storage
-- **SQLite Database** - `inspiranet.db` file stored in `instance/` directory
+- **MySQL Database** - `inspiranet_db` dengan InnoDB engine
 - **File Uploads:**
-  - Payment proof images: `uploads/payments/` directory (max 16MB per file)
-  - QRIS payment image: `uploads/payment/` directory (admin-configurable)
-  - Student profile photos: `uploads/profiles/` directory (displayed in navbar)
-  - Essay answer photos: `uploads/answers/` directory
-- **Automatic Migration** - Database schema automatically updated on startup using SQLAlchemy URL parsing and instance path resolution
+  - Payment proof images: `storage/uploads/payments/` (max 16MB)
+  - QRIS payment image: `storage/uploads/payment/` (admin-configurable)
+  - Student profile photos: `storage/uploads/profiles/` (displayed in navbar)
+  - Essay answer photos: `storage/uploads/answers/`
 
 ### Environment Configuration
-- `SESSION_SECRET` - Flask session encryption key (defaults to 'inspiranet-secret-key-2025')
-- `ADMIN_PASSWORD` - Initial admin account password (defaults to 'inspiragacor25')
-- Admin account email: 'admin'
+- **Database credentials** di `config/database.php`:
+  - DB_HOST (default: localhost)
+  - DB_USER (default: root)
+  - DB_PASS (default: '')
+  - DB_NAME (default: inspiranet_db)
+- **Admin account default:**
+  - Email: admin@gmail.com
+  - Password: inspiranetgacor25
 
-### No External Services Required
-The application is designed to run completely standalone without external APIs, databases, or third-party services, making it ideal for Replit deployment.
+### Deployment
+- Cocok untuk **shared hosting** (cPanel, DirectAdmin, dll)
+- Cocok untuk **VPS** dengan Apache/Nginx
+- Mudah di-deploy tanpa complex dependencies
+- Database import via phpMyAdmin atau MySQL CLI
