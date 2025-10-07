@@ -7,7 +7,7 @@ function getDB() {
         try {
             $database_url = getenv('DATABASE_URL');
             
-            if ($database_url) {
+            if ($database_url && $database_url !== '') {
                 $url_parts = parse_url($database_url);
                 
                 $host = $url_parts['host'] ?? 'localhost';

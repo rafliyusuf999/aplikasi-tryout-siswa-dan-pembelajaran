@@ -15,6 +15,12 @@ $exams = $stmt->fetchAll();
 
 $leaderboard = [];
 $exam_title = '';
+$branches = [];
+
+if ($user['role'] === 'admin' || $user['role'] === 'teacher') {
+    $stmt = $pdo->query("SELECT DISTINCT inspira_branch FROM users WHERE inspira_branch IS NOT NULL AND inspira_branch != '' ORDER BY inspira_branch");
+    $branches = $stmt->fetchAll(PDO::FETCH_COLUMN);
+}
 
 if ($exam_id) {
     $stmt = $pdo->prepare("SELECT title FROM exams WHERE id = ?");
@@ -22,15 +28,37 @@ if ($exam_id) {
     $exam = $stmt->fetch();
     $exam_title = $exam['title'] ?? '';
     
-    if ($view_type === 'branch' && $user['role'] === 'student') {
-        $query = "SELECT ea.*, u.full_name, u.email, u.inspira_branch, u.profile_photo
-                  FROM exam_attempts ea
-                  JOIN users u ON ea.user_id = u.id
-                  WHERE ea.exam_id = ? AND ea.is_completed = true 
-                  AND u.inspira_branch = ?
-                  ORDER BY ea.total_score DESC, ea.finished_at ASC";
-        $stmt = $pdo->prepare($query);
-        $stmt->execute([$exam_id, $user['inspira_branch']]);
+    if ($view_type === 'branch') {
+        if ($user['role'] === 'student') {
+            $query = "SELECT ea.*, u.full_name, u.email, u.inspira_branch, u.profile_photo
+                      FROM exam_attempts ea
+                      JOIN users u ON ea.user_id = u.id
+                      WHERE ea.exam_id = ? AND ea.is_completed = true 
+                      AND u.inspira_branch = ?
+                      ORDER BY ea.total_score DESC, ea.finished_at ASC";
+            $stmt = $pdo->prepare($query);
+            $stmt->execute([$exam_id, $user['inspira_branch']]);
+        } else {
+            $branch = $_GET['branch'] ?? '';
+            if ($branch) {
+                $query = "SELECT ea.*, u.full_name, u.email, u.inspira_branch, u.profile_photo
+                          FROM exam_attempts ea
+                          JOIN users u ON ea.user_id = u.id
+                          WHERE ea.exam_id = ? AND ea.is_completed = true 
+                          AND u.inspira_branch = ?
+                          ORDER BY ea.total_score DESC, ea.finished_at ASC";
+                $stmt = $pdo->prepare($query);
+                $stmt->execute([$exam_id, $branch]);
+            } else {
+                $query = "SELECT ea.*, u.full_name, u.email, u.inspira_branch, u.profile_photo
+                          FROM exam_attempts ea
+                          JOIN users u ON ea.user_id = u.id
+                          WHERE ea.exam_id = ? AND ea.is_completed = true
+                          ORDER BY ea.total_score DESC, ea.finished_at ASC";
+                $stmt = $pdo->prepare($query);
+                $stmt->execute([$exam_id]);
+            }
+        }
     } else {
         $query = "SELECT ea.*, u.full_name, u.email, u.inspira_branch, u.profile_photo
                   FROM exam_attempts ea
@@ -51,10 +79,10 @@ include '../app/Views/includes/navbar.php';
 <div class="container" style="margin-top: 2rem;">
     <h1 style="text-align: center; color: var(--primary-color); margin-bottom: 2rem;">🏆 Peringkat Try Out</h1>
     
-    <div class="card" style="margin-top: 1.5rem;">
-        <div class="form-group">
-            <label>Pilih Try Out</label>
-            <select id="exam_select" class="form-control" onchange="location.href='?exam_id=' + this.value + '&view=<?php echo $view_type; ?>'">
+    <div class="card" style="margin-top: 1.5rem; padding: 2rem;">
+        <div class="form-group" style="margin-bottom: 1.5rem;">
+            <label style="font-size: 1.1rem; font-weight: 600; color: var(--primary-color); margin-bottom: 0.75rem; display: block;">📋 Pilih Try Out</label>
+            <select id="exam_select" class="form-control" style="font-size: 1rem; padding: 0.75rem; border: 2px solid var(--primary-color); border-radius: 8px; transition: all 0.3s ease;" onchange="location.href='?exam_id=' + this.value + '&view=<?php echo $view_type; ?><?php echo isset($_GET['branch']) ? '&branch=' . urlencode($_GET['branch']) : ''; ?>'">
                 <option value="">-- Pilih Try Out --</option>
                 <?php foreach ($exams as $exam): ?>
                 <option value="<?php echo $exam['id']; ?>" <?php echo $exam_id == $exam['id'] ? 'selected' : ''; ?>>
@@ -64,22 +92,45 @@ include '../app/Views/includes/navbar.php';
             </select>
         </div>
         
-        <?php if ($exam_id && $user['role'] === 'student'): ?>
-        <div style="display: flex; gap: 1rem; margin-top: 1.5rem; margin-bottom: 1.5rem;">
-            <a href="?exam_id=<?php echo $exam_id; ?>&view=branch" class="btn <?php echo $view_type === 'branch' ? 'btn-primary' : 'btn-secondary'; ?>">
-                Peringkat Cabang (<?php echo htmlspecialchars($user['inspira_branch']); ?>)
-            </a>
-            <a href="?exam_id=<?php echo $exam_id; ?>&view=global" class="btn <?php echo $view_type === 'global' ? 'btn-primary' : 'btn-secondary'; ?>">
-                Peringkat Global
-            </a>
+        <?php if ($exam_id): ?>
+        <div style="display: flex; gap: 1rem; margin-bottom: 1.5rem; flex-wrap: wrap; align-items: center;">
+            <?php if ($user['role'] === 'student'): ?>
+                <a href="?exam_id=<?php echo $exam_id; ?>&view=branch" class="btn <?php echo $view_type === 'branch' ? 'btn-primary' : 'btn-secondary'; ?>" style="transition: all 0.3s ease;">
+                    📍 Peringkat Cabang (<?php echo htmlspecialchars($user['inspira_branch']); ?>)
+                </a>
+                <a href="?exam_id=<?php echo $exam_id; ?>&view=global" class="btn <?php echo $view_type === 'global' ? 'btn-primary' : 'btn-secondary'; ?>" style="transition: all 0.3s ease;">
+                    🌍 Peringkat Global
+                </a>
+            <?php else: ?>
+                <a href="?exam_id=<?php echo $exam_id; ?>&view=global" class="btn <?php echo $view_type === 'global' ? 'btn-primary' : 'btn-secondary'; ?>" style="transition: all 0.3s ease;">
+                    🌍 Peringkat Global
+                </a>
+                <a href="?exam_id=<?php echo $exam_id; ?>&view=branch" class="btn <?php echo $view_type === 'branch' ? 'btn-primary' : 'btn-secondary'; ?>" style="transition: all 0.3s ease;">
+                    📍 Peringkat Per Cabang
+                </a>
+                <?php if ($view_type === 'branch' && count($branches) > 0): ?>
+                <select id="branch_select" class="form-control" style="max-width: 250px; border: 2px solid var(--primary-color); border-radius: 8px;" onchange="location.href='?exam_id=<?php echo $exam_id; ?>&view=branch&branch=' + this.value">
+                    <option value="">-- Pilih Cabang --</option>
+                    <?php foreach ($branches as $branch): ?>
+                    <option value="<?php echo htmlspecialchars($branch); ?>" <?php echo ($_GET['branch'] ?? '') == $branch ? 'selected' : ''; ?>>
+                        <?php echo htmlspecialchars($branch); ?>
+                    </option>
+                    <?php endforeach; ?>
+                </select>
+                <?php endif; ?>
+            <?php endif; ?>
         </div>
         <?php endif; ?>
         
         <?php if ($exam_id && count($leaderboard) > 0): ?>
-        <h2 style="text-align: center; margin-bottom: 1.5rem;">
+        <h2 style="text-align: center; margin-bottom: 1.5rem; color: var(--primary-color); animation: fadeIn 0.5s ease-in;">
             <?php echo htmlspecialchars($exam_title); ?>
-            <?php if ($view_type === 'branch' && $user['role'] === 'student'): ?>
-            <br><small class="text-muted">(Cabang: <?php echo htmlspecialchars($user['inspira_branch']); ?>)</small>
+            <?php if ($view_type === 'branch'): ?>
+                <?php if ($user['role'] === 'student'): ?>
+                <br><small class="text-muted">(Cabang: <?php echo htmlspecialchars($user['inspira_branch']); ?>)</small>
+                <?php elseif (isset($_GET['branch']) && $_GET['branch']): ?>
+                <br><small class="text-muted">(Cabang: <?php echo htmlspecialchars($_GET['branch']); ?>)</small>
+                <?php endif; ?>
             <?php endif; ?>
         </h2>
         
