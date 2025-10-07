@@ -127,29 +127,60 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 $started_at = new DateTime($attempt['started_at']);
 $now = new DateTime();
 $elapsed = $now->getTimestamp() - $started_at->getTimestamp();
-$remaining = max(0, ($exam['duration'] * 60) - $elapsed);
+$remaining = max(0, ($exam['duration_minutes'] * 60) - $elapsed);
 
 include '../../app/Views/includes/header.php';
 include '../../app/Views/includes/navbar.php';
 ?>
 
 <style>
+body {
+    overflow-x: hidden;
+}
+
+.exam-container {
+    display: flex;
+    gap: 1.5rem;
+    margin-top: 2rem;
+    margin-bottom: 2rem;
+}
+
+.questions-section {
+    flex: 1;
+    min-width: 0;
+}
+
+.sidebar {
+    width: 280px;
+    position: sticky;
+    top: 80px;
+    align-self: flex-start;
+    max-height: calc(100vh - 100px);
+    overflow-y: auto;
+}
+
 .question-card {
     background: white;
     border-radius: 8px;
-    padding: 1.5rem;
+    padding: 2rem;
     margin-bottom: 1.5rem;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    scroll-margin-top: 100px;
+}
+
+.question-card.active {
+    border: 3px solid var(--primary-color);
 }
 
 .question-number {
     display: inline-block;
     background: var(--primary-color);
     color: white;
-    padding: 0.5rem 1rem;
-    border-radius: 4px;
+    padding: 0.5rem 1.2rem;
+    border-radius: 6px;
     margin-bottom: 1rem;
     font-weight: bold;
+    font-size: 1.1rem;
 }
 
 .option-label {
@@ -160,6 +191,7 @@ include '../../app/Views/includes/navbar.php';
     border-radius: 8px;
     cursor: pointer;
     transition: all 0.3s;
+    background: white;
 }
 
 .option-label:hover {
@@ -176,19 +208,75 @@ include '../../app/Views/includes/navbar.php';
 }
 
 #timer-box {
-    position: sticky;
-    top: 80px;
-    background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+    background: linear-gradient(135deg, #FF6B6B 0%, #EE5A6F 100%);
     color: white;
     padding: 1.5rem;
     border-radius: 8px;
     text-align: center;
     margin-bottom: 1.5rem;
+    box-shadow: 0 4px 10px rgba(255, 107, 107, 0.3);
 }
 
-@keyframes pulse {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.7; }
+#timer-display {
+    font-size: 2.5rem;
+    font-weight: bold;
+    font-family: 'Courier New', monospace;
+}
+
+.timer-label {
+    font-size: 0.9rem;
+    margin-top: 0.5rem;
+    opacity: 0.9;
+}
+
+.question-nav {
+    background: white;
+    border-radius: 8px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.question-nav h3 {
+    margin-bottom: 1rem;
+    font-size: 1.1rem;
+    color: #333;
+}
+
+.nav-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 0.5rem;
+}
+
+.nav-item {
+    aspect-ratio: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid #ddd;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: all 0.3s;
+    background: white;
+    color: #666;
+}
+
+.nav-item:hover {
+    border-color: var(--primary-color);
+    background: #f5f5f5;
+}
+
+.nav-item.answered {
+    background: #4CAF50;
+    color: white;
+    border-color: #4CAF50;
+}
+
+.nav-item.active {
+    border-color: var(--primary-color);
+    background: var(--primary-color);
+    color: white;
 }
 
 .submit-section {
@@ -199,26 +287,46 @@ include '../../app/Views/includes/navbar.php';
     border-radius: 8px;
     box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
     margin-top: 2rem;
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+}
+
+@media (max-width: 768px) {
+    .exam-container {
+        flex-direction: column;
+    }
+    .sidebar {
+        position: relative;
+        width: 100%;
+        max-height: none;
+        order: -1;
+    }
 }
 </style>
 
-<div class="container" style="margin-top: 2rem; margin-bottom: 2rem;">
-    <div style="display: grid; grid-template-columns: 1fr 300px; gap: 2rem;">
-        <div>
+<div class="container">
+    <div class="exam-container">
+        <div class="questions-section">
             <h1><?php echo htmlspecialchars($exam['title']); ?></h1>
-            <p><?php echo htmlspecialchars($exam['description']); ?></p>
+            <p style="color: rgba(255,255,255,0.9); margin-bottom: 1.5rem;"><?php echo htmlspecialchars($exam['description']); ?></p>
             
             <form method="POST" id="examForm">
                 <?php echo csrf(); ?>
                 <input type="hidden" name="action" value="submit">
                 
                 <?php foreach ($questions as $index => $question): ?>
-                <div class="question-card">
+                <div class="question-card" id="question-<?php echo ($index + 1); ?>" data-question="<?php echo ($index + 1); ?>">
                     <div class="question-number">Soal #<?php echo ($index + 1); ?></div>
                     <?php if ($question['category']): ?>
-                        <div style="color: #666; margin-bottom: 0.5rem;">Kategori: <?php echo htmlspecialchars($question['category']); ?></div>
+                        <div style="color: #666; margin-bottom: 0.5rem;"><em>Kategori: <?php echo htmlspecialchars($question['category']); ?></em></div>
                     <?php endif; ?>
-                    <div style="font-size: 1.1rem; margin-bottom: 1rem;">
+                    <div style="font-size: 1.1rem; margin-bottom: 1.5rem; line-height: 1.6;">
                         <?php echo nl2br(htmlspecialchars($question['question_text'])); ?>
                     </div>
                     
@@ -232,34 +340,52 @@ include '../../app/Views/includes/navbar.php';
                             <?php if ($option): ?>
                             <label class="option-label">
                                 <input type="radio" name="answer_<?php echo $question['id']; ?>" value="<?php echo $key; ?>" 
-                                       <?php echo (isset($answers[$question['id']]) && $answers[$question['id']] === $key) ? 'checked' : ''; ?>>
+                                       data-question-num="<?php echo ($index + 1); ?>"
+                                       <?php echo (isset($answers[$question['id']]) && $answers[$question['id']] === $key) ? 'checked' : ''; ?>
+                                       onchange="updateNavigation()">
                                 <span class="option-text"><?php echo strtoupper($key); ?>. <?php echo htmlspecialchars($option); ?></span>
                             </label>
                             <?php endif; ?>
                         <?php endforeach; ?>
                     <?php else: ?>
-                        <textarea name="essay_<?php echo $question['id']; ?>" class="form-control" rows="6" placeholder="Tulis jawaban Anda di sini..."><?php echo htmlspecialchars($essay_answers[$question['id']] ?? ''); ?></textarea>
+                        <textarea name="essay_<?php echo $question['id']; ?>" class="form-control allow-file-upload" rows="6" placeholder="Tulis jawaban Anda di sini..." data-question-num="<?php echo ($index + 1); ?>" oninput="updateNavigation()"><?php echo htmlspecialchars($essay_answers[$question['id']] ?? ''); ?></textarea>
+                        <div style="margin-top: 0.5rem; color: #666; font-size: 0.9rem;">💡 Atau upload file gambar jawaban Anda di bawah</div>
                     <?php endif; ?>
                 </div>
                 <?php endforeach; ?>
                 
                 <div class="submit-section">
                     <button type="button" onclick="saveProgress()" class="btn btn-secondary">💾 Simpan Progress</button>
-                    <button type="submit" onclick="return confirmSubmit()" class="btn btn-success" style="float: right;">✅ Selesaikan Ujian</button>
+                    <button type="submit" onclick="return confirmSubmit()" class="btn btn-success">✅ Selesaikan Ujian</button>
                 </div>
             </form>
         </div>
         
-        <div>
+        <div class="sidebar">
             <div id="timer-box">
-                <div id="timer-display" style="font-size: 2rem; font-weight: bold;"></div>
+                <div id="timer-display"></div>
+                <div class="timer-label">Waktu Tersisa</div>
             </div>
             
-            <div style="background: white; padding: 1.5rem; border-radius: 8px;">
-                <h3>Info Ujian</h3>
-                <p><strong>Total Soal:</strong> <?php echo count($questions); ?></p>
-                <p><strong>Durasi:</strong> <?php echo $exam['duration']; ?> menit</p>
-                <p><strong>Poin Total:</strong> <?php echo array_sum(array_column($questions, 'points')); ?></p>
+            <div class="question-nav">
+                <h3>📋 Navigasi Soal</h3>
+                <div class="nav-grid">
+                    <?php foreach ($questions as $index => $question): ?>
+                    <div class="nav-item" data-question="<?php echo ($index + 1); ?>" onclick="scrollToQuestion(<?php echo ($index + 1); ?>)">
+                        <?php echo ($index + 1); ?>
+                    </div>
+                    <?php endforeach; ?>
+                </div>
+                <div style="margin-top: 1rem; font-size: 0.85rem; color: #666;">
+                    <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.3rem;">
+                        <div style="width: 20px; height: 20px; background: #4CAF50; border-radius: 3px;"></div>
+                        <span>Terjawab</span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <div style="width: 20px; height: 20px; border: 2px solid #ddd; border-radius: 3px;"></div>
+                        <span>Belum Dijawab</span>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -268,11 +394,15 @@ include '../../app/Views/includes/navbar.php';
 <script>
 let examTimer;
 let antiCheat;
+let isUploadingFile = false;
 
 document.addEventListener('DOMContentLoaded', function() {
+    updateNavigation();
+    setupScrollTracking();
+    
     showSecurityWarningModal(() => {
         examTimer = new ExamTimer(<?php echo max(1, round($remaining / 60)); ?>, handleTimeUp);
-        examTimer.start('timer-box');
+        examTimer.start('timer-display');
         
         antiCheat = new AntiCheat(
             handleCheatingWarning,
@@ -282,12 +412,107 @@ document.addEventListener('DOMContentLoaded', function() {
         );
         antiCheat.enable();
         
+        setupAntiCheat();
+        
         setInterval(autoSave, 60000);
     });
 });
 
+function setupAntiCheat() {
+    let cheatingWarnings = 0;
+    const MAX_WARNINGS = 3;
+    
+    document.addEventListener('visibilitychange', function() {
+        if (document.hidden && !isUploadingFile) {
+            cheatingWarnings++;
+            if (cheatingWarnings >= MAX_WARNINGS) {
+                alert('⚠️ TERDETEKSI KECURANGAN!\n\nAnda telah keluar dari halaman ujian sebanyak ' + MAX_WARNINGS + ' kali.\nUjian akan ditutup secara otomatis.');
+                document.getElementById('examForm').submit();
+            } else {
+                alert('⚠️ PERINGATAN KECURANGAN!\n\nJangan keluar dari halaman ujian!\nPeringatan: ' + cheatingWarnings + '/' + MAX_WARNINGS);
+            }
+        }
+    });
+    
+    document.addEventListener('contextmenu', function(e) {
+        if (!e.target.classList.contains('allow-file-upload')) {
+            e.preventDefault();
+            alert('⛔ Klik kanan dinonaktifkan selama ujian!');
+        }
+    });
+    
+    document.addEventListener('keydown', function(e) {
+        if ((e.ctrlKey || e.metaKey) && (e.key === 'c' || e.key === 'C' || e.key === 'v' || e.key === 'V')) {
+            if (!e.target.classList.contains('allow-file-upload')) {
+                e.preventDefault();
+                alert('⛔ Copy-paste dinonaktifkan selama ujian!');
+            }
+        }
+        
+        if (e.key === 'PrintScreen' || (e.ctrlKey && e.shiftKey && e.key === 's')) {
+            e.preventDefault();
+            cheatingWarnings++;
+            if (cheatingWarnings >= MAX_WARNINGS) {
+                alert('⚠️ TERDETEKSI SCREENSHOT!\n\nUjian akan ditutup secara otomatis.');
+                document.getElementById('examForm').submit();
+            } else {
+                alert('⚠️ Screenshot terdeteksi!\nPeringatan: ' + cheatingWarnings + '/' + MAX_WARNINGS);
+            }
+        }
+    });
+}
+
+function scrollToQuestion(questionNum) {
+    const element = document.getElementById('question-' + questionNum);
+    if (element) {
+        element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        element.classList.add('active');
+        setTimeout(() => element.classList.remove('active'), 2000);
+    }
+}
+
+function updateNavigation() {
+    document.querySelectorAll('.nav-item').forEach(item => {
+        const questionNum = item.getAttribute('data-question');
+        const questionCard = document.getElementById('question-' + questionNum);
+        
+        if (questionCard) {
+            const radio = questionCard.querySelector('input[type="radio"]:checked');
+            const textarea = questionCard.querySelector('textarea');
+            
+            if (radio || (textarea && textarea.value.trim().length > 0)) {
+                item.classList.add('answered');
+            } else {
+                item.classList.remove('answered');
+            }
+        }
+    });
+}
+
+function setupScrollTracking() {
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                const questionNum = entry.target.getAttribute('data-question');
+                document.querySelectorAll('.nav-item').forEach(nav => {
+                    nav.classList.remove('active');
+                });
+                const activeNav = document.querySelector('.nav-item[data-question="' + questionNum + '"]');
+                if (activeNav) {
+                    activeNav.classList.add('active');
+                }
+            }
+        });
+    }, { threshold: 0.5 });
+    
+    document.querySelectorAll('.question-card').forEach(card => {
+        observer.observe(card);
+    });
+}
+
 function handleTimeUp() {
-    antiCheat.disable();
+    if (antiCheat) antiCheat.disable();
+    alert('⏰ Waktu habis! Ujian akan diselesaikan secara otomatis.');
     document.getElementById('examForm').submit();
 }
 
@@ -296,7 +521,8 @@ function handleCheatingWarning(message) {
 }
 
 function confirmSubmit() {
-    return confirm('Yakin ingin menyelesaikan ujian? Pastikan semua jawaban sudah benar!');
+    if (antiCheat) antiCheat.disable();
+    return confirm('Yakin ingin menyelesaikan ujian?\n\nPastikan semua jawaban sudah benar!\nAnda tidak dapat mengubah jawaban setelah submit.');
 }
 
 function saveProgress() {
@@ -312,6 +538,9 @@ function saveProgress() {
         if (data.success) {
             alert('✅ Progress berhasil disimpan!');
         }
+    })
+    .catch(() => {
+        alert('⚠️ Gagal menyimpan progress. Coba lagi.');
     });
 }
 
@@ -326,7 +555,15 @@ function autoSave() {
 }
 
 window.addEventListener('beforeunload', function(e) {
-    autoSave();
+    if (!document.getElementById('examForm').submitted) {
+        autoSave();
+        e.preventDefault();
+        e.returnValue = '';
+    }
+});
+
+document.getElementById('examForm').addEventListener('submit', function() {
+    this.submitted = true;
 });
 </script>
 
