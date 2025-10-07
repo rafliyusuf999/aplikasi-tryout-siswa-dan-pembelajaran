@@ -62,5 +62,20 @@ function url($path = '') {
 }
 
 function asset($path) {
-    return url('static/' . ltrim($path, '/'));
+    return '/static/' . ltrim($path, '/');
+}
+
+function requireAuth($role) {
+    requireRole($role);
+}
+
+function verifyCsrf() {
+    if (!isset($_POST['csrf_token']) || !verifyCSRFToken($_POST['csrf_token'])) {
+        die('CSRF token validation failed');
+    }
+}
+
+function csrf() {
+    $token = generateCSRFToken();
+    return '<input type="hidden" name="csrf_token" value="' . htmlspecialchars($token) . '">';
 }

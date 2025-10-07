@@ -15,7 +15,7 @@
                     if($user['role'] == 'admin'): ?>
                         <li><a href="<?php echo url('admin/dashboard.php'); ?>" onclick="closeMobileMenu()">Dashboard</a></li>
                         <li><a href="<?php echo url('admin/students.php'); ?>" onclick="closeMobileMenu()">Siswa</a></li>
-                        <li><a href="<?php echo url('admin/teachers.php'); ?>" onclick="closeMobileMenu()">Guru</a></li>
+                        <li><a href="<?php echo url('admin/teachers.php'); ?>" onclick="closeMobileMenu()">Mentor</a></li>
                         <li><a href="<?php echo url('admin/exams.php'); ?>" onclick="closeMobileMenu()">TO</a></li>
                         <li><a href="<?php echo url('admin/payments.php'); ?>" onclick="closeMobileMenu()">Pembayaran</a></li>
                     <?php elseif($user['role'] == 'teacher'): ?>

@@ -50,7 +50,7 @@ include '../../app/Views/includes/navbar.php';
     <h2>⚡ Quick Access</h2>
     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-top: 1rem;">
         <a href="<?php echo url('admin/students.php'); ?>" class="btn btn-primary" style="text-decoration: none; text-align: center;">Kelola Siswa</a>
-        <a href="<?php echo url('admin/teachers.php'); ?>" class="btn btn-primary" style="text-decoration: none; text-align: center;">Kelola Guru</a>
+        <a href="<?php echo url('admin/teachers.php'); ?>" class="btn btn-primary" style="text-decoration: none; text-align: center;">Kelola Mentor</a>
         <a href="<?php echo url('admin/exams.php'); ?>" class="btn btn-primary" style="text-decoration: none; text-align: center;">Kelola TO</a>
         <a href="<?php echo url('admin/payments.php'); ?>" class="btn btn-primary" style="text-decoration: none; text-align: center;">Konfirmasi Pembayaran</a>
     </div>
