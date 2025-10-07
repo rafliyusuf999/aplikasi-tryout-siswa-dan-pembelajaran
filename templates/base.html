@@ -37,6 +37,7 @@
                         <li><a href="{{ url_for('student_exams') }}" onclick="closeMobileMenu()">Daftar TO</a></li>
                     {% endif %}
                     <li><a href="{{ url_for('all_leaderboards') }}" onclick="closeMobileMenu()">Peringkat</a></li>
+                    <li><a href="{{ url_for('profile') }}" onclick="closeMobileMenu()">Profil</a></li>
                     <li class="user-profile">
                         <div class="profile-info">
                             {% if current_user.profile_photo %}
