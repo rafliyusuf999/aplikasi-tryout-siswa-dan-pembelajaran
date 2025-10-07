@@ -5,5 +5,4 @@ requireLogin();
 
 logout();
 
-header('Location: /index.php');
-exit;
+redirect('index.php');

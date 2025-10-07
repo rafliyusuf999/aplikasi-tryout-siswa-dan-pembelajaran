@@ -224,9 +224,47 @@ class AntiCheat {
     triggerLogout(message) {
         this.disable();
         this.markCheating().then(() => {
-            alert(message + '\n\n⛔ ANDA TERDETEKSI CURANG!\nAnda tidak akan bisa mengerjakan TO ini lagi.');
-            window.location.href = this.logoutUrl;
+            this.showCountdownModal(message, this.logoutUrl);
         });
+    }
+    
+    showCountdownModal(message, redirectUrl) {
+        const modal = document.createElement('div');
+        modal.id = 'cheatingCountdownModal';
+        modal.className = 'modal';
+        modal.style.display = 'block';
+        modal.innerHTML = `
+            <div class="modal-content" style="max-width: 500px; margin: 100px auto; text-align: center;">
+                <div style="background: linear-gradient(135deg, #dc3545 0%, #c82333 100%); color: white; padding: 2rem; border-radius: 8px 8px 0 0;">
+                    <h2 style="margin: 0; font-size: 1.8rem;">⛔ TERDETEKSI CURANG!</h2>
+                </div>
+                <div style="padding: 2rem; background: white;">
+                    <div style="font-size: 3rem; font-weight: bold; color: #dc3545; margin: 1rem 0;" id="countdownTimer">3</div>
+                    <p style="font-size: 1.1rem; margin: 1rem 0;">${message}</p>
+                    <p style="color: #666;">Anda akan dikeluarkan dalam <span id="countdownText">3</span> detik...</p>
+                    <div style="background: #fff3cd; border: 1px solid #ffc107; border-radius: 8px; padding: 1rem; margin-top: 1rem;">
+                        <strong>⚠️ Peringatan:</strong> Pelanggaran ini telah dicatat dalam sistem!
+                    </div>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+        
+        let countdown = 3;
+        const countdownInterval = setInterval(() => {
+            countdown--;
+            const timerElement = document.getElementById('countdownTimer');
+            const textElement = document.getElementById('countdownText');
+            if (timerElement && textElement) {
+                timerElement.textContent = countdown;
+                textElement.textContent = countdown;
+            }
+            
+            if (countdown <= 0) {
+                clearInterval(countdownInterval);
+                window.location.href = redirectUrl;
+            }
+        }, 1000);
     }
 
     triggerRestart(message) {

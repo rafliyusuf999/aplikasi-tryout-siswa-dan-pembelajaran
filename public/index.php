@@ -70,7 +70,7 @@ include '../app/Views/includes/navbar.php';
         <li>🔒 Anti-Kecurangan Ketat</li>
         <li>💳 Pembayaran Try Out Premium</li>
         <li>📈 Analisis Hasil Detail</li>
-        <li>👨‍🏫 Bimbingan Mentor Profesional</li>
+        <li>👨‍🏫 Bimbingan Mentor</li>
     </ul>
 </div>
 

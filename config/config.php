@@ -8,7 +8,7 @@ ini_set('session.cookie_samesite', 'Lax');
 session_start();
 
 define('BASE_PATH', dirname(__DIR__));
-define('UPLOAD_PATH', BASE_PATH . '/storage/uploads/');
+define('UPLOAD_PATH', BASE_PATH . '/public/storage/uploads/');
 define('MAX_FILE_SIZE', 16 * 1024 * 1024);
 
 define('BRANCHES', [

@@ -7,11 +7,15 @@ $pdo = getDB();
 $pageTitle = 'Kelola Siswa';
 
 $search = $_GET['search'] ?? '';
-$query = "SELECT * FROM users WHERE role = 'student'";
+$query = "SELECT u.*, 
+          COALESCE(SUM(ea.cheating_warnings), 0) as total_cheating 
+          FROM users u
+          LEFT JOIN exam_attempts ea ON u.id = ea.user_id
+          WHERE u.role = 'student'";
 if ($search) {
-    $query .= " AND (full_name ILIKE :search OR email ILIKE :search OR inspira_branch ILIKE :search)";
+    $query .= " AND (u.full_name ILIKE :search OR u.email ILIKE :search OR u.inspira_branch ILIKE :search)";
 }
-$query .= " ORDER BY created_at DESC";
+$query .= " GROUP BY u.id ORDER BY u.created_at DESC";
 
 $stmt = $pdo->prepare($query);
 if ($search) {
@@ -88,6 +92,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             setFlash('Status curang berhasil dibersihkan', 'success');
             redirect('admin/students.php');
         }
+        
+        if ($_POST['action'] === 'clear_all_cheating') {
+            $stmt = $pdo->prepare("UPDATE exam_attempts SET cheating_warnings = 0");
+            $stmt->execute();
+            
+            setFlash('Status curang semua siswa berhasil dibersihkan', 'success');
+            redirect('admin/students.php');
+        }
     }
 }
 
@@ -105,7 +117,10 @@ include '../../app/Views/includes/navbar.php';
             <a href="<?php echo url('admin/students.php'); ?>" class="btn btn-secondary">Reset</a>
         </form>
         
-        <button onclick="showAddModal()" class="btn btn-primary" style="margin-bottom: 1.5rem;">+ Tambah Siswa</button>
+        <div style="display: flex; gap: 1rem; margin-bottom: 1.5rem;">
+            <button onclick="showAddModal()" class="btn btn-primary">+ Tambah Siswa</button>
+            <button onclick="clearAllCheating()" class="btn btn-danger">🚫 Clear Curang All</button>
+        </div>
         
         <div style="overflow-x: auto;">
             <table class="table">
@@ -116,6 +131,7 @@ include '../../app/Views/includes/navbar.php';
                         <th>Cabang</th>
                         <th>Kelas</th>
                         <th>Sekolah</th>
+                        <th>Status Curang</th>
                         <th>Aksi</th>
                     </tr>
                 </thead>
@@ -128,9 +144,19 @@ include '../../app/Views/includes/navbar.php';
                         <td><?php echo htmlspecialchars($student['class_level'] ?? '-'); ?></td>
                         <td><?php echo htmlspecialchars($student['school_name'] ?? '-'); ?></td>
                         <td>
+                            <?php if ($student['total_cheating'] > 0): ?>
+                                <span class="badge badge-danger">⚠️ <?php echo $student['total_cheating']; ?></span>
+                            <?php else: ?>
+                                <span class="badge badge-success">✓ Bersih</span>
+                            <?php endif; ?>
+                        </td>
+                        <td>
                             <button onclick='editStudent(<?php echo json_encode($student); ?>)' class="btn btn-sm btn-primary">Edit</button>
+                            <button onclick='viewProfile(<?php echo $student['id']; ?>)' class="btn btn-sm btn-info">Lihat Profil</button>
                             <button onclick='resetPassword(<?php echo $student['id']; ?>)' class="btn btn-sm btn-secondary">Reset Password</button>
-                            <button onclick='clearCheating(<?php echo $student['id']; ?>)' class="btn btn-sm btn-secondary">Clear Curang</button>
+                            <?php if ($student['total_cheating'] > 0): ?>
+                                <button onclick='clearCheating(<?php echo $student['id']; ?>)' class="btn btn-sm btn-warning">Clear Curang</button>
+                            <?php endif; ?>
                             <form method="POST" style="display: inline;">
                                 <?php echo csrf(); ?>
                                 <input type="hidden" name="action" value="delete">
@@ -297,6 +323,23 @@ function clearCheating(id) {
         document.body.appendChild(form);
         form.submit();
     }
+}
+
+function clearAllCheating() {
+    if (confirm('Yakin ingin membersihkan status curang SEMUA siswa?')) {
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.innerHTML = `
+            <?php echo csrf(); ?>
+            <input type="hidden" name="action" value="clear_all_cheating">
+        `;
+        document.body.appendChild(form);
+        form.submit();
+    }
+}
+
+function viewProfile(id) {
+    window.location.href = '<?php echo url('admin/student_profile.php?id='); ?>' + id;
 }
 
 function closeModal(id) {
