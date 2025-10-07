@@ -59,7 +59,12 @@ if (empty($questions)) {
 }
 
 $answers = $attempt['answers'] ? json_decode($attempt['answers'], true) : [];
-$essay_answers = $attempt['essay_answers'] ? json_decode($attempt['essay_answers'], true) : [];
+$essay_answers_raw = $attempt['essay_answers'] ? json_decode($attempt['essay_answers'], true) : [];
+
+$essay_answers = [];
+foreach ($essay_answers_raw as $q_id => $essay_text) {
+    $essay_answers[$q_id] = preg_replace('/\[File: [^\]]+\]\n?/', '', $essay_text);
+}
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     verifyCsrf();
@@ -68,6 +73,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $new_answers = [];
         $new_essay_answers = [];
         $total_score = 0;
+        
+        $stmt = $pdo->prepare("SELECT essay_answers FROM exam_attempts WHERE id = ?");
+        $stmt->execute([$attempt['id']]);
+        $existing_essay = $stmt->fetchColumn();
+        $existing_essay_data = $existing_essay ? json_decode($existing_essay, true) : [];
         
         foreach ($questions as $question) {
             $q_id = $question['id'];
@@ -81,6 +91,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
             } else {
                 $essay_answer = $_POST["essay_$q_id"] ?? '';
+                
+                if (isset($existing_essay_data[$q_id])) {
+                    preg_match_all('/\[File: ([^\]]+)\]/', $existing_essay_data[$q_id], $matches);
+                    if (!empty($matches[0])) {
+                        $file_markers = implode("\n", $matches[0]);
+                        $essay_answer = trim($essay_answer) . "\n" . $file_markers;
+                    }
+                }
+                
                 $new_essay_answers[$q_id] = $essay_answer;
             }
         }
@@ -96,6 +115,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $new_answers = [];
         $new_essay_answers = [];
         
+        $stmt = $pdo->prepare("SELECT essay_answers FROM exam_attempts WHERE id = ?");
+        $stmt->execute([$attempt['id']]);
+        $existing_essay = $stmt->fetchColumn();
+        $existing_essay_data = $existing_essay ? json_decode($existing_essay, true) : [];
+        
         foreach ($questions as $question) {
             $q_id = $question['id'];
             
@@ -104,6 +128,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $new_answers[$q_id] = $answer;
             } else {
                 $essay_answer = $_POST["essay_$q_id"] ?? '';
+                
+                if (isset($existing_essay_data[$q_id])) {
+                    preg_match_all('/\[File: ([^\]]+)\]/', $existing_essay_data[$q_id], $matches);
+                    if (!empty($matches[0])) {
+                        $file_markers = implode("\n", $matches[0]);
+                        $essay_answer = trim($essay_answer) . "\n" . $file_markers;
+                    }
+                }
+                
                 $new_essay_answers[$q_id] = $essay_answer;
             }
         }
@@ -120,6 +153,64 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt->execute([$attempt['id']]);
         
         echo json_encode(['success' => true]);
+        exit;
+    }
+    
+    if (isset($_POST['action']) && $_POST['action'] === 'upload_essay_file') {
+        header('Content-Type: application/json');
+        
+        if (!isset($_FILES['file']) || $_FILES['file']['error'] !== 0) {
+            echo json_encode(['success' => false, 'error' => 'File tidak ditemukan atau error upload']);
+            exit;
+        }
+        
+        $file = $_FILES['file'];
+        $question_id = (int)$_POST['question_id'];
+        $attempt_id = (int)$_POST['attempt_id'];
+        
+        if ($attempt_id !== $attempt['id']) {
+            echo json_encode(['success' => false, 'error' => 'Invalid attempt ID']);
+            exit;
+        }
+        
+        $allowed_types = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
+        $file_type = mime_content_type($file['tmp_name']);
+        
+        if (!in_array($file_type, $allowed_types)) {
+            echo json_encode(['success' => false, 'error' => 'Hanya file gambar (JPG, PNG, GIF) yang diperbolehkan']);
+            exit;
+        }
+        
+        $max_size = 5 * 1024 * 1024;
+        if ($file['size'] > $max_size) {
+            echo json_encode(['success' => false, 'error' => 'File terlalu besar. Maksimal 5MB']);
+            exit;
+        }
+        
+        $upload_dir = '../../storage/uploads/answers/';
+        if (!file_exists($upload_dir)) {
+            mkdir($upload_dir, 0777, true);
+        }
+        
+        $file_extension = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
+        $new_filename = 'essay_' . $attempt_id . '_' . $question_id . '_' . time() . '.' . $file_extension;
+        $upload_path = $upload_dir . $new_filename;
+        
+        if (move_uploaded_file($file['tmp_name'], $upload_path)) {
+            $stmt = $pdo->prepare("SELECT essay_answers FROM exam_attempts WHERE id = ?");
+            $stmt->execute([$attempt_id]);
+            $current_essay = $stmt->fetchColumn();
+            $essay_data = $current_essay ? json_decode($current_essay, true) : [];
+            
+            $essay_data[$question_id] = ($essay_data[$question_id] ?? '') . "\n[File: $new_filename]";
+            
+            $stmt = $pdo->prepare("UPDATE exam_attempts SET essay_answers = ? WHERE id = ?");
+            $stmt->execute([json_encode($essay_data), $attempt_id]);
+            
+            echo json_encode(['success' => true, 'filename' => $new_filename]);
+        } else {
+            echo json_encode(['success' => false, 'error' => 'Gagal menyimpan file']);
+        }
         exit;
     }
 }
@@ -350,6 +441,30 @@ body {
                     <?php else: ?>
                         <textarea name="essay_<?php echo $question['id']; ?>" class="form-control allow-file-upload" rows="6" placeholder="Tulis jawaban Anda di sini..." data-question-num="<?php echo ($index + 1); ?>" oninput="updateNavigation()"><?php echo htmlspecialchars($essay_answers[$question['id']] ?? ''); ?></textarea>
                         <div style="margin-top: 0.5rem; color: #666; font-size: 0.9rem;">💡 Atau upload file gambar jawaban Anda di bawah</div>
+                        <div style="margin-top: 0.5rem;">
+                            <input type="file" 
+                                   id="file_<?php echo $question['id']; ?>" 
+                                   class="form-control" 
+                                   accept="image/jpeg,image/jpg,image/png,image/gif" 
+                                   onchange="uploadEssayFile(<?php echo $question['id']; ?>, <?php echo $attempt['id']; ?>)"
+                                   style="padding: 0.5rem;">
+                            <div id="upload_status_<?php echo $question['id']; ?>" style="margin-top: 0.3rem; font-size: 0.85rem;">
+                                <?php 
+                                if (isset($essay_answers_raw[$question['id']])) {
+                                    preg_match_all('/\[File: ([^\]]+)\]/', $essay_answers_raw[$question['id']], $matches);
+                                    if (!empty($matches[1])) {
+                                        echo '<div style="color: #28a745; margin-top: 0.3rem;">';
+                                        echo '📎 File terupload: ';
+                                        foreach ($matches[1] as $idx => $filename) {
+                                            if ($idx > 0) echo ', ';
+                                            echo '<a href="' . url('storage/uploads/answers/' . htmlspecialchars($filename)) . '" target="_blank" style="color: #007bff;">' . htmlspecialchars($filename) . '</a>';
+                                        }
+                                        echo '</div>';
+                                    }
+                                }
+                                ?>
+                            </div>
+                        </div>
                     <?php endif; ?>
                 </div>
                 <?php endforeach; ?>
@@ -565,6 +680,64 @@ window.addEventListener('beforeunload', function(e) {
 document.getElementById('examForm').addEventListener('submit', function() {
     this.submitted = true;
 });
+
+async function uploadEssayFile(questionId, attemptId) {
+    const fileInput = document.getElementById('file_' + questionId);
+    const statusDiv = document.getElementById('upload_status_' + questionId);
+    const file = fileInput.files[0];
+    
+    if (!file) {
+        return;
+    }
+    
+    const maxSize = 5 * 1024 * 1024;
+    if (file.size > maxSize) {
+        statusDiv.innerHTML = '<span style="color: #dc3545;">❌ File terlalu besar! Maksimal 5MB</span>';
+        fileInput.value = '';
+        return;
+    }
+    
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('question_id', questionId);
+    formData.append('attempt_id', attemptId);
+    formData.append('action', 'upload_essay_file');
+    formData.append('csrf_token', document.querySelector('input[name="csrf_token"]').value);
+    
+    statusDiv.innerHTML = '<span style="color: #007bff;">📤 Uploading...</span>';
+    
+    if (antiCheat) {
+        antiCheat.setUploadingState(true);
+    }
+    isUploadingFile = true;
+    
+    try {
+        const response = await fetch('', {
+            method: 'POST',
+            body: formData
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            const fileUrl = '/storage/uploads/answers/' + data.filename;
+            statusDiv.innerHTML = '<div style="color: #28a745; margin-top: 0.3rem;">📎 File terupload: <a href="' + fileUrl + '" target="_blank" style="color: #007bff;">' + data.filename + '</a></div>';
+            fileInput.value = '';
+            updateNavigation();
+        } else {
+            statusDiv.innerHTML = '<span style="color: #dc3545;">❌ ' + (data.error || 'Upload gagal') + '</span>';
+            fileInput.value = '';
+        }
+    } catch (error) {
+        statusDiv.innerHTML = '<span style="color: #dc3545;">❌ Terjadi kesalahan saat upload</span>';
+        fileInput.value = '';
+    } finally {
+        if (antiCheat) {
+            antiCheat.setUploadingState(false);
+        }
+        isUploadingFile = false;
+    }
+}
 </script>
 
 <?php include '../../app/Views/includes/footer.php'; ?>
