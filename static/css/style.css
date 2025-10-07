@@ -836,10 +836,12 @@ body {
         width: 95%;
         padding: 1rem;
         max-height: calc(100vh - 30px);
+        overflow-y: auto !important;
     }
     
     .modal {
         padding: 10px 0;
+        overflow-y: auto !important;
     }
     
     table {

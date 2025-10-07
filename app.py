@@ -512,13 +512,23 @@ def admin_edit_teacher(id):
     if teacher.role != 'teacher':
         return jsonify({'success': False, 'message': 'Hanya bisa mengedit guru'}), 400
     
+    new_email = request.form.get('email')
+    if new_email != teacher.email:
+        existing_user = User.query.filter_by(email=new_email).first()
+        if existing_user:
+            flash('Email sudah digunakan oleh pengguna lain!', 'danger')
+            return redirect(url_for('admin_teachers'))
+    
     teacher.full_name = request.form.get('full_name')
-    teacher.email = request.form.get('email')
+    teacher.email = new_email
     teacher.phone_number = request.form.get('phone_number')
     
     password = request.form.get('password')
-    if password:
+    if password and len(password) >= 6:
         teacher.set_password(password)
+    elif password and len(password) < 6:
+        flash('Password minimal 6 karakter!', 'danger')
+        return redirect(url_for('admin_teachers'))
     
     db.session.commit()
     
