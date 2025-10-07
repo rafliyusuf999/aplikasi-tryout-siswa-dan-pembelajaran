@@ -34,7 +34,7 @@ if ($exam['is_premium']) {
     }
 }
 
-$stmt = $pdo->prepare("SELECT * FROM exam_attempts WHERE exam_id = ? AND user_id = ? ORDER BY created_at DESC LIMIT 1");
+$stmt = $pdo->prepare("SELECT * FROM exam_attempts WHERE exam_id = ? AND user_id = ? ORDER BY started_at DESC LIMIT 1");
 $stmt->execute([$exam_id, $user['id']]);
 $attempt = $stmt->fetch();
 
