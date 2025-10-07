@@ -108,6 +108,38 @@ include '../../app/Views/includes/navbar.php';
                 </div>
                 
                 <div class="card" style="text-align: center; padding: 1.5rem;">
+                    <div style="font-size: 2rem; color: var(--primary-color);">▶️</div>
+                    <div style="font-size: 1.2rem; font-weight: bold;">
+                        <?php 
+                        $start_dt = new DateTime($attempt['started_at']);
+                        echo $start_dt->format('H:i');
+                        ?>
+                    </div>
+                    <div style="color: #666; font-size: 0.85rem;">
+                        <?php echo $start_dt->format('d/m/Y'); ?>
+                    </div>
+                    <div style="color: #666; margin-top: 0.3rem;">Waktu Mulai</div>
+                </div>
+                
+                <div class="card" style="text-align: center; padding: 1.5rem;">
+                    <div style="font-size: 2rem; color: var(--primary-color);">⏹️</div>
+                    <div style="font-size: 1.2rem; font-weight: bold;">
+                        <?php 
+                        if ($attempt['finished_at']) {
+                            $end_dt = new DateTime($attempt['finished_at']);
+                            echo $end_dt->format('H:i');
+                        } else {
+                            echo '-';
+                        }
+                        ?>
+                    </div>
+                    <div style="color: #666; font-size: 0.85rem;">
+                        <?php echo $attempt['finished_at'] ? $end_dt->format('d/m/Y') : ''; ?>
+                    </div>
+                    <div style="color: #666; margin-top: 0.3rem;">Waktu Selesai</div>
+                </div>
+                
+                <div class="card" style="text-align: center; padding: 1.5rem;">
                     <div style="font-size: 2rem; color: var(--primary-color);">⏱️</div>
                     <div style="font-size: 1.5rem; font-weight: bold;">
                         <?php 
@@ -121,7 +153,7 @@ include '../../app/Views/includes/navbar.php';
                         }
                         ?>
                     </div>
-                    <div style="color: #666;">Waktu Pengerjaan</div>
+                    <div style="color: #666;">Durasi Pengerjaan</div>
                 </div>
                 
                 <div class="card" style="text-align: center; padding: 1.5rem;">
