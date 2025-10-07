@@ -211,6 +211,52 @@ def logout():
     flash('Anda telah logout.', 'info')
     return redirect(url_for('index'))
 
+@app.route('/profile')
+@login_required
+def profile():
+    return render_template('profile.html', branches=BRANCHES, class_levels=CLASS_LEVELS)
+
+@app.route('/profile/update', methods=['POST'])
+@login_required
+def update_profile():
+    full_name = request.form.get('full_name')
+    email = request.form.get('email')
+    password = request.form.get('password')
+    inspira_branch = request.form.get('inspira_branch')
+    class_level = request.form.get('class_level')
+    school_name = request.form.get('school_name')
+    phone_number = request.form.get('phone_number')
+    
+    if User.query.filter(User.email == email, User.id != current_user.id).first():
+        flash('Email sudah digunakan oleh pengguna lain!', 'danger')
+        return redirect(url_for('profile'))
+    
+    if User.query.filter(func.lower(User.full_name) == func.lower(full_name), User.id != current_user.id).first():
+        flash('Nama sudah digunakan oleh pengguna lain!', 'danger')
+        return redirect(url_for('profile'))
+    
+    current_user.full_name = full_name
+    current_user.email = email
+    current_user.inspira_branch = inspira_branch
+    current_user.class_level = class_level
+    current_user.school_name = school_name
+    current_user.phone_number = phone_number
+    
+    if password:
+        current_user.set_password(password)
+    
+    photo = request.files.get('profile_photo')
+    if photo and photo.filename:
+        os.makedirs(os.path.join(app.config['UPLOAD_FOLDER'], 'profiles'), exist_ok=True)
+        filename = secure_filename(f"profile_{email}_{datetime.now().timestamp()}.jpg")
+        filepath = os.path.join(app.config['UPLOAD_FOLDER'], 'profiles', filename)
+        photo.save(filepath)
+        current_user.profile_photo = filename
+    
+    db.session.commit()
+    flash('Profil berhasil diperbarui!', 'success')
+    return redirect(url_for('profile'))
+
 @app.route('/admin/dashboard')
 @login_required
 def admin_dashboard():
