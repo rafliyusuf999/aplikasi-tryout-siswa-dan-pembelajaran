@@ -786,6 +786,20 @@ body::before {
 }
 
 @media (max-width: 768px) {
+    .navbar {
+        background: rgba(139, 21, 56, 1);
+    }
+    
+    .stat-card {
+        background: linear-gradient(135deg, rgba(139, 21, 56, 0.85) 0%, rgba(165, 42, 74, 0.85) 100%);
+        border: 2px solid rgba(139, 21, 56, 0.9);
+    }
+    
+    .card {
+        background: rgba(255, 255, 255, 0.15);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+    
     .hero h1 {
         font-size: 2rem;
     }
@@ -932,6 +946,15 @@ body::before {
 }
 
 @media (max-width: 480px) {
+    .navbar {
+        background: #8B1538;
+    }
+    
+    .stat-card {
+        background: linear-gradient(135deg, #8B1538 0%, #A52A4A 100%);
+        border: 2px solid #8B1538;
+    }
+    
     .navbar-brand {
         font-size: 1.2rem;
     }

@@ -7,7 +7,7 @@ function getDB() {
         try {
             $database_url = getenv('DATABASE_URL');
             
-            if ($database_url && $database_url !== '') {
+            if ($database_url && trim($database_url) !== '') {
                 $url_parts = parse_url($database_url);
                 
                 $host = $url_parts['host'] ?? 'localhost';
@@ -18,6 +18,7 @@ function getDB() {
                 
                 $dsn = "pgsql:host={$host};port={$port};dbname={$dbname}";
                 if (isset($url_parts['query'])) {
+                    $params = [];
                     parse_str($url_parts['query'], $params);
                     if (isset($params['sslmode'])) {
                         $dsn .= ";sslmode={$params['sslmode']}";
@@ -30,11 +31,17 @@ function getDB() {
                     PDO::ATTR_EMULATE_PREPARES => false,
                 ]);
             } else {
-                $host = getenv('PGHOST') ?: 'localhost';
-                $user = getenv('PGUSER') ?: 'root';
-                $pass = getenv('PGPASSWORD') ?: '';
-                $name = getenv('PGDATABASE') ?: 'inspiranet_db';
-                $port = getenv('PGPORT') ?: '5432';
+                $host = getenv('PGHOST');
+                $user = getenv('PGUSER');
+                $pass = getenv('PGPASSWORD');
+                $name = getenv('PGDATABASE');
+                $port = getenv('PGPORT');
+                
+                if (!$host || trim($host) === '') $host = 'localhost';
+                if (!$user || trim($user) === '') $user = 'postgres';
+                if (!$pass || trim($pass) === '') $pass = '';
+                if (!$name || trim($name) === '') $name = 'inspiranet_db';
+                if (!$port || trim($port) === '') $port = '5432';
                 
                 $dsn = "pgsql:host={$host};port={$port};dbname={$name}";
                 $pdo = new PDO($dsn, $user, $pass, [
