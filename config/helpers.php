@@ -17,7 +17,11 @@ function getFlash() {
 }
 
 function redirect($url) {
-    header("Location: $url");
+    if (strpos($url, 'http') === 0) {
+        header("Location: $url");
+    } else {
+        header("Location: /" . ltrim($url, '/'));
+    }
     exit;
 }
 
