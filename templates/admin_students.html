@@ -28,6 +28,7 @@
         <table class="table">
             <thead>
                 <tr>
+                    <th>Foto</th>
                     <th>Nama</th>
                     <th>Email</th>
                     <th>Cabang</th>
@@ -40,6 +41,17 @@
             <tbody>
                 {% for student in students %}
                 <tr {% if student_cheating_data.get(student.id, 0) > 0 %}style="background-color: #fff3f3;"{% endif %}>
+                    <td>
+                        {% if student.profile_photo %}
+                        <img src="{{ url_for('uploaded_file', filename='profiles/' + student.profile_photo) }}" 
+                             alt="{{ student.full_name }}" 
+                             style="width: 50px; height: 50px; border-radius: 50%; object-fit: cover; border: 2px solid var(--primary-color);">
+                        {% else %}
+                        <div style="width: 50px; height: 50px; border-radius: 50%; background: var(--primary-color); color: white; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 1.2rem;">
+                            {{ student.full_name[0].upper() }}
+                        </div>
+                        {% endif %}
+                    </td>
                     <td>{{ student.full_name }}</td>
                     <td>{{ student.email }}</td>
                     <td>{{ student.inspira_branch }}</td>
@@ -68,7 +80,8 @@
                             data-school="{{ student.school_name }}"
                             data-phone="{{ student.phone_number or '-' }}"
                             data-created="{{ student.created_at.strftime('%d/%m/%Y %H:%M') }}"
-                            data-has-cheating="{{ '1' if student_cheating_data.get(student.id, 0) > 0 else '0' }}">
+                            data-has-cheating="{{ '1' if student_cheating_data.get(student.id, 0) > 0 else '0' }}"
+                            data-photo="{{ student.profile_photo or '' }}">
                             Detail
                         </button>
                         <button 
@@ -159,6 +172,9 @@
             <span class="close" onclick="closeModal('studentDetailsModal')">&times;</span>
         </div>
         <div class="modal-body">
+            <div style="text-align: center; margin-bottom: 1.5rem;">
+                <div id="detail_photo_container"></div>
+            </div>
             <table style="width: 100%; border-collapse: collapse;">
                 <tr style="border-bottom: 1px solid #ddd;">
                     <td style="padding: 1rem; font-weight: bold; width: 40%;">Nama Lengkap:</td>
@@ -191,9 +207,12 @@
                 <tr style="border-bottom: 1px solid #ddd;">
                     <td style="padding: 1rem; font-weight: bold;">Password:</td>
                     <td style="padding: 1rem;">
-                        <button onclick="showResetPasswordForm()" class="btn btn-warning" style="padding: 0.5rem 1rem;">
-                            🔑 Reset Password
-                        </button>
+                        <div style="display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;">
+                            <button onclick="showResetPasswordForm()" class="btn btn-warning" style="padding: 0.5rem 1rem;">
+                                🔑 Atur Password Baru
+                            </button>
+                            <small style="color: #666;">(Password terenkripsi untuk keamanan)</small>
+                        </div>
                     </td>
                 </tr>
             </table>
@@ -286,6 +305,15 @@ document.addEventListener('DOMContentLoaded', function() {
             const school = this.getAttribute('data-school');
             const phone = this.getAttribute('data-phone');
             const created = this.getAttribute('data-created');
+            const photo = this.getAttribute('data-photo');
+            
+            // Display photo
+            const photoContainer = document.getElementById('detail_photo_container');
+            if (photo) {
+                photoContainer.innerHTML = `<img src="/uploads/profiles/${photo}" alt="${currentStudentName}" style="width: 120px; height: 120px; border-radius: 50%; object-fit: cover; border: 4px solid var(--primary-color);">`;
+            } else {
+                photoContainer.innerHTML = `<div style="width: 120px; height: 120px; border-radius: 50%; background: var(--primary-color); color: white; display: flex; align-items: center; justify-content: center; font-size: 3rem; font-weight: bold; margin: 0 auto; border: 4px solid var(--primary-color);">${currentStudentName.charAt(0).toUpperCase()}</div>`;
+            }
             
             document.getElementById('detail_name').textContent = currentStudentName;
             document.getElementById('detail_email').textContent = email;
