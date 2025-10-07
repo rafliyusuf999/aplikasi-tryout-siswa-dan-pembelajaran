@@ -378,6 +378,91 @@ document.querySelectorAll('.student-clear-cheating-btn').forEach(function(button
 });
 </script>
 
+<style>
+@media (max-width: 1024px) {
+    .table-responsive {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    .table td {
+        white-space: nowrap;
+    }
+}
+
+@media (max-width: 768px) {
+    .card > div:first-child {
+        flex-direction: column;
+        align-items: flex-start !important;
+    }
+    
+    .card > div:first-child > div {
+        width: 100%;
+        margin-top: 0.5rem;
+    }
+    
+    .table {
+        font-size: 0.85rem;
+    }
+    
+    .table td button {
+        padding: 0.4rem 0.8rem !important;
+        font-size: 0.8rem;
+        margin-right: 3px !important;
+        margin-bottom: 0.3rem;
+    }
+    
+    .table thead th {
+        font-size: 0.9rem;
+        padding: 0.5rem;
+    }
+    
+    .table tbody td {
+        padding: 0.5rem;
+    }
+    
+    .modal-content {
+        width: 95%;
+        margin: 5% auto;
+    }
+    
+    .modal-body table td {
+        font-size: 0.85rem;
+        padding: 0.7rem !important;
+    }
+}
+
+@media (max-width: 480px) {
+    h1 {
+        font-size: 1.5rem !important;
+    }
+    
+    .card h2 {
+        font-size: 1.2rem;
+    }
+    
+    .table {
+        font-size: 0.75rem;
+    }
+    
+    .table td button {
+        padding: 0.3rem 0.6rem !important;
+        font-size: 0.75rem;
+    }
+    
+    .btn {
+        font-size: 0.85rem;
+    }
+    
+    .table td img,
+    .table td div[style*="width: 50px"] {
+        width: 35px !important;
+        height: 35px !important;
+        font-size: 1rem !important;
+    }
+}
+</style>
+
 <div id="clearCheatingModal" class="modal">
     <div class="modal-content">
         <div class="modal-header">
