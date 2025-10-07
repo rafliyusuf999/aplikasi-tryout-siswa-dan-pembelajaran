@@ -34,6 +34,17 @@ if ($exam['is_premium']) {
     }
 }
 
+// Cek apakah ada completed attempt sebelumnya (first attempt)
+$stmt = $pdo->prepare("SELECT * FROM exam_attempts WHERE exam_id = ? AND user_id = ? AND is_completed = true ORDER BY finished_at ASC LIMIT 1");
+$stmt->execute([$exam_id, $user['id']]);
+$first_attempt = $stmt->fetch();
+
+// Hitung jumlah attempt yang sudah completed
+$stmt = $pdo->prepare("SELECT COUNT(*) FROM exam_attempts WHERE exam_id = ? AND user_id = ? AND is_completed = true");
+$stmt->execute([$exam_id, $user['id']]);
+$completed_attempts_count = (int)$stmt->fetchColumn();
+
+// Get current active attempt or create new one
 $stmt = $pdo->prepare("SELECT * FROM exam_attempts WHERE exam_id = ? AND user_id = ? ORDER BY started_at DESC LIMIT 1");
 $stmt->execute([$exam_id, $user['id']]);
 $attempt = $stmt->fetch();
@@ -106,6 +117,59 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         
         $stmt = $pdo->prepare("UPDATE exam_attempts SET answers = ?, essay_answers = ?, total_score = ?, finished_at = NOW(), is_completed = true WHERE id = ?");
         $stmt->execute([json_encode($new_answers), json_encode($new_essay_answers), $total_score, $attempt['id']]);
+        
+        // Update leaderboard HANYA jika ini adalah first completed attempt
+        if ($completed_attempts_count === 0) {
+            // Hitung total poin dari semua exam
+            $stmt = $pdo->prepare("
+                SELECT COALESCE(SUM(total_score), 0) as combined_score
+                FROM exam_attempts
+                WHERE user_id = ? AND is_completed = true
+            ");
+            $stmt->execute([$user['id']]);
+            $combined = $stmt->fetch();
+            $combined_score = (int)$combined['combined_score'];
+            
+            // Delete old leaderboard entry untuk exam ini (jika ada)
+            $stmt = $pdo->prepare("DELETE FROM leaderboards WHERE exam_id = ? AND user_id = ?");
+            $stmt->execute([$exam_id, $user['id']]);
+            
+            // Hitung ranking berdasarkan branch
+            $stmt = $pdo->prepare("
+                SELECT COUNT(*) + 1 as rank
+                FROM (
+                    SELECT DISTINCT user_id, MAX(total_score) as max_score
+                    FROM exam_attempts
+                    WHERE exam_id = ? AND is_completed = true
+                    GROUP BY user_id
+                ) as scores
+                JOIN users ON scores.user_id = users.id
+                WHERE users.branch = ? AND scores.max_score > ?
+            ");
+            $stmt->execute([$exam_id, $user['branch'], $total_score]);
+            $rank_in_branch = (int)$stmt->fetchColumn();
+            
+            // Hitung ranking global
+            $stmt = $pdo->prepare("
+                SELECT COUNT(*) + 1 as rank
+                FROM (
+                    SELECT DISTINCT user_id, MAX(total_score) as max_score
+                    FROM exam_attempts
+                    WHERE exam_id = ? AND is_completed = true
+                    GROUP BY user_id
+                ) as scores
+                WHERE scores.max_score > ?
+            ");
+            $stmt->execute([$exam_id, $total_score]);
+            $rank_global = (int)$stmt->fetchColumn();
+            
+            // Insert leaderboard entry
+            $stmt = $pdo->prepare("
+                INSERT INTO leaderboards (exam_id, user_id, total_score, rank_in_branch, rank_global, achieved_at)
+                VALUES (?, ?, ?, ?, ?, NOW())
+            ");
+            $stmt->execute([$exam_id, $user['id'], $total_score, $rank_in_branch, $rank_global]);
+        }
         
         setFlash('Try Out berhasil diselesaikan!', 'success');
         redirect('student/result.php?id=' . $attempt['id']);
@@ -481,6 +545,36 @@ body {
                 <div id="timer-display"></div>
                 <div class="timer-label">Waktu Tersisa</div>
             </div>
+            
+            <?php if ($first_attempt && $completed_attempts_count > 0): 
+                $first_answers = $first_attempt['answers'] ? json_decode($first_attempt['answers'], true) : [];
+            ?>
+            <div class="previous-attempt-box" style="
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                color: white;
+                padding: 1.5rem;
+                border-radius: 15px;
+                margin-top: 1rem;
+                box-shadow: 0 4px 10px rgba(102, 126, 234, 0.3);
+            ">
+                <h3 style="margin: 0 0 1rem 0; font-size: 1.1rem; display: flex; align-items: center; gap: 0.5rem;">
+                    <span>📊</span> Attempt Pertama
+                </h3>
+                <div style="background: rgba(255,255,255,0.1); padding: 1rem; border-radius: 10px;">
+                    <div style="font-size: 0.9rem; opacity: 0.9; margin-bottom: 0.5rem;">Nilai yang Dinilai:</div>
+                    <div style="font-size: 2rem; font-weight: bold;">
+                        <?php echo number_format($first_attempt['total_score'], 0); ?>
+                    </div>
+                    <div style="font-size: 0.85rem; opacity: 0.8; margin-top: 0.5rem;">
+                        Tanggal: <?php echo date('d/m/Y H:i', strtotime($first_attempt['finished_at'])); ?>
+                    </div>
+                </div>
+                <div style="margin-top: 1rem; font-size: 0.85rem; opacity: 0.9; line-height: 1.5;">
+                    ℹ️ Ini adalah attempt ke-<?php echo $completed_attempts_count + 1; ?>. 
+                    Nilai dari attempt pertama yang akan masuk ke leaderboard.
+                </div>
+            </div>
+            <?php endif; ?>
             
             <div class="question-nav">
                 <h3>📋 Navigasi Soal</h3>
