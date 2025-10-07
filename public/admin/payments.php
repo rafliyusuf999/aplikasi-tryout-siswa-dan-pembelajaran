@@ -6,7 +6,7 @@ requireAnyRole(['admin', 'teacher']);
 $pdo = getDB();
 $pageTitle = 'Kelola Pembayaran';
 
-$status_filter = $_GET['status'] ?? 'pending';
+$status_filter = $_GET['status'] ?? 'approved';
 $search = $_GET['search'] ?? '';
 
 $query = "SELECT p.*, u.full_name as student_name, u.email as student_email, 
@@ -104,16 +104,18 @@ include '../../app/Views/includes/navbar.php';
     <h1>Kelola Pembayaran</h1>
     
     <div class="card" style="margin-top: 1.5rem;">
-        <div style="display: flex; gap: 1rem; margin-bottom: 1.5rem; flex-wrap: wrap;">
-            <a href="?status=pending" class="btn <?php echo $status_filter === 'pending' ? 'btn-primary' : 'btn-secondary'; ?>">
-                Pending
-            </a>
+        <div style="display: flex; gap: 1rem; margin-bottom: 1.5rem; flex-wrap: wrap; align-items: center;">
             <a href="?status=approved" class="btn <?php echo $status_filter === 'approved' ? 'btn-primary' : 'btn-secondary'; ?>">
                 Disetujui
             </a>
             <a href="?status=rejected" class="btn <?php echo $status_filter === 'rejected' ? 'btn-primary' : 'btn-secondary'; ?>">
                 Ditolak
             </a>
+            <?php if (getCurrentUser()['role'] === 'admin'): ?>
+            <a href="<?php echo url('admin/payment_settings.php'); ?>" class="btn btn-warning" style="margin-left: auto;">
+                ⚙️ Pengaturan Pembayaran
+            </a>
+            <?php endif; ?>
         </div>
         
         <form method="GET" style="display: flex; gap: 1rem; margin-bottom: 1.5rem;">
@@ -126,16 +128,6 @@ include '../../app/Views/includes/navbar.php';
         <div style="display: flex; gap: 1rem; margin-bottom: 1.5rem; flex-wrap: wrap;">
             <?php if (getCurrentUser()['role'] === 'admin'): ?>
             <button onclick="showAddModal()" class="btn btn-primary">+ Tambah Pembayaran Manual</button>
-            <?php endif; ?>
-            
-            <?php if ($status_filter === 'pending' && count($payments) > 0): ?>
-            <form method="POST" style="display: inline;">
-                <?php echo csrf(); ?>
-                <input type="hidden" name="action" value="approve_all">
-                <button type="submit" class="btn btn-success" onclick="return confirm('Yakin menyetujui SEMUA pembayaran pending (<?php echo count($payments); ?> pembayaran)?')">
-                    ✓ Setujui Semua (<?php echo count($payments); ?>)
-                </button>
-            </form>
             <?php endif; ?>
         </div>
         
