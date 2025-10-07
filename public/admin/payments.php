@@ -6,7 +6,7 @@ requireAnyRole(['admin', 'teacher']);
 $pdo = getDB();
 $pageTitle = 'Kelola Pembayaran';
 
-$status_filter = $_GET['status'] ?? 'pending';
+$status_filter = $_GET['status'] ?? 'approved';
 $search = $_GET['search'] ?? '';
 
 $query = "SELECT p.*, u.full_name as student_name, u.email as student_email, 
@@ -105,9 +105,6 @@ include '../../app/Views/includes/navbar.php';
     
     <div class="card" style="margin-top: 1.5rem;">
         <div style="display: flex; gap: 1rem; margin-bottom: 1.5rem; flex-wrap: wrap; align-items: center;">
-            <a href="?status=pending" class="btn <?php echo $status_filter === 'pending' ? 'btn-primary' : 'btn-secondary'; ?>">
-                Pending
-            </a>
             <a href="?status=approved" class="btn <?php echo $status_filter === 'approved' ? 'btn-primary' : 'btn-secondary'; ?>">
                 Disetujui
             </a>
@@ -131,11 +128,17 @@ include '../../app/Views/includes/navbar.php';
         <div style="display: flex; gap: 1rem; margin-bottom: 1.5rem; flex-wrap: wrap;">
             <?php if (getCurrentUser()['role'] === 'admin'): ?>
             <button onclick="showAddModal()" class="btn btn-primary">+ Tambah Pembayaran Manual</button>
-            <?php if ($status_filter === 'pending' && count($payments) > 0): ?>
-            <form method="POST" style="display: inline;" onsubmit="return confirm('Setujui semua pembayaran pending?')">
+            <?php 
+            $stmt_pending_count = $pdo->query("SELECT COUNT(*) FROM payments WHERE status = 'pending'");
+            $pending_count = $stmt_pending_count->fetchColumn();
+            if ($pending_count > 0): 
+            ?>
+            <form method="POST" style="display: inline;" onsubmit="return confirm('Setujui semua <?php echo $pending_count; ?> pembayaran pending?')">
                 <?php echo csrf(); ?>
                 <input type="hidden" name="action" value="approve_all">
-                <button type="submit" class="btn btn-success">✓ Setujui Semua</button>
+                <button type="submit" class="btn btn-success" style="font-size: 1.1rem; padding: 0.6rem 1.5rem;">
+                    ✓ Setujui Semua (<?php echo $pending_count; ?> Pending)
+                </button>
             </form>
             <?php endif; ?>
             <?php endif; ?>
