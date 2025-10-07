@@ -832,8 +832,14 @@ body {
     }
     
     .modal-content {
-        margin: 5% auto;
+        margin: 10px auto;
         width: 95%;
+        padding: 1rem;
+        max-height: calc(100vh - 30px);
+    }
+    
+    .modal {
+        padding: 10px 0;
     }
     
     table {

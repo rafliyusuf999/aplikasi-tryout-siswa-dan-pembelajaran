@@ -502,6 +502,29 @@ def admin_add_teacher():
     flash('Guru berhasil ditambahkan!', 'success')
     return redirect(url_for('admin_teachers'))
 
+@app.route('/admin/teachers/<int:id>/edit', methods=['POST'])
+@login_required
+def admin_edit_teacher(id):
+    if current_user.role != 'admin':
+        return jsonify({'success': False, 'message': 'Akses ditolak'}), 403
+    
+    teacher = User.query.get_or_404(id)
+    if teacher.role != 'teacher':
+        return jsonify({'success': False, 'message': 'Hanya bisa mengedit guru'}), 400
+    
+    teacher.full_name = request.form.get('full_name')
+    teacher.email = request.form.get('email')
+    teacher.phone_number = request.form.get('phone_number')
+    
+    password = request.form.get('password')
+    if password:
+        teacher.set_password(password)
+    
+    db.session.commit()
+    
+    flash('Data guru berhasil diperbarui!', 'success')
+    return redirect(url_for('admin_teachers'))
+
 @app.route('/admin/teachers/delete/<int:id>', methods=['POST'])
 @login_required
 def admin_delete_teacher(id):
