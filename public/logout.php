@@ -5,5 +5,5 @@ requireLogin();
 
 logout();
 
-setFlash('Anda telah logout.', 'info');
-redirect('index.php');
+header('Location: /index.php');
+exit;

@@ -15,12 +15,12 @@ $query = "SELECT e.*, u.full_name as creator_name,
           (SELECT status FROM payments WHERE exam_id = e.id AND user_id = :user_id2 ORDER BY created_at DESC LIMIT 1) as payment_status
           FROM exams e
           LEFT JOIN users u ON e.created_by = u.id
-          WHERE e.is_active = TRUE";
+          WHERE e.is_active = true";
 
 if ($filter === 'free') {
-    $query .= " AND e.is_premium = FALSE";
+    $query .= " AND e.is_premium = false";
 } elseif ($filter === 'premium') {
-    $query .= " AND e.is_premium = TRUE";
+    $query .= " AND e.is_premium = true";
 }
 
 if ($search) {

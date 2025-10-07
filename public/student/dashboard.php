@@ -6,11 +6,11 @@ requireRole('student');
 $user = getCurrentUser();
 $pdo = getDB();
 
-$stmt = $pdo->prepare("SELECT COUNT(*) FROM exam_attempts WHERE user_id = ? AND is_completed = TRUE");
+$stmt = $pdo->prepare("SELECT COUNT(*) FROM exam_attempts WHERE user_id = ? AND is_completed = true");
 $stmt->execute([$user['id']]);
 $total_attempts = $stmt->fetchColumn();
 
-$stmt = $pdo->prepare("SELECT AVG(total_score) FROM exam_attempts WHERE user_id = ? AND is_completed = TRUE");
+$stmt = $pdo->prepare("SELECT AVG(total_score) FROM exam_attempts WHERE user_id = ? AND is_completed = true");
 $stmt->execute([$user['id']]);
 $avg_score = $stmt->fetchColumn() ?? 0;
 
@@ -24,7 +24,7 @@ $rankings = $stmt->fetch();
 $best_rank_branch = $rankings['best_rank_branch'] ?? '-';
 $best_rank_global = $rankings['best_rank_global'] ?? '-';
 
-$stmt = $pdo->prepare("SELECT MAX(total_score) FROM exam_attempts WHERE user_id = ? AND is_completed = TRUE");
+$stmt = $pdo->prepare("SELECT MAX(total_score) FROM exam_attempts WHERE user_id = ? AND is_completed = true");
 $stmt->execute([$user['id']]);
 $best_score = $stmt->fetchColumn() ?? 0;
 
@@ -32,7 +32,7 @@ $stmt = $pdo->prepare("
     SELECT ea.*, e.title, e.duration_minutes, e.is_premium
     FROM exam_attempts ea
     JOIN exams e ON ea.exam_id = e.id
-    WHERE ea.user_id = ? AND ea.is_completed = TRUE
+    WHERE ea.user_id = ? AND ea.is_completed = true
     ORDER BY ea.finished_at DESC
     LIMIT 5
 ");

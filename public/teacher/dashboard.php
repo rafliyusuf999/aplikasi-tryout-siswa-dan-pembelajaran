@@ -19,7 +19,7 @@ $total_students = $stmt->fetchColumn();
 
 $stmt = $pdo->prepare("SELECT COUNT(*) FROM exam_attempts ea 
                        JOIN exams e ON ea.exam_id = e.id 
-                       WHERE e.created_by = ? AND ea.is_completed = TRUE");
+                       WHERE e.created_by = ? AND ea.is_completed = true");
 $stmt->execute([$user['id']]);
 $completed_attempts = $stmt->fetchColumn();
 

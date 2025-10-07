@@ -17,7 +17,7 @@ $pdo = getDB();
 $stmt = $pdo->query("SELECT COUNT(*) FROM users WHERE role = 'student'");
 $total_students = $stmt->fetchColumn();
 
-$stmt = $pdo->query("SELECT COUNT(*) FROM exams WHERE is_active = TRUE");
+$stmt = $pdo->query("SELECT COUNT(*) FROM exams WHERE is_active = true");
 $total_exams = $stmt->fetchColumn();
 
 $stmt = $pdo->query("SELECT COUNT(DISTINCT inspira_branch) FROM users WHERE inspira_branch IS NOT NULL");

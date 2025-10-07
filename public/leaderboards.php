@@ -10,7 +10,7 @@ $pageTitle = 'Peringkat';
 $exam_id = $_GET['exam_id'] ?? null;
 $view_type = $_GET['view'] ?? 'branch';
 
-$stmt = $pdo->query("SELECT id, title FROM exams WHERE is_active = TRUE ORDER BY created_at DESC");
+$stmt = $pdo->query("SELECT id, title FROM exams WHERE is_active = true ORDER BY created_at DESC");
 $exams = $stmt->fetchAll();
 
 $leaderboard = [];
@@ -26,7 +26,7 @@ if ($exam_id) {
         $query = "SELECT ea.*, u.full_name, u.email, u.inspira_branch, u.profile_photo
                   FROM exam_attempts ea
                   JOIN users u ON ea.user_id = u.id
-                  WHERE ea.exam_id = ? AND ea.is_completed = TRUE 
+                  WHERE ea.exam_id = ? AND ea.is_completed = true 
                   AND u.inspira_branch = ?
                   ORDER BY ea.total_score DESC, ea.finished_at ASC";
         $stmt = $pdo->prepare($query);
@@ -35,7 +35,7 @@ if ($exam_id) {
         $query = "SELECT ea.*, u.full_name, u.email, u.inspira_branch, u.profile_photo
                   FROM exam_attempts ea
                   JOIN users u ON ea.user_id = u.id
-                  WHERE ea.exam_id = ? AND ea.is_completed = TRUE
+                  WHERE ea.exam_id = ? AND ea.is_completed = true
                   ORDER BY ea.total_score DESC, ea.finished_at ASC";
         $stmt = $pdo->prepare($query);
         $stmt->execute([$exam_id]);

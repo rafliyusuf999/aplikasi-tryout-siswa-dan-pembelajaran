@@ -33,7 +33,7 @@ $payments = $stmt->fetchAll();
 $stmt = $pdo->query("SELECT id, full_name, email FROM users WHERE role = 'student' ORDER BY full_name");
 $students = $stmt->fetchAll();
 
-$stmt = $pdo->query("SELECT id, title, price FROM exams WHERE is_premium = TRUE ORDER BY title");
+$stmt = $pdo->query("SELECT id, title, price FROM exams WHERE is_premium = true ORDER BY title");
 $exams = $stmt->fetchAll();
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -49,6 +49,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             
             setFlash('Pembayaran berhasil disetujui', 'success');
             redirect('admin/payments.php?status=' . $status_filter);
+        }
+        
+        if ($_POST['action'] === 'approve_all') {
+            $user = getCurrentUser();
+            
+            $stmt = $pdo->prepare("UPDATE payments SET status = 'approved', approved_at = NOW(), approved_by = ? WHERE status = 'pending'");
+            $stmt->execute([$user['id']]);
+            $affected = $stmt->rowCount();
+            
+            setFlash("Berhasil menyetujui $affected pembayaran", 'success');
+            redirect('admin/payments.php?status=approved');
         }
         
         if ($_POST['action'] === 'reject' && isset($_POST['id'])) {
@@ -112,9 +123,21 @@ include '../../app/Views/includes/navbar.php';
             <a href="<?php echo url('admin/payments.php?status=' . $status_filter); ?>" class="btn btn-secondary">Reset</a>
         </form>
         
-        <?php if (getCurrentUser()['role'] === 'admin'): ?>
-        <button onclick="showAddModal()" class="btn btn-primary" style="margin-bottom: 1.5rem;">+ Tambah Pembayaran Manual</button>
-        <?php endif; ?>
+        <div style="display: flex; gap: 1rem; margin-bottom: 1.5rem; flex-wrap: wrap;">
+            <?php if (getCurrentUser()['role'] === 'admin'): ?>
+            <button onclick="showAddModal()" class="btn btn-primary">+ Tambah Pembayaran Manual</button>
+            <?php endif; ?>
+            
+            <?php if ($status_filter === 'pending' && count($payments) > 0): ?>
+            <form method="POST" style="display: inline;">
+                <?php echo csrf(); ?>
+                <input type="hidden" name="action" value="approve_all">
+                <button type="submit" class="btn btn-success" onclick="return confirm('Yakin menyetujui SEMUA pembayaran pending (<?php echo count($payments); ?> pembayaran)?')">
+                    ✓ Setujui Semua (<?php echo count($payments); ?>)
+                </button>
+            </form>
+            <?php endif; ?>
+        </div>
         
         <div style="overflow-x: auto;">
             <table class="table">

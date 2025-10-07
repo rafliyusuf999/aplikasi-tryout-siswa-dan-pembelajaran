@@ -1019,6 +1019,36 @@ body::before {
     }
 }
 
+/* iPhone specific fixes */
+@supports (-webkit-touch-callout: none) {
+    body {
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+    }
+    
+    .card, .stat-card, .modal-content {
+        -webkit-transform: translateZ(0);
+        transform: translateZ(0);
+        -webkit-backface-visibility: hidden;
+        backface-visibility: hidden;
+    }
+    
+    .card:hover, .stat-card:hover {
+        -webkit-transform: translateY(-8px) translateZ(0) scale(1.02);
+        transform: translateY(-8px) translateZ(0) scale(1.02);
+    }
+    
+    .btn:hover {
+        -webkit-transform: translateY(-5px) translateZ(0) scale(1.02);
+        transform: translateY(-5px) translateZ(0) scale(1.02);
+    }
+    
+    input, select, textarea {
+        -webkit-appearance: none;
+        border-radius: 8px;
+    }
+}
+
 .table-responsive {
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
