@@ -556,6 +556,29 @@ body::before {
     position: relative;
 }
 
+.modal-content .form-control {
+    background: #f8f9fa;
+    color: #2C1810;
+    border: 2px solid #dee2e6;
+}
+
+.modal-content .form-control::placeholder {
+    color: #6c757d;
+}
+
+.modal-content .form-control:focus {
+    background: white;
+    border-color: var(--primary-color);
+}
+
+.modal-content .form-group label {
+    color: #2C1810;
+}
+
+.modal-content h2, .modal-content h3 {
+    color: var(--primary-color);
+}
+
 .modal-header {
     display: flex;
     justify-content: space-between;
