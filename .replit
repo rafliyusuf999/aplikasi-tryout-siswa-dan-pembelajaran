@@ -1,4 +1,4 @@
-modules = ["python-3.11"]
+modules = ["python-3.11", "php-8.2"]
 [agent]
 expertMode = true
 
@@ -10,7 +10,7 @@ localPort = 5000
 externalPort = 80
 
 [[ports]]
-localPort = 42477
+localPort = 32853
 externalPort = 3000
 
 [workflows]
@@ -31,7 +31,7 @@ author = "agent"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "python app.py"
+args = "php -S 0.0.0.0:5000 -t public"
 waitForPort = 5000
 
 [workflows.workflow.metadata]
