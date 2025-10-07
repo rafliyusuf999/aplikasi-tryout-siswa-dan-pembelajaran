@@ -30,40 +30,42 @@ include '../app/Views/includes/header.php';
 include '../app/Views/includes/navbar.php';
 ?>
 
+<canvas id="particles-bg"></canvas>
+
 <div class="hero">
     <h1>🎓 Selamat Datang di INSPIRANET</h1>
     <p>Platform Try Out Online Terpercaya untuk Persiapan Ujian Anda</p>
 </div>
 
 <div class="stats-grid">
-    <div class="stat-card">
+    <div class="stat-card" data-animate="slide-up">
         <div class="stat-icon">👥</div>
-        <div class="stat-number"><?php echo $total_students; ?></div>
+        <div class="stat-number" data-count="<?php echo $total_students; ?>">0</div>
         <div class="stat-label">Total Siswa</div>
     </div>
-    <div class="stat-card">
+    <div class="stat-card" data-animate="slide-up" style="animation-delay: 0.1s;">
         <div class="stat-icon">📝</div>
-        <div class="stat-number"><?php echo $total_exams; ?></div>
+        <div class="stat-number" data-count="<?php echo $total_exams; ?>">0</div>
         <div class="stat-label">Try Out Aktif</div>
     </div>
-    <div class="stat-card">
+    <div class="stat-card" data-animate="slide-up" style="animation-delay: 0.2s;">
         <div class="stat-icon">🏢</div>
-        <div class="stat-number"><?php echo $total_branches; ?></div>
+        <div class="stat-number" data-count="<?php echo $total_branches; ?>">0</div>
         <div class="stat-label">Cabang</div>
     </div>
-    <div class="stat-card">
+    <div class="stat-card" data-animate="slide-up" style="animation-delay: 0.3s;">
         <div class="stat-icon">✨</div>
-        <div class="stat-number"><?php echo $active_students; ?></div>
+        <div class="stat-number" data-count="<?php echo $active_students; ?>">0</div>
         <div class="stat-label">Siswa Aktif</div>
     </div>
 </div>
 
-<div class="card" style="margin-top: 3rem;">
+<div class="card" style="margin-top: 3rem;" data-animate="fade-in">
     <h2>Tentang Platform Kami</h2>
-    <p>INSPIRANET adalah platform try out online yang dirancang khusus untuk membantu siswa mempersiapkan diri menghadapi ujian. Dengan sistem yang canggih dan anti-kecurangan, kami memastikan pengalaman ujian yang adil dan kompetitif.</p>
+    <p style="color: rgba(255,255,255,0.9); line-height: 1.8;">INSPIRANET adalah platform try out online yang dirancang khusus untuk membantu siswa mempersiapkan diri menghadapi ujian. Dengan sistem yang canggih dan anti-kecurangan, kami memastikan pengalaman ujian yang adil dan kompetitif.</p>
     
-    <h3 style="margin-top: 2rem;">Fitur Unggulan:</h3>
-    <ul style="line-height: 2;">
+    <h3 style="margin-top: 2rem; color: #ffd700;">Fitur Unggulan:</h3>
+    <ul style="line-height: 2; color: rgba(255,255,255,0.9);">
         <li>📊 Sistem Peringkat Cabang & Global</li>
         <li>🔒 Anti-Kecurangan Ketat</li>
         <li>💳 Pembayaran Try Out Premium</li>
