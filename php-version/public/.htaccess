@@ -1,0 +1,26 @@
+RewriteEngine On
+
+# Prevent directory listing
+Options -Indexes
+
+# Handle uploads folder
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteRule ^storage/uploads/(.*)$ ../storage/uploads/$1 [L]
+
+# Handle static files
+RewriteRule ^static/(.*)$ static/$1 [L]
+
+# Security headers
+<IfModule mod_headers.c>
+    Header set X-Content-Type-Options "nosniff"
+    Header set X-Frame-Options "SAMEORIGIN"
+    Header set X-XSS-Protection "1; mode=block"
+</IfModule>
+
+# PHP security
+<IfModule mod_php7.c>
+    php_flag display_errors Off
+    php_value upload_max_filesize 16M
+    php_value post_max_size 16M
+    php_value max_execution_time 300
+</IfModule>
