@@ -40,13 +40,18 @@ Preferred communication style: Simple, everyday language.
 
 ### Authentication & Authorization
 - Role-based access control (RBAC) with three user types:
-  - **Admin:** Full system control, user management, payment approval, complete question management for all exams (add, edit, delete)
-  - **Teacher:** Exam creation, question management (add, edit, delete for own exams), student result viewing
-  - **Student:** Exam participation, payment submission, leaderboard access
+  - **Admin:** Full system control, user management (students and teachers with edit capability), payment approval, complete question management for all exams (add, edit, delete), exam editing with schedule management
+  - **Teacher:** Exam creation, question management (add, edit, delete for own exams), student result viewing, visibility to all exams (both admin and teacher-created)
+  - **Student:** Exam participation, payment submission, leaderboard access, profile management
 - Session-based authentication via Flask-Login
 - Password hashing with Werkzeug's generate_password_hash/check_password_hash
+- **Admin Capabilities:**
+  - Edit teacher information (name, email, phone, password with validation)
+  - Edit student information with profile photo management
+  - Reset passwords for teachers and students (minimum 6 characters)
+  - Email uniqueness validation when editing users
 
-**Design Rationale:** Role-based system ensures proper access segregation. Session-based auth provides security without external dependencies. Admin has full control while teachers can only manage their own exam questions.
+**Design Rationale:** Role-based system ensures proper access segregation. Session-based auth provides security without external dependencies. Admin has full control over users and exams while teachers can manage their own content and view all exams for comprehensive access. Email uniqueness and password validation ensure data integrity and security.
 
 ### Branch Competition System
 - **4 Branches:** Inspiranet_Cakrawala 1-4
@@ -110,6 +115,8 @@ Preferred communication style: Simple, everyday language.
   - `admin_questions.html` - Admin interface for managing all exam questions (add, edit, delete)
   - `admin_payments.html` - Payment management with manual payment creation
   - `admin_payment_settings.html` - Configure QRIS, payment instructions, and bank details
+  - `admin_teachers.html` - Admin interface for managing teachers (add, edit with email validation, delete)
+  - `admin_exams.html` - Admin exam management with edit capability for schedules and settings
   - `teacher_questions.html` - Teacher interface for managing own exam questions (add, edit, delete)
   - `student_exam.html` - Exam interface with essay photo upload and comprehensive error handling
   - `student_pay.html` - Payment page displaying QRIS and dynamic payment instructions
