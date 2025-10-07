@@ -92,6 +92,7 @@ Preferred communication style: Simple, everyday language.
 - **Modal Improvements:** Scrollable content with overflow handling to prevent content being cut off
 - **Enhanced User Interface:**
   - **Navbar Profile Display:** User profile photo and name shown in navigation bar with responsive design
+  - **User Profile Management:** Dedicated profile page where all users can view and update their personal information, including email, name, password, photo, and role-specific details (branch, class, school for students)
   - Complete countdown timer with HH:MM:SS format updating every second
   - Visual question status indicators with color coding (grey=unanswered, green=answered, yellow=doubtful)
   - Question navigation buttons with scale effect for current question while preserving status colors
@@ -114,6 +115,7 @@ Preferred communication style: Simple, everyday language.
   - `student_pay.html` - Payment page displaying QRIS and dynamic payment instructions
   - `essay_answers.html` - Admin/teacher dashboard for viewing essay submissions
   - `register.html` - Student registration with profile photo upload
+  - `profile.html` - User profile management page for viewing and updating personal information
 - `static/css/` - Responsive stylesheets with custom theme and improved modal scrolling
 - `static/js/` - Client-side JavaScript with anti-cheat enforcement
 - `uploads/` - File upload directories (profiles, answers, payment proofs)
