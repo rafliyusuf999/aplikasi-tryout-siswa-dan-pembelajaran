@@ -443,19 +443,35 @@ body::before {
 .form-group label {
     display: block;
     margin-bottom: 0.5rem;
-    color: var(--text-dark);
+    color: #ffffff;
     font-weight: 600;
 }
 
 .form-control {
     width: 100%;
     padding: 0.75rem 1rem;
-    border: 2px solid rgba(255, 255, 255, 0.2);
+    border: 2px solid rgba(255, 255, 255, 0.3);
     border-radius: 8px;
     font-size: 1rem;
     transition: all 0.3s ease;
-    background: rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.15);
     color: #ffffff;
+}
+
+select.form-control {
+    background: rgba(255, 255, 255, 0.2);
+    cursor: pointer;
+}
+
+select.form-control option {
+    background: #2C1810;
+    color: #ffffff;
+    padding: 0.5rem;
+}
+
+.text-muted {
+    color: rgba(255, 255, 255, 0.7) !important;
+    font-size: 0.9rem;
 }
 
 .form-control::placeholder {
