@@ -176,14 +176,16 @@ def register():
             flash('Nama sudah terdaftar! Gunakan nama yang berbeda.', 'danger')
             return redirect(url_for('register'))
         
-        profile_photo = None
         photo = request.files.get('profile_photo')
-        if photo and photo.filename:
-            os.makedirs(os.path.join(app.config['UPLOAD_FOLDER'], 'profiles'), exist_ok=True)
-            filename = secure_filename(f"profile_{email}_{datetime.now().timestamp()}.jpg")
-            filepath = os.path.join(app.config['UPLOAD_FOLDER'], 'profiles', filename)
-            photo.save(filepath)
-            profile_photo = filename
+        if not photo or not photo.filename:
+            flash('Foto profil wajib diupload!', 'danger')
+            return redirect(url_for('register'))
+        
+        os.makedirs(os.path.join(app.config['UPLOAD_FOLDER'], 'profiles'), exist_ok=True)
+        filename = secure_filename(f"profile_{email}_{datetime.now().timestamp()}.jpg")
+        filepath = os.path.join(app.config['UPLOAD_FOLDER'], 'profiles', filename)
+        photo.save(filepath)
+        profile_photo = filename
         
         user = User(
             email=email,
