@@ -577,6 +577,47 @@ def admin_add_exam():
     flash('TO berhasil ditambahkan!', 'success')
     return redirect(url_for('admin_exams'))
 
+@app.route('/admin/exams/<int:id>/edit', methods=['POST'])
+@login_required
+def admin_edit_exam(id):
+    if current_user.role != 'admin':
+        return jsonify({'success': False, 'message': 'Akses ditolak'}), 403
+    
+    exam = Exam.query.get_or_404(id)
+    
+    exam.title = request.form.get('title')
+    exam.description = request.form.get('description')
+    exam.duration_minutes = int(request.form.get('duration_minutes', 120))
+    exam.is_premium = request.form.get('is_premium') == 'true'
+    exam.price = int(request.form.get('price', 0))
+    
+    start_time_str = request.form.get('start_time')
+    end_time_str = request.form.get('end_time')
+    
+    exam.start_time = None
+    exam.end_time = None
+    
+    if start_time_str:
+        try:
+            from datetime import timedelta
+            local_time = datetime.strptime(start_time_str, '%Y-%m-%dT%H:%M')
+            exam.start_time = local_time - timedelta(hours=7)
+        except:
+            pass
+    
+    if end_time_str:
+        try:
+            from datetime import timedelta
+            local_time = datetime.strptime(end_time_str, '%Y-%m-%dT%H:%M')
+            exam.end_time = local_time - timedelta(hours=7)
+        except:
+            pass
+    
+    db.session.commit()
+    
+    flash('TO berhasil diperbarui!', 'success')
+    return redirect(url_for('admin_exams'))
+
 @app.route('/admin/exams/<int:id>/delete', methods=['POST'])
 @login_required
 def admin_delete_exam(id):

@@ -37,6 +37,19 @@
                         <a href="{{ url_for('admin_questions', id=exam.id) }}" class="btn btn-primary" style="padding: 0.5rem 1rem; text-decoration: none; margin-right: 5px;">Soal</a>
                         <a href="{{ url_for('admin_view_essay_answers', exam_id=exam.id) }}" class="btn btn-secondary" style="padding: 0.5rem 1rem; text-decoration: none; margin-right: 5px;">Esai</a>
                         <a href="{{ url_for('leaderboard', exam_id=exam.id) }}" class="btn btn-success" style="padding: 0.5rem 1rem; text-decoration: none; margin-right: 5px;">Ranking</a>
+                        <button 
+                            class="btn btn-info exam-edit-btn" 
+                            style="padding: 0.5rem 1rem; margin-right: 5px;"
+                            data-id="{{ exam.id }}"
+                            data-title="{{ exam.title }}"
+                            data-description="{{ exam.description or '' }}"
+                            data-duration="{{ exam.duration_minutes }}"
+                            data-start="{{ exam.get_local_start_time().strftime('%Y-%m-%dT%H:%M') if exam.get_local_start_time() else '' }}"
+                            data-end="{{ exam.get_local_end_time().strftime('%Y-%m-%dT%H:%M') if exam.get_local_end_time() else '' }}"
+                            data-premium="{{ 'true' if exam.is_premium else 'false' }}"
+                            data-price="{{ exam.price }}">
+                            ✏️ Edit
+                        </button>
                         <form method="POST" action="{{ url_for('admin_reset_exam_attempts', exam_id=exam.id) }}" style="display: inline;" onsubmit="return confirm('⚠️ PERINGATAN! Anda akan menghapus SEMUA attempt dan hasil siswa untuk TO ini. Siswa akan bisa mengerjakan TO ini lagi dari awal. Yakin?');">
                             <button type="submit" class="btn btn-warning" style="padding: 0.5rem 1rem; margin-right: 5px;">🔄 Reset</button>
                         </form>
@@ -95,4 +108,78 @@
         </form>
     </div>
 </div>
+
+<div id="editExamModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Edit TO</h3>
+            <span class="close" onclick="closeModal('editExamModal')">&times;</span>
+        </div>
+        <form method="POST" id="editExamForm">
+            <div class="form-group">
+                <label>Judul TO:</label>
+                <input type="text" id="edit_title" name="title" class="form-control" required>
+            </div>
+            <div class="form-group">
+                <label>Deskripsi:</label>
+                <textarea id="edit_description" name="description" class="form-control" rows="3"></textarea>
+            </div>
+            <div class="form-group">
+                <label>Durasi (menit):</label>
+                <input type="number" id="edit_duration" name="duration_minutes" class="form-control" required>
+            </div>
+            <div class="form-group">
+                <label>Waktu Mulai:</label>
+                <input type="datetime-local" id="edit_start_time" name="start_time" class="form-control">
+                <small style="color: #666;">Kosongkan jika TO bisa dikerjakan kapan saja</small>
+            </div>
+            <div class="form-group">
+                <label>Waktu Selesai:</label>
+                <input type="datetime-local" id="edit_end_time" name="end_time" class="form-control">
+                <small style="color: #666;">Kosongkan jika tidak ada batas waktu</small>
+            </div>
+            <div class="form-group">
+                <label>Jenis:</label>
+                <select id="edit_is_premium" name="is_premium" class="form-control" required>
+                    <option value="false">Gratis</option>
+                    <option value="true">Premium</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Harga:</label>
+                <input type="number" id="edit_price" name="price" class="form-control">
+            </div>
+            <button type="submit" class="btn btn-primary" style="width: 100%;">Simpan Perubahan</button>
+        </form>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.exam-edit-btn').forEach(function(button) {
+        button.addEventListener('click', function() {
+            const id = this.getAttribute('data-id');
+            const title = this.getAttribute('data-title');
+            const description = this.getAttribute('data-description');
+            const duration = this.getAttribute('data-duration');
+            const startTime = this.getAttribute('data-start');
+            const endTime = this.getAttribute('data-end');
+            const isPremium = this.getAttribute('data-premium');
+            const price = this.getAttribute('data-price');
+            
+            document.getElementById('edit_title').value = title;
+            document.getElementById('edit_description').value = description;
+            document.getElementById('edit_duration').value = duration;
+            document.getElementById('edit_start_time').value = startTime;
+            document.getElementById('edit_end_time').value = endTime;
+            document.getElementById('edit_is_premium').value = isPremium;
+            document.getElementById('edit_price').value = price;
+            
+            document.getElementById('editExamForm').action = '{{ url_for("admin_edit_exam", id=0) }}'.replace('/0', '/' + id);
+            
+            showModal('editExamModal');
+        });
+    });
+});
+</script>
 {% endblock %}
