@@ -131,16 +131,40 @@ Preferred communication style: Simple, everyday language.
   - `.htaccess` - Apache routing & security
 - `storage/uploads/` - File uploads (profiles, payments, answers, payment)
 
+## Recent Changes (October 2025)
+
+### Database Migration
+- **Migrated from MySQL to PostgreSQL** - Using Replit's managed PostgreSQL (Neon)
+- **Schema converted** - All tables migrated with proper data types
+- **Boolean fields fixed** - `is_premium`, `is_active`, `is_completed` now use BOOLEAN type
+- **Data permanency** - All data stored in cloud database (persistent across sessions)
+
+### Payment System Updates
+- **Removed pending tab** - Default view is now "approved" payments
+- **Added Payment Settings page** - `/admin/payment_settings.php` for QRIS & bank config
+- **QRIS upload** - Admin can upload/update QRIS payment image
+- **Bank account configuration** - Admin can set bank name, account number, and account holder
+
+### Questions Management
+- **Added Questions page** - `/admin/questions.php` for managing exam questions
+- **Multiple choice & essay** - Support for both question types
+- **Category tagging** - Questions can be categorized (Math, Science, etc.)
+
+### Bug Fixes
+- **Boolean type errors fixed** - SQL queries updated for PostgreSQL boolean compatibility
+- **Redirect function improved** - Absolute path handling to prevent double path issues
+- **Mobile responsive** - iPhone/Safari specific CSS fixes for animations
+
 ## External Dependencies
 
 ### PHP Requirements
-- **PHP 7.4+** - Core language
-- **PDO MySQL Extension** - Database connectivity
+- **PHP 8.2+** - Core language
+- **PDO PostgreSQL Extension** - Database connectivity (changed from MySQL)
 - **GD atau Imagick** - Image processing (optional)
 - **Apache/Nginx** - Web server
 
 ### Storage
-- **MySQL Database** - `inspiranet_db` dengan InnoDB engine
+- **PostgreSQL Database** - Replit managed database (Neon-backed)
 - **File Uploads:**
   - Payment proof images: `storage/uploads/payments/` (max 16MB)
   - QRIS payment image: `storage/uploads/payment/` (admin-configurable)
