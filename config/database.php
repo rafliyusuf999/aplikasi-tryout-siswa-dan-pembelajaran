@@ -5,50 +5,26 @@ function getDB() {
     
     if ($pdo === null) {
         try {
-            $database_url = $_ENV['DATABASE_URL'] ?? $_SERVER['DATABASE_URL'] ?? getenv('DATABASE_URL');
+            $db_file = __DIR__ . '/../storage/database.sqlite';
+            $db_dir = dirname($db_file);
             
-            if ($database_url && trim($database_url) !== '') {
-                $url_parts = parse_url($database_url);
-                
-                $host = $url_parts['host'] ?? 'localhost';
-                $port = $url_parts['port'] ?? 5432;
-                $user = $url_parts['user'] ?? '';
-                $pass = $url_parts['pass'] ?? '';
-                $dbname = ltrim($url_parts['path'] ?? '', '/');
-                
-                $dsn = "pgsql:host={$host};port={$port};dbname={$dbname}";
-                if (isset($url_parts['query'])) {
-                    $params = [];
-                    parse_str($url_parts['query'], $params);
-                    if (isset($params['sslmode'])) {
-                        $dsn .= ";sslmode={$params['sslmode']}";
-                    }
-                }
-                
-                $pdo = new PDO($dsn, $user, $pass, [
-                    PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-                    PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-                    PDO::ATTR_EMULATE_PREPARES => false,
-                ]);
-            } else {
-                $host = $_ENV['PGHOST'] ?? $_SERVER['PGHOST'] ?? getenv('PGHOST');
-                $user = $_ENV['PGUSER'] ?? $_SERVER['PGUSER'] ?? getenv('PGUSER');
-                $pass = $_ENV['PGPASSWORD'] ?? $_SERVER['PGPASSWORD'] ?? getenv('PGPASSWORD');
-                $name = $_ENV['PGDATABASE'] ?? $_SERVER['PGDATABASE'] ?? getenv('PGDATABASE');
-                $port = $_ENV['PGPORT'] ?? $_SERVER['PGPORT'] ?? getenv('PGPORT');
-                
-                if (!$host || trim($host) === '') $host = 'localhost';
-                if (!$user || trim($user) === '') $user = 'postgres';
-                if (!$pass || trim($pass) === '') $pass = '';
-                if (!$name || trim($name) === '') $name = 'inspiranet_db';
-                if (!$port || trim($port) === '') $port = '5432';
-                
-                $dsn = "pgsql:host={$host};port={$port};dbname={$name}";
-                $pdo = new PDO($dsn, $user, $pass, [
-                    PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-                    PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-                    PDO::ATTR_EMULATE_PREPARES => false,
-                ]);
+            if (!file_exists($db_dir)) {
+                mkdir($db_dir, 0755, true);
+            }
+            
+            $is_new_db = !file_exists($db_file);
+            
+            $pdo = new PDO("sqlite:{$db_file}", null, null, [
+                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+                PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+                PDO::ATTR_EMULATE_PREPARES => false,
+            ]);
+            
+            $pdo->exec('PRAGMA foreign_keys = ON;');
+            $pdo->exec('PRAGMA journal_mode = WAL;');
+            
+            if ($is_new_db) {
+                initializeDatabase($pdo);
             }
         } catch (PDOException $e) {
             die("Database connection failed: " . $e->getMessage());
@@ -56,4 +32,9 @@ function getDB() {
     }
     
     return $pdo;
+}
+
+function initializeDatabase($pdo) {
+    $schema = file_get_contents(__DIR__ . '/schema_sqlite.sql');
+    $pdo->exec($schema);
 }

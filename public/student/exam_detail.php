@@ -56,10 +56,9 @@ $stmt->execute([$exam_id, $user['id']]);
 $attempt = $stmt->fetch();
 
 if (!$attempt || $attempt['is_completed']) {
-    $stmt = $pdo->prepare("INSERT INTO exam_attempts (exam_id, user_id, started_at) VALUES (?, ?, NOW()) RETURNING id");
+    $stmt = $pdo->prepare("INSERT INTO exam_attempts (exam_id, user_id, started_at) VALUES (?, ?, datetime('now'))");
     $stmt->execute([$exam_id, $user['id']]);
-    $attempt = $stmt->fetch();
-    $attempt_id = $attempt['id'];
+    $attempt_id = $pdo->lastInsertId();
     
     $stmt = $pdo->prepare("SELECT * FROM exam_attempts WHERE id = ?");
     $stmt->execute([$attempt_id]);
@@ -106,7 +105,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $answer = $_POST["answer_$q_id"] ?? '';
                 $new_answers[$q_id] = $answer;
                 
-                if ($answer === $question['correct_answer']) {
+                // Hitung skor HANYA pada percobaan pertama
+                if ($completed_attempts_count === 0 && $answer === $question['correct_answer']) {
                     $total_score += $question['points'];
                 }
             } else {
@@ -124,7 +124,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         }
         
-        $stmt = $pdo->prepare("UPDATE exam_attempts SET answers = ?, essay_answers = ?, total_score = ?, finished_at = NOW(), is_completed = true WHERE id = ?");
+        // Pada percobaan kedua, ambil skor dari percobaan pertama
+        if ($completed_attempts_count === 1 && $first_attempt) {
+            $total_score = $first_attempt['total_score'];
+        }
+        
+        $stmt = $pdo->prepare("UPDATE exam_attempts SET answers = ?, essay_answers = ?, total_score = ?, finished_at = datetime('now'), is_completed = 1 WHERE id = ?");
         $stmt->execute([json_encode($new_answers), json_encode($new_essay_answers), $total_score, $attempt['id']]);
         
         // Update leaderboard dan nilai HANYA jika ini adalah first completed attempt
@@ -175,7 +180,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // Insert leaderboard entry
             $stmt = $pdo->prepare("
                 INSERT INTO leaderboards (exam_id, user_id, total_score, rank_in_branch, rank_global, achieved_at)
-                VALUES (?, ?, ?, ?, ?, NOW())
+                VALUES (?, ?, ?, ?, ?, datetime('now'))
             ");
             $stmt->execute([$exam_id, $user['id'], $total_score, $rank_in_branch, $rank_global]);
         }

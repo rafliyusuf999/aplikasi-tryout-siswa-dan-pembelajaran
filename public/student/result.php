@@ -26,6 +26,22 @@ if (!$attempt) {
     redirect('student/exams.php');
 }
 
+// Cek apakah ini pengerjaan kedua
+$stmt = $pdo->prepare("SELECT COUNT(*) FROM exam_attempts WHERE exam_id = ? AND user_id = ? AND is_completed = true AND finished_at <= ?");
+$stmt->execute([$attempt['exam_id'], $user['id'], $attempt['finished_at']]);
+$attempt_number = (int)$stmt->fetchColumn();
+$is_second_attempt = ($attempt_number >= 2);
+
+// Jika pengerjaan kedua, ambil soal dan jawaban
+$questions_with_answers = [];
+if ($is_second_attempt) {
+    $stmt = $pdo->prepare("SELECT * FROM questions WHERE exam_id = ? ORDER BY question_order ASC");
+    $stmt->execute([$attempt['exam_id']]);
+    $questions_with_answers = $stmt->fetchAll();
+    
+    $student_answers = $attempt['answers'] ? json_decode($attempt['answers'], true) : [];
+}
+
 $stmt = $pdo->prepare("SELECT COUNT(*) as rank FROM exam_attempts 
                        WHERE exam_id = ? AND total_score > ? AND is_completed = true");
 $stmt->execute([$attempt['exam_id'], $attempt['total_score']]);
@@ -170,6 +186,84 @@ include '../../app/Views/includes/navbar.php';
             <?php if ($attempt['cheating_warnings'] > 0): ?>
             <div style="background: #fff3cd; border: 1px solid #ffc107; border-radius: 8px; padding: 1rem; margin: 1rem 0;">
                 <strong>⚠️ Perhatian:</strong> Terdeteksi <?php echo $attempt['cheating_warnings']; ?> peringatan kecurangan selama ujian.
+            </div>
+            <?php endif; ?>
+            
+            <?php if ($is_second_attempt && !empty($questions_with_answers)): ?>
+            <div style="margin-top: 2rem;">
+                <div style="background: #e7f3ff; border: 2px solid #0056b3; border-radius: 8px; padding: 1rem; margin-bottom: 1.5rem;">
+                    <strong>ℹ️ Mode Review:</strong> Ini adalah pengerjaan kedua Anda. Berikut adalah pembahasan soal dan jawaban yang benar.
+                </div>
+                
+                <h3 style="margin-bottom: 1.5rem; color: var(--primary-color);">📋 Pembahasan Soal</h3>
+                
+                <?php foreach ($questions_with_answers as $index => $question): 
+                    $q_id = $question['id'];
+                    $student_answer = $student_answers[$q_id] ?? '';
+                    $is_correct = ($student_answer === $question['correct_answer']);
+                ?>
+                <div class="card" style="margin-bottom: 1.5rem; padding: 1.5rem; <?php echo $is_correct ? 'border-left: 4px solid #28a745;' : 'border-left: 4px solid #dc3545;'; ?>">
+                    <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem;">
+                        <span style="background: var(--primary-color); color: white; padding: 0.5rem 1rem; border-radius: 6px; font-weight: bold;">
+                            Soal <?php echo $index + 1; ?>
+                        </span>
+                        <?php if ($question['question_type'] === 'multiple_choice'): ?>
+                            <?php if ($is_correct): ?>
+                                <span style="background: #28a745; color: white; padding: 0.5rem 1rem; border-radius: 6px;">✓ Benar</span>
+                            <?php else: ?>
+                                <span style="background: #dc3545; color: white; padding: 0.5rem 1rem; border-radius: 6px;">✗ Salah</span>
+                            <?php endif; ?>
+                        <?php endif; ?>
+                    </div>
+                    
+                    <div style="margin-bottom: 1rem;">
+                        <strong>Pertanyaan:</strong><br>
+                        <?php echo nl2br(htmlspecialchars($question['question_text'])); ?>
+                    </div>
+                    
+                    <?php if ($question['question_type'] === 'multiple_choice'): ?>
+                        <div style="margin-bottom: 1rem;">
+                            <strong>Jawaban Anda:</strong> 
+                            <span style="padding: 0.3rem 0.8rem; border-radius: 4px; <?php echo $is_correct ? 'background: #d4edda; color: #155724;' : 'background: #f8d7da; color: #721c24;'; ?>">
+                                <?php echo $student_answer ? htmlspecialchars($student_answer) : 'Tidak dijawab'; ?>
+                            </span>
+                        </div>
+                        
+                        <?php if (!$is_correct): ?>
+                        <div style="margin-bottom: 1rem;">
+                            <strong>Jawaban Benar:</strong> 
+                            <span style="padding: 0.3rem 0.8rem; border-radius: 4px; background: #d4edda; color: #155724;">
+                                <?php echo htmlspecialchars($question['correct_answer']); ?>
+                            </span>
+                        </div>
+                        <?php endif; ?>
+                        
+                        <div style="margin-top: 1rem; padding: 1rem; background: #f8f9fa; border-radius: 6px;">
+                            <strong>Pilihan:</strong><br>
+                            <?php if ($question['option_a']): ?>
+                                <div style="margin: 0.5rem 0;">A. <?php echo htmlspecialchars($question['option_a']); ?></div>
+                            <?php endif; ?>
+                            <?php if ($question['option_b']): ?>
+                                <div style="margin: 0.5rem 0;">B. <?php echo htmlspecialchars($question['option_b']); ?></div>
+                            <?php endif; ?>
+                            <?php if ($question['option_c']): ?>
+                                <div style="margin: 0.5rem 0;">C. <?php echo htmlspecialchars($question['option_c']); ?></div>
+                            <?php endif; ?>
+                            <?php if ($question['option_d']): ?>
+                                <div style="margin: 0.5rem 0;">D. <?php echo htmlspecialchars($question['option_d']); ?></div>
+                            <?php endif; ?>
+                            <?php if ($question['option_e']): ?>
+                                <div style="margin: 0.5rem 0;">E. <?php echo htmlspecialchars($question['option_e']); ?></div>
+                            <?php endif; ?>
+                        </div>
+                    <?php else: ?>
+                        <div style="padding: 1rem; background: #f8f9fa; border-radius: 6px;">
+                            <strong>Jawaban Essay:</strong><br>
+                            <?php echo $student_answer ? nl2br(htmlspecialchars($student_answer)) : '<em>Tidak dijawab</em>'; ?>
+                        </div>
+                    <?php endif; ?>
+                </div>
+                <?php endforeach; ?>
             </div>
             <?php endif; ?>
             

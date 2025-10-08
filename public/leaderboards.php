@@ -30,7 +30,7 @@ if ($exam_id) {
     
     if ($view_type === 'branch') {
         if ($user['role'] === 'student') {
-            $query = "SELECT ea.*, u.full_name, u.email, u.inspira_branch, u.profile_photo
+            $query = "SELECT ea.*, u.full_name, u.email, u.inspira_branch, u.profile_photo, u.class_level, u.school_name
                       FROM exam_attempts ea
                       JOIN users u ON ea.user_id = u.id
                       WHERE ea.exam_id = ? AND ea.is_completed = true 
@@ -41,7 +41,7 @@ if ($exam_id) {
         } else {
             $branch = $_GET['branch'] ?? '';
             if ($branch) {
-                $query = "SELECT ea.*, u.full_name, u.email, u.inspira_branch, u.profile_photo
+                $query = "SELECT ea.*, u.full_name, u.email, u.inspira_branch, u.profile_photo, u.class_level, u.school_name
                           FROM exam_attempts ea
                           JOIN users u ON ea.user_id = u.id
                           WHERE ea.exam_id = ? AND ea.is_completed = true 
@@ -50,7 +50,7 @@ if ($exam_id) {
                 $stmt = $pdo->prepare($query);
                 $stmt->execute([$exam_id, $branch]);
             } else {
-                $query = "SELECT ea.*, u.full_name, u.email, u.inspira_branch, u.profile_photo
+                $query = "SELECT ea.*, u.full_name, u.email, u.inspira_branch, u.profile_photo, u.class_level, u.school_name
                           FROM exam_attempts ea
                           JOIN users u ON ea.user_id = u.id
                           WHERE ea.exam_id = ? AND ea.is_completed = true
@@ -60,7 +60,7 @@ if ($exam_id) {
             }
         }
     } else {
-        $query = "SELECT ea.*, u.full_name, u.email, u.inspira_branch, u.profile_photo
+        $query = "SELECT ea.*, u.full_name, u.email, u.inspira_branch, u.profile_photo, u.class_level, u.school_name
                   FROM exam_attempts ea
                   JOIN users u ON ea.user_id = u.id
                   WHERE ea.exam_id = ? AND ea.is_completed = true
@@ -140,11 +140,13 @@ include '../app/Views/includes/navbar.php';
                     <tr>
                         <th>Peringkat</th>
                         <th>Siswa</th>
+                        <th>Kelas</th>
+                        <th>Sekolah</th>
                         <?php if ($view_type === 'global'): ?>
-                        <th>Cabang</th>
+                        <th>Cabang/Provinsi</th>
                         <?php endif; ?>
                         <th>Nilai</th>
-                        <th>Waktu Pengerjaan</th>
+                        <th>Waktu</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -186,19 +188,29 @@ include '../app/Views/includes/navbar.php';
                                 </div>
                             </div>
                         </td>
+                        <td>
+                            <span style="font-weight: 500;"><?php echo htmlspecialchars($entry['class_level'] ?? '-'); ?></span>
+                        </td>
+                        <td>
+                            <span style="font-size: 0.9rem;"><?php echo htmlspecialchars($entry['school_name'] ?? '-'); ?></span>
+                        </td>
                         <?php if ($view_type === 'global'): ?>
-                        <td><?php echo htmlspecialchars($entry['inspira_branch'] ?? '-'); ?></td>
+                        <td>
+                            <span style="font-weight: 500; color: var(--primary-color);">
+                                <?php echo htmlspecialchars($entry['inspira_branch'] ?? '-'); ?>
+                            </span>
+                        </td>
                         <?php endif; ?>
                         <td style="font-size: 1.25rem; font-weight: bold; color: var(--primary-color);">
                             <?php echo number_format($entry['total_score'], 1); ?>
                         </td>
-                        <td>
+                        <td style="white-space: nowrap;">
                             <?php 
                             if ($entry['finished_at']) {
                                 $start = new DateTime($entry['started_at']);
                                 $end = new DateTime($entry['finished_at']);
                                 $diff = $start->diff($end);
-                                echo $diff->h . ' jam ' . $diff->i . ' menit';
+                                echo $diff->h . 'j ' . $diff->i . 'm';
                             } else {
                                 echo '-';
                             }
