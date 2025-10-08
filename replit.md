@@ -133,6 +133,35 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes (October 2025)
 
+### October 8, 2025 - Exam UX Enhancements & Bug Fixes
+- **Ragu-ragu (Doubtful) Question Marking** - New feature for students:
+  - Students can mark questions they're uncertain about with a checkbox
+  - Visual indicators in navigation sidebar: Yellow badge for doubtful, Green for answered, Grey for unanswered
+  - Toggle functionality: unchecking removes doubtful status and reverts to normal answered/blank logic
+- **Real-time Timer Fix** - Eliminated timer delay issues:
+  - Timer now uses server-provided seconds (not client-calculated minutes)
+  - New `startRealtime()` method in ExamTimer class for accurate countdown
+  - Countdown displays HH:MM:SS format without delays
+  - Backward compatibility maintained with `start()` method
+- **Button & UI Refinements**:
+  - Reduced button sizes for cleaner, more compact interface
+  - `.btn-sm` padding reduced from 0.4rem/0.8rem to 0.3rem/0.7rem
+  - Removed distracting scale/translateY animations, replaced with subtle opacity changes
+  - Improved responsive design for mobile (min-height 36px for btn-sm)
+- **Navbar Simplification**:
+  - Removed redundant menu items (e.g., "Mentor" for admin, "Hasil Siswa" for teacher)
+  - Unified "TO" → "Try Out" naming convention
+  - Profile photo and name now clickable and directly links to profile page
+  - Cleaner navigation structure for all user roles
+- **Phone Number Validation** - Added unique constraint:
+  - Registration now checks for duplicate phone numbers before submission
+  - Prevents multiple accounts with same phone number
+  - Validation occurs before file upload processing
+- **Security Verification**:
+  - Confirmed no answer leakage before exam completion
+  - Anti-cheat mechanisms still fully functional
+  - Second attempt scoring logic preserved correctly
+
 ### October 8, 2025 - Major Bug Fixes & UX Improvements
 - **Fixed SQL Syntax Errors** - Converted all PostgreSQL-specific syntax to SQLite-compatible:
   - Replaced `?::boolean` with standard `?` placeholders
@@ -143,21 +172,11 @@ Preferred communication style: Simple, everyday language.
   - Auto-play victory music when student achieves rank 1, 2, or 3
   - Animated pulsing effects for ranking badges (gold, silver, bronze)
   - Enhanced visual feedback with glowing shadows
-- **UX Design Improvements**:
-  - Added hover effects for all button types (info, warning)
-  - Improved CSS consistency across the application
-  - Removed duplicate CSS rules
-  - Enhanced responsive design elements
 - **cPanel Hosting Optimization**:
   - Verified folder structure is properly configured
   - .htaccess redirects working correctly
   - index.php redirect to public folder functional
   - All paths using proper url() helper function
-- **Functionality Verification**:
-  - All modals and buttons tested and working
-  - Form submissions verified
-  - JavaScript functions checked for errors
-  - No breaking changes introduced
 
 ### Database Migration
 - **Migrated from MySQL to PostgreSQL to SQLite** - Using local SQLite database
