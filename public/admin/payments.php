@@ -62,6 +62,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             redirect('admin/payments.php?status=approved');
         }
         
+        if ($_POST['action'] === 'reject_all') {
+            $stmt = $pdo->prepare("UPDATE payments SET status = 'rejected' WHERE status = 'pending'");
+            $stmt->execute();
+            $affected = $stmt->rowCount();
+            
+            setFlash("Berhasil menolak $affected pembayaran", 'success');
+            redirect('admin/payments.php?status=rejected');
+        }
+        
         if ($_POST['action'] === 'reject' && isset($_POST['id'])) {
             $id = (int)$_POST['id'];
             
@@ -140,6 +149,13 @@ include '../../app/Views/includes/navbar.php';
                     ✓ Setujui Semua (<?php echo $pending_count; ?> Pending)
                 </button>
             </form>
+            <form method="POST" style="display: inline;" onsubmit="return confirm('Tolak semua <?php echo $pending_count; ?> pembayaran pending?')">
+                <?php echo csrf(); ?>
+                <input type="hidden" name="action" value="reject_all">
+                <button type="submit" class="btn btn-danger" style="font-size: 1.1rem; padding: 0.6rem 1.5rem;">
+                    ✗ Tolak Semua (<?php echo $pending_count; ?> Pending)
+                </button>
+            </form>
             <?php endif; ?>
             <?php endif; ?>
         </div>
@@ -177,26 +193,27 @@ include '../../app/Views/includes/navbar.php';
                         </td>
                         <td>
                             <?php if ($payment['payment_proof']): ?>
-                                <a href="<?php echo url('storage/uploads/payments/' . $payment['payment_proof']); ?>" target="_blank" class="btn btn-sm btn-info">Lihat</a>
+                                <?php 
+                                $file_ext = strtolower(pathinfo($payment['payment_proof'], PATHINFO_EXTENSION));
+                                $image_url = url('storage/uploads/payments/' . $payment['payment_proof']);
+                                ?>
+                                <?php if (in_array($file_ext, ['jpg', 'jpeg', 'png'])): ?>
+                                    <img src="<?php echo $image_url; ?>" 
+                                         alt="Bukti Pembayaran" 
+                                         style="width: 80px; height: 80px; object-fit: cover; cursor: pointer; border-radius: 4px; border: 2px solid #ddd;" 
+                                         onclick="showPaymentProof(<?php echo $payment['id']; ?>, '<?php echo $image_url; ?>', <?php echo $payment['status'] === 'pending' ? 'true' : 'false'; ?>, 'image')">
+                                <?php else: ?>
+                                    <a href="<?php echo $image_url; ?>" target="_blank" class="btn btn-sm btn-info" onclick="showPaymentProof(<?php echo $payment['id']; ?>, '<?php echo $image_url; ?>', <?php echo $payment['status'] === 'pending' ? 'true' : 'false'; ?>, 'pdf'); return false;">Lihat PDF</a>
+                                <?php endif; ?>
                             <?php else: ?>
-                                <span class="text-muted">-</span>
+                                <?php if ($payment['status'] === 'pending'): ?>
+                                    <button class="btn btn-sm btn-secondary" onclick="showPaymentProof(<?php echo $payment['id']; ?>, '', true, 'none')">Lihat</button>
+                                <?php else: ?>
+                                    <span class="text-muted">-</span>
+                                <?php endif; ?>
                             <?php endif; ?>
                         </td>
                         <td>
-                            <?php if ($payment['status'] === 'pending'): ?>
-                                <form method="POST" style="display: inline;">
-                                    <?php echo csrf(); ?>
-                                    <input type="hidden" name="action" value="approve">
-                                    <input type="hidden" name="id" value="<?php echo $payment['id']; ?>">
-                                    <button type="submit" class="btn btn-sm btn-success">Setujui</button>
-                                </form>
-                                <form method="POST" style="display: inline;">
-                                    <?php echo csrf(); ?>
-                                    <input type="hidden" name="action" value="reject">
-                                    <input type="hidden" name="id" value="<?php echo $payment['id']; ?>">
-                                    <button type="submit" class="btn btn-sm btn-warning">Tolak</button>
-                                </form>
-                            <?php endif; ?>
                             <?php if (getCurrentUser()['role'] === 'admin'): ?>
                             <form method="POST" style="display: inline;">
                                 <?php echo csrf(); ?>
@@ -210,6 +227,37 @@ include '../../app/Views/includes/navbar.php';
                     <?php endforeach; ?>
                 </tbody>
             </table>
+        </div>
+    </div>
+</div>
+
+<div id="proofModal" class="modal">
+    <div class="modal-content" style="max-width: 800px;">
+        <span class="close" onclick="closeModal('proofModal')">&times;</span>
+        <h2>Bukti Pembayaran</h2>
+        <div style="text-align: center; margin: 1.5rem 0;">
+            <img id="proofImage" src="" alt="Bukti Pembayaran" style="max-width: 100%; max-height: 500px; border: 2px solid #ddd; border-radius: 8px; display: none;">
+            <div id="proofPdf" style="display: none;">
+                <p style="font-size: 1.2rem; color: #666; margin: 2rem 0;">📄 Bukti pembayaran berupa file PDF</p>
+                <a id="proofPdfLink" href="" target="_blank" class="btn btn-info">Buka PDF di Tab Baru</a>
+            </div>
+            <div id="proofNone" style="display: none;">
+                <p style="font-size: 1.2rem; color: #666; margin: 2rem 0;">⚠️ Tidak ada bukti pembayaran yang diupload</p>
+            </div>
+        </div>
+        <div id="proofActions" style="display: flex; gap: 1rem; justify-content: center; margin-top: 1.5rem;">
+            <form method="POST" id="approveForm">
+                <?php echo csrf(); ?>
+                <input type="hidden" name="action" value="approve">
+                <input type="hidden" name="id" id="approvePaymentId">
+                <button type="submit" class="btn btn-success" style="font-size: 1.1rem; padding: 0.8rem 2rem;">✓ Setujui</button>
+            </form>
+            <form method="POST" id="rejectForm">
+                <?php echo csrf(); ?>
+                <input type="hidden" name="action" value="reject">
+                <input type="hidden" name="id" id="rejectPaymentId">
+                <button type="submit" class="btn btn-danger" style="font-size: 1.1rem; padding: 0.8rem 2rem;">✗ Tolak</button>
+            </form>
         </div>
     </div>
 </div>
@@ -258,6 +306,33 @@ include '../../app/Views/includes/navbar.php';
 <script>
 function showAddModal() {
     document.getElementById('addModal').style.display = 'block';
+}
+
+function showPaymentProof(paymentId, imageUrl, isPending, type) {
+    document.getElementById('proofImage').style.display = 'none';
+    document.getElementById('proofPdf').style.display = 'none';
+    document.getElementById('proofNone').style.display = 'none';
+    
+    if (type === 'image') {
+        document.getElementById('proofImage').src = imageUrl;
+        document.getElementById('proofImage').style.display = 'block';
+    } else if (type === 'pdf') {
+        document.getElementById('proofPdfLink').href = imageUrl;
+        document.getElementById('proofPdf').style.display = 'block';
+    } else {
+        document.getElementById('proofNone').style.display = 'block';
+    }
+    
+    document.getElementById('approvePaymentId').value = paymentId;
+    document.getElementById('rejectPaymentId').value = paymentId;
+    
+    if (isPending) {
+        document.getElementById('proofActions').style.display = 'flex';
+    } else {
+        document.getElementById('proofActions').style.display = 'none';
+    }
+    
+    document.getElementById('proofModal').style.display = 'block';
 }
 
 function updateAmount() {
