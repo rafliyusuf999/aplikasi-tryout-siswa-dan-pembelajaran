@@ -6,9 +6,12 @@
 
 #### 1. ✅ Sistem Pembayaran
 - **Masalah**: Error saat menyetujui pembayaran karena penggunaan `NOW()` (PostgreSQL) pada database SQLite
-- **Solusi**: Mengubah semua `NOW()` menjadi `datetime('now')` di `public/admin/payments.php`
+- **Solusi**: Mengubah semua `NOW()` menjadi `datetime('now')` di semua file
 - **File yang diubah**: 
   - `public/admin/payments.php` (3 lokasi)
+  - `public/admin/payment_settings.php` (1 lokasi)
+  - `public/student/pay.php` (1 lokasi)
+- **Verifikasi**: 0 penggunaan NOW() tersisa di codebase
 
 #### 2. ✅ Validasi Waktu Try Out
 - **Masalah**: Siswa bisa mulai try out sebelum waktu yang ditentukan (misal: jam 20:00 padahal seharusnya 23:00)
@@ -25,11 +28,13 @@
 - **Solusi**:
   - Menambahkan constraint `UNIQUE` pada kolom `phone_number` di schema database
   - Membuat tool cleanup di `public/admin/cleanup_duplicates.php` untuk membersihkan data duplikat
-  - Sebelum menerapkan constraint, admin harus membersihkan duplikat terlebih dahulu
+  - Membuat tool migrasi di `public/admin/migrate_phone_unique.php` untuk enforce constraint pada database yang sudah ada
+  - Menggunakan `CREATE UNIQUE INDEX` untuk database existing agar constraint berfungsi
 - **File yang diubah**:
   - `config/schema_sqlite.sql` - tambah UNIQUE constraint
   - `public/admin/cleanup_duplicates.php` - tool baru untuk cleanup
-  - `public/admin/students.php` - link ke tool cleanup
+  - `public/admin/migrate_phone_unique.php` - tool baru untuk migrasi database
+  - `public/admin/students.php` - link ke tool cleanup dan migrasi
 
 #### 4. ✅ Deteksi Kecurangan
 - **Masalah**: Sistem deteksi kecurangan tidak berfungsi karena endpoint yang salah
@@ -106,6 +111,7 @@
 ### File Baru yang Ditambahkan
 
 - `public/admin/cleanup_duplicates.php` - Tool untuk membersihkan data duplikat
+- `public/admin/migrate_phone_unique.php` - Tool untuk migrasi database (enforce UNIQUE constraint)
 - `CHANGELOG.md` - Dokumentasi ini
 
 ### Rekomendasi Selanjutnya
