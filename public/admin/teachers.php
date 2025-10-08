@@ -9,7 +9,7 @@ $pageTitle = 'Kelola Mentor';
 $search = $_GET['search'] ?? '';
 $query = "SELECT * FROM users WHERE role = 'teacher'";
 if ($search) {
-    $query .= " AND (full_name ILIKE :search OR email ILIKE :search)";
+    $query .= " AND (full_name LIKE :search OR email LIKE :search)";
 }
 $query .= " ORDER BY created_at DESC";
 

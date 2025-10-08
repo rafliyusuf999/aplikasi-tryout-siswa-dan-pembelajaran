@@ -17,7 +17,7 @@ $query = "SELECT p.*, u.full_name as student_name, u.email as student_email,
           WHERE p.status = :status";
 
 if ($search) {
-    $query .= " AND (u.full_name ILIKE :search OR u.email ILIKE :search OR e.title ILIKE :search)";
+    $query .= " AND (u.full_name LIKE :search OR u.email LIKE :search OR e.title LIKE :search)";
 }
 
 $query .= " ORDER BY p.created_at DESC";

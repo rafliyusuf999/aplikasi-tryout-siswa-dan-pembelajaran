@@ -10,7 +10,7 @@ $search = $_GET['search'] ?? '';
 $query = "SELECT e.*, u.full_name as creator_name FROM exams e 
           LEFT JOIN users u ON e.created_by = u.id WHERE 1=1";
 if ($search) {
-    $query .= " AND (e.title ILIKE :search OR e.description ILIKE :search)";
+    $query .= " AND (e.title LIKE :search OR e.description LIKE :search)";
 }
 $query .= " ORDER BY e.created_at DESC";
 
@@ -33,14 +33,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $title = sanitize($_POST['title']);
             $description = sanitize($_POST['description']);
             $duration_minutes = (int)$_POST['duration_minutes'];
-            $is_premium = isset($_POST['is_premium']) ? 'true' : 'false';
+            $is_premium = isset($_POST['is_premium']) ? 1 : 0;
             $price = (int)($_POST['price'] ?? 0);
-            $is_active = isset($_POST['is_active']) ? 'true' : 'false';
+            $is_active = isset($_POST['is_active']) ? 1 : 0;
             $start_time = $_POST['start_time'] ? $_POST['start_time'] : null;
             $end_time = $_POST['end_time'] ? $_POST['end_time'] : null;
             $created_by = (int)$_POST['created_by'];
             
-            $stmt = $pdo->prepare("INSERT INTO exams (title, description, duration_minutes, is_premium, price, is_active, start_time, end_time, created_by) VALUES (?, ?, ?, ?::boolean, ?, ?::boolean, ?, ?, ?)");
+            $stmt = $pdo->prepare("INSERT INTO exams (title, description, duration_minutes, is_premium, price, is_active, start_time, end_time, created_by) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
             $stmt->execute([$title, $description, $duration_minutes, $is_premium, $price, $is_active, $start_time, $end_time, $created_by]);
             
             setFlash('Try Out berhasil ditambahkan', 'success');
@@ -52,13 +52,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $title = sanitize($_POST['title']);
             $description = sanitize($_POST['description']);
             $duration_minutes = (int)$_POST['duration_minutes'];
-            $is_premium = isset($_POST['is_premium']) ? 'true' : 'false';
+            $is_premium = isset($_POST['is_premium']) ? 1 : 0;
             $price = (int)($_POST['price'] ?? 0);
-            $is_active = isset($_POST['is_active']) ? 'true' : 'false';
+            $is_active = isset($_POST['is_active']) ? 1 : 0;
             $start_time = $_POST['start_time'] ? $_POST['start_time'] : null;
             $end_time = $_POST['end_time'] ? $_POST['end_time'] : null;
             
-            $stmt = $pdo->prepare("UPDATE exams SET title = ?, description = ?, duration_minutes = ?, is_premium = ?::boolean, price = ?, is_active = ?::boolean, start_time = ?, end_time = ? WHERE id = ?");
+            $stmt = $pdo->prepare("UPDATE exams SET title = ?, description = ?, duration_minutes = ?, is_premium = ?, price = ?, is_active = ?, start_time = ?, end_time = ? WHERE id = ?");
             $stmt->execute([$title, $description, $duration_minutes, $is_premium, $price, $is_active, $start_time, $end_time, $id]);
             
             setFlash('Try Out berhasil diupdate', 'success');

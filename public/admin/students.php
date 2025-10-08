@@ -13,7 +13,7 @@ $query = "SELECT u.*,
           LEFT JOIN exam_attempts ea ON u.id = ea.user_id
           WHERE u.role = 'student'";
 if ($search) {
-    $query .= " AND (u.full_name ILIKE :search OR u.email ILIKE :search OR u.inspira_branch ILIKE :search)";
+    $query .= " AND (u.full_name LIKE :search OR u.email LIKE :search OR u.inspira_branch LIKE :search)";
 }
 $query .= " GROUP BY u.id ORDER BY u.created_at DESC";
 

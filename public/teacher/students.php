@@ -23,7 +23,7 @@ if ($exam_id) {
               WHERE e.created_by = :created_by AND ea.exam_id = :exam_id";
     
     if ($search) {
-        $query .= " AND (u.full_name ILIKE :search OR u.email ILIKE :search)";
+        $query .= " AND (u.full_name LIKE :search OR u.email LIKE :search)";
     }
     
     $query .= " ORDER BY ea.total_score DESC, ea.finished_at ASC";

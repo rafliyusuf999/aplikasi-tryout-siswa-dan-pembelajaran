@@ -24,7 +24,7 @@ if ($filter === 'free') {
 }
 
 if ($search) {
-    $query .= " AND (e.title ILIKE :search OR e.description ILIKE :search)";
+    $query .= " AND (e.title LIKE :search OR e.description LIKE :search)";
 }
 
 $query .= " ORDER BY e.created_at DESC";
