@@ -107,13 +107,19 @@ class AntiCheat {
         this.keyHandler = this.handleKeyDown.bind(this);
         this.visibilityHandler = this.handleVisibilityChange.bind(this);
         this.blurHandler = this.handleWindowBlur.bind(this);
+        this.mouseHandler = this.handleMouseDown.bind(this);
         
         document.addEventListener('copy', this.copyHandler);
         document.addEventListener('cut', this.cutHandler);
         document.addEventListener('contextmenu', this.contextHandler);
         document.addEventListener('keydown', this.keyHandler);
+        document.addEventListener('keyup', this.keyHandler);
         document.addEventListener('visibilitychange', this.visibilityHandler);
         window.addEventListener('blur', this.blurHandler);
+        document.addEventListener('mousedown', this.mouseHandler);
+        
+        this.checkDevTools();
+        this.devToolsInterval = setInterval(() => this.checkDevTools(), 1000);
     }
 
     removeListeners() {
@@ -121,8 +127,14 @@ class AntiCheat {
         document.removeEventListener('cut', this.cutHandler);
         document.removeEventListener('contextmenu', this.contextHandler);
         document.removeEventListener('keydown', this.keyHandler);
+        document.removeEventListener('keyup', this.keyHandler);
         document.removeEventListener('visibilitychange', this.visibilityHandler);
         window.removeEventListener('blur', this.blurHandler);
+        document.removeEventListener('mousedown', this.mouseHandler);
+        
+        if (this.devToolsInterval) {
+            clearInterval(this.devToolsInterval);
+        }
     }
 
     handleCopy(e) {
@@ -146,16 +158,55 @@ class AntiCheat {
         }
     }
 
+    handleMouseDown(e) {
+        if (this.enabled && e.button === 1) {
+            e.preventDefault();
+            this.showWarningNotification('Tombol tengah mouse tidak diperbolehkan!');
+        }
+    }
+
+    checkDevTools() {
+        if (!this.enabled) return;
+        
+        const threshold = 160;
+        const widthThreshold = window.outerWidth - window.innerWidth > threshold;
+        const heightThreshold = window.outerHeight - window.innerHeight > threshold;
+        
+        if (widthThreshold || heightThreshold) {
+            this.triggerLogout('Developer Tools terdeteksi! Anda akan dikeluarkan dari ujian.');
+        }
+    }
+
     handleKeyDown(e) {
         if (this.enabled) {
             if ((e.ctrlKey || e.metaKey) && (e.key === 'c' || e.key === 'v' || e.key === 'x')) {
                 e.preventDefault();
                 this.triggerLogout('Terdeteksi menggunakan shortcut copy/paste! Anda akan dikeluarkan dari ujian.');
+                return;
             }
 
-            if (e.key === 'PrintScreen' || e.key === 'F12') {
+            if (e.key === 'PrintScreen' || e.key === 'Print' || e.code === 'PrintScreen') {
                 e.preventDefault();
-                this.triggerLogout('Screenshot/DevTools terdeteksi! Anda akan dikeluarkan dari ujian.');
+                this.triggerLogout('Screenshot terdeteksi! Anda akan dikeluarkan dari ujian.');
+                return;
+            }
+
+            if (e.key === 'F12' || (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J' || e.key === 'C'))) {
+                e.preventDefault();
+                this.triggerLogout('Developer Tools terdeteksi! Anda akan dikeluarkan dari ujian.');
+                return;
+            }
+
+            if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key.toLowerCase() === 's') {
+                e.preventDefault();
+                this.triggerLogout('Screenshot terdeteksi! Anda akan dikeluarkan dari ujian.');
+                return;
+            }
+
+            if ((e.metaKey || e.ctrlKey) && e.shiftKey && (e.key === '3' || e.key === '4' || e.key === '5')) {
+                e.preventDefault();
+                this.triggerLogout('Screenshot terdeteksi! Anda akan dikeluarkan dari ujian.');
+                return;
             }
         }
     }
@@ -209,11 +260,12 @@ class AntiCheat {
     async markCheating() {
         if (this.attemptId) {
             try {
-                await fetch(`/student/exams/${this.attemptId}/mark_cheating`, {
+                const formData = new FormData();
+                formData.append('action', 'mark_cheating');
+                
+                await fetch(window.location.pathname, {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    }
+                    body: formData
                 });
             } catch (error) {
                 console.error('Failed to mark cheating:', error);

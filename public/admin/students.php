@@ -100,6 +100,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             setFlash('Status curang semua siswa berhasil dibersihkan', 'success');
             redirect('admin/students.php');
         }
+        
+        if ($_POST['action'] === 'delete_all') {
+            $stmt = $pdo->prepare("SELECT COUNT(*) FROM users WHERE role = 'student'");
+            $stmt->execute();
+            $count = $stmt->fetchColumn();
+            
+            $stmt = $pdo->prepare("DELETE FROM users WHERE role = 'student'");
+            $stmt->execute();
+            
+            setFlash("Berhasil menghapus {$count} siswa", 'success');
+            redirect('admin/students.php');
+        }
     }
 }
 
@@ -117,9 +129,12 @@ include '../../app/Views/includes/navbar.php';
             <a href="<?php echo url('admin/students.php'); ?>" class="btn btn-secondary">Reset</a>
         </form>
         
-        <div style="display: flex; gap: 1rem; margin-bottom: 1.5rem;">
+        <div style="display: flex; gap: 1rem; margin-bottom: 1.5rem; flex-wrap: wrap;">
             <button onclick="showAddModal()" class="btn btn-primary">+ Tambah Siswa</button>
-            <button onclick="clearAllCheating()" class="btn btn-danger">🚫 Clear Curang All</button>
+            <button onclick="clearAllCheating()" class="btn btn-warning">🚫 Clear Curang All</button>
+            <a href="<?php echo url('admin/cleanup_duplicates.php'); ?>" class="btn btn-info">🧹 Cleanup Duplikat</a>
+            <a href="<?php echo url('admin/migrate_phone_unique.php'); ?>" class="btn btn-success">🚀 Migrasi Database</a>
+            <button onclick="deleteAllStudents()" class="btn btn-danger" style="margin-left: auto;">🗑️ Hapus Semua Siswa</button>
         </div>
         
         <div style="overflow-x: auto;">
@@ -335,6 +350,21 @@ function clearAllCheating() {
         `;
         document.body.appendChild(form);
         form.submit();
+    }
+}
+
+function deleteAllStudents() {
+    if (confirm('⚠️ PERINGATAN! Yakin ingin menghapus SEMUA siswa?\n\nTindakan ini akan menghapus:\n- Semua data siswa\n- Semua percobaan ujian mereka\n- Semua pembayaran mereka\n- Semua data terkait lainnya\n\nTindakan ini TIDAK BISA dibatalkan!')) {
+        if (confirm('Konfirmasi sekali lagi: Hapus SEMUA siswa?')) {
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.innerHTML = `
+                <?php echo csrf(); ?>
+                <input type="hidden" name="action" value="delete_all">
+            `;
+            document.body.appendChild(form);
+            form.submit();
+        }
     }
 }
 

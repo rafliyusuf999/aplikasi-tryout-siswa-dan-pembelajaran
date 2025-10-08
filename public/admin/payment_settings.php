@@ -45,7 +45,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $account_number = sanitize($_POST['account_number']);
     $account_name = sanitize($_POST['account_name']);
     
-    $stmt = $pdo->prepare("UPDATE payment_settings SET qris_image = ?, payment_instructions = ?, bank_name = ?, account_number = ?, account_name = ?, updated_at = NOW() WHERE id = ?");
+    $stmt = $pdo->prepare("UPDATE payment_settings SET qris_image = ?, payment_instructions = ?, bank_name = ?, account_number = ?, account_name = ?, updated_at = datetime('now') WHERE id = ?");
     $stmt->execute([$qris_image, $payment_instructions, $bank_name, $account_number, $account_name, $settings['id']]);
     
     setFlash('Pengaturan pembayaran berhasil diupdate', 'success');

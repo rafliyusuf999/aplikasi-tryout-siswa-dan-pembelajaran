@@ -82,6 +82,32 @@ include '../../app/Views/includes/navbar.php';
                         | 👨‍🏫 <?php echo htmlspecialchars($exam['creator_name']); ?>
                         <?php endif; ?>
                     </small>
+                    <?php 
+                    $current_time = new DateTime('now', new DateTimeZone('Asia/Jakarta'));
+                    $exam_status = 'available';
+                    $status_message = '';
+                    
+                    if ($exam['start_time']) {
+                        $start_time = new DateTime($exam['start_time'], new DateTimeZone('Asia/Jakarta'));
+                        if ($current_time < $start_time) {
+                            $exam_status = 'not_started';
+                            $status_message = '🕐 Mulai: ' . $start_time->format('d/m/Y H:i') . ' WIB';
+                        }
+                    }
+                    
+                    if ($exam['end_time']) {
+                        $end_time = new DateTime($exam['end_time'], new DateTimeZone('Asia/Jakarta'));
+                        if ($current_time > $end_time) {
+                            $exam_status = 'ended';
+                            $status_message = '⏰ Berakhir: ' . $end_time->format('d/m/Y H:i') . ' WIB';
+                        } else if ($exam_status === 'available') {
+                            $status_message = '⏰ Berakhir: ' . $end_time->format('d/m/Y H:i') . ' WIB';
+                        }
+                    }
+                    
+                    if ($status_message): ?>
+                        <br><small class="text-muted" style="<?php echo $exam_status === 'not_started' ? 'color: #ff9800 !important;' : ($exam_status === 'ended' ? 'color: #f44336 !important;' : ''); ?>"><?php echo $status_message; ?></small>
+                    <?php endif; ?>
                 </div>
                 
                 <div style="margin-bottom: 1rem;">
@@ -116,7 +142,11 @@ include '../../app/Views/includes/navbar.php';
                     }
                     ?>
                     
-                    <?php if ($can_access): ?>
+                    <?php if ($exam_status === 'not_started'): ?>
+                        <button class="btn btn-secondary" style="width: 100%;" disabled>Belum Dimulai</button>
+                    <?php elseif ($exam_status === 'ended'): ?>
+                        <button class="btn btn-danger" style="width: 100%;" disabled>Sudah Berakhir</button>
+                    <?php elseif ($can_access): ?>
                         <a href="<?php echo url('student/exam_detail.php?id=' . $exam['id']); ?>" class="btn <?php echo $button_class; ?>" style="width: 100%;">
                             <?php echo $button_text; ?>
                         </a>

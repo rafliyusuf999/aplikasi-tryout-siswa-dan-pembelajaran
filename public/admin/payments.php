@@ -44,7 +44,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $id = (int)$_POST['id'];
             $user = getCurrentUser();
             
-            $stmt = $pdo->prepare("UPDATE payments SET status = 'approved', approved_at = NOW(), approved_by = ? WHERE id = ?");
+            $stmt = $pdo->prepare("UPDATE payments SET status = 'approved', approved_at = datetime('now'), approved_by = ? WHERE id = ?");
             $stmt->execute([$user['id'], $id]);
             
             setFlash('Pembayaran berhasil disetujui', 'success');
@@ -54,7 +54,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($_POST['action'] === 'approve_all') {
             $user = getCurrentUser();
             
-            $stmt = $pdo->prepare("UPDATE payments SET status = 'approved', approved_at = NOW(), approved_by = ? WHERE status = 'pending'");
+            $stmt = $pdo->prepare("UPDATE payments SET status = 'approved', approved_at = datetime('now'), approved_by = ? WHERE status = 'pending'");
             $stmt->execute([$user['id']]);
             $affected = $stmt->rowCount();
             
@@ -78,7 +78,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $amount = (int)$_POST['amount'];
             $current_user = getCurrentUser();
             
-            $stmt = $pdo->prepare("INSERT INTO payments (user_id, exam_id, amount, status, approved_at, approved_by) VALUES (?, ?, ?, 'approved', NOW(), ?)");
+            $stmt = $pdo->prepare("INSERT INTO payments (user_id, exam_id, amount, status, approved_at, approved_by) VALUES (?, ?, ?, 'approved', datetime('now'), ?)");
             $stmt->execute([$user_id, $exam_id, $amount, $current_user['id']]);
             
             setFlash('Pembayaran manual berhasil ditambahkan', 'success');

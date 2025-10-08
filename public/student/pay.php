@@ -60,7 +60,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
     
     if ($existing_payment && $existing_payment['status'] === 'pending') {
-        $stmt = $pdo->prepare("UPDATE payments SET amount = ?, payment_proof = COALESCE(?, payment_proof), updated_at = NOW() WHERE id = ?");
+        $stmt = $pdo->prepare("UPDATE payments SET amount = ?, payment_proof = COALESCE(?, payment_proof), updated_at = datetime('now') WHERE id = ?");
         $stmt->execute([$amount, $payment_proof, $existing_payment['id']]);
     } else {
         $stmt = $pdo->prepare("INSERT INTO payments (user_id, exam_id, amount, payment_proof, status) VALUES (?, ?, ?, ?, 'pending')");

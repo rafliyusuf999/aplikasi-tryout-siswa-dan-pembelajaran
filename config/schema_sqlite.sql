@@ -11,7 +11,8 @@ CREATE TABLE IF NOT EXISTS users (
     school_name VARCHAR(150),
     phone_number VARCHAR(20),
     profile_photo VARCHAR(255),
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(phone_number)
 );
 
 CREATE INDEX IF NOT EXISTS idx_users_role ON users(role);

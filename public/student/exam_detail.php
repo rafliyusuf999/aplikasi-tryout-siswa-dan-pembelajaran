@@ -34,6 +34,26 @@ if ($exam['is_premium']) {
     }
 }
 
+$current_time = new DateTime('now', new DateTimeZone('Asia/Jakarta'));
+
+if ($exam['start_time']) {
+    $start_time = new DateTime($exam['start_time'], new DateTimeZone('Asia/Jakarta'));
+    if ($current_time < $start_time) {
+        $formatted_start = $start_time->format('d/m/Y H:i');
+        setFlash("Try Out ini belum dimulai. Waktu mulai: {$formatted_start} WIB", 'warning');
+        redirect('student/exams.php');
+    }
+}
+
+if ($exam['end_time']) {
+    $end_time = new DateTime($exam['end_time'], new DateTimeZone('Asia/Jakarta'));
+    if ($current_time > $end_time) {
+        $formatted_end = $end_time->format('d/m/Y H:i');
+        setFlash("Try Out ini sudah berakhir pada: {$formatted_end} WIB", 'danger');
+        redirect('student/exams.php');
+    }
+}
+
 // Cek apakah ada completed attempt sebelumnya (first attempt)
 $stmt = $pdo->prepare("SELECT * FROM exam_attempts WHERE exam_id = ? AND user_id = ? AND is_completed = true ORDER BY finished_at ASC LIMIT 1");
 $stmt->execute([$exam_id, $user['id']]);
