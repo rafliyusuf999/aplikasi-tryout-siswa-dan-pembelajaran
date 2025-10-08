@@ -327,7 +327,11 @@ class AntiCheat {
     }
 }
 
-function showSecurityWarningModal() {
+let securityWarningCallback = null;
+
+function showSecurityWarningModal(callback) {
+    securityWarningCallback = callback;
+    
     const modal = document.createElement('div');
     modal.id = 'securityWarningModal';
     modal.className = 'modal';
@@ -335,7 +339,7 @@ function showSecurityWarningModal() {
     modal.innerHTML = `
         <div class="modal-content" style="max-width: 600px; margin: 20px auto; max-height: 90vh; overflow-y: auto;">
             <div class="modal-header" style="background: linear-gradient(135deg, #dc3545 0%, #c82333 100%); color: white; padding: 20px;">
-                <h2 style="margin: 0; font-size: 1.5rem; text-align: center;">🔒 Anti-Cheating Ketat</h2>
+                <h2 style="margin: 0; font-size: 1.5rem; text-align: center;">🔒 Anti-Kecurangan Ketat</h2>
                 <p style="margin: 8px 0 0 0; font-size: 0.9rem; text-align: center; opacity: 0.95;">Proteksi copy-paste, screenshot, dan pindah tab selama ujian</p>
             </div>
             <div class="modal-body" style="padding: 25px;">
@@ -347,12 +351,12 @@ function showSecurityWarningModal() {
                             <small style="color: #666; line-height: 1.6;">Jika terdeteksi mencoba copy, Anda akan OTOMATIS LOGOUT</small>
                         </li>
                         <li style="margin-bottom: 15px; padding: 12px; background: #f8f9fa; border-radius: 8px; border-left: 4px solid #dc3545;">
-                            <strong style="font-size: 1rem;">🚫 DILARANG PINDAH TAB/WINDOW</strong><br>
-                            <small style="color: #666; line-height: 1.6;">Jika pindah tab, ujian akan OTOMATIS RESTART dari awal</small>
+                            <strong style="font-size: 1rem;">🚫 DILARANG PINDAH TAB/WINDOW (LEBIH DARI 3 DETIK)</strong><br>
+                            <small style="color: #666; line-height: 1.6;">Jika pindah tab lebih dari 3 detik, Anda akan OTOMATIS LOGOUT</small>
                         </li>
                         <li style="margin-bottom: 15px; padding: 12px; background: #f8f9fa; border-radius: 8px; border-left: 4px solid #dc3545;">
                             <strong style="font-size: 1rem;">🚫 DILARANG SCREENSHOT</strong><br>
-                            <small style="color: #666; line-height: 1.6;">Screenshot dan Developer Tools tidak diperbolehkan</small>
+                            <small style="color: #666; line-height: 1.6;">Screenshot dan Developer Tools akan logout otomatis</small>
                         </li>
                         <li style="margin-bottom: 15px; padding: 12px; background: #d4edda; border-radius: 8px; border-left: 4px solid #28a745;">
                             <strong style="font-size: 1rem;">✅ FOKUS PADA UJIAN</strong><br>
@@ -436,11 +440,12 @@ function acceptSecurityWarning() {
         modal.remove();
         console.log('✓ Modal removed');
     }
-    if (typeof startExamAfterWarning === 'function') {
-        console.log('✓ Calling startExamAfterWarning()...');
-        startExamAfterWarning();
+    if (securityWarningCallback && typeof securityWarningCallback === 'function') {
+        console.log('✓ Calling callback function...');
+        securityWarningCallback();
+        securityWarningCallback = null;
     } else {
-        console.error('❌ startExamAfterWarning function not found!');
+        console.error('❌ Callback function not found!');
     }
 }
 
