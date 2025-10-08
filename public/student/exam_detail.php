@@ -44,6 +44,12 @@ $stmt = $pdo->prepare("SELECT COUNT(*) FROM exam_attempts WHERE exam_id = ? AND 
 $stmt->execute([$exam_id, $user['id']]);
 $completed_attempts_count = (int)$stmt->fetchColumn();
 
+// Jika sudah ada 2 attempt completed, redirect ke result page first attempt
+if ($completed_attempts_count >= 2) {
+    setFlash('Anda sudah menyelesaikan ujian ini 2 kali. Berikut adalah hasil pengerjaan pertama Anda.', 'info');
+    redirect('student/result.php?id=' . $first_attempt['id']);
+}
+
 // Get current active attempt or create new one
 $stmt = $pdo->prepare("SELECT * FROM exam_attempts WHERE exam_id = ? AND user_id = ? ORDER BY started_at DESC LIMIT 1");
 $stmt->execute([$exam_id, $user['id']]);
@@ -59,6 +65,9 @@ if (!$attempt || $attempt['is_completed']) {
     $stmt->execute([$attempt_id]);
     $attempt = $stmt->fetch();
 }
+
+// Flag untuk pengerjaan kedua (review mode)
+$is_second_attempt = ($completed_attempts_count === 1);
 
 $stmt = $pdo->prepare("SELECT * FROM questions WHERE exam_id = ? ORDER BY question_order ASC");
 $stmt->execute([$exam_id]);
@@ -118,7 +127,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt = $pdo->prepare("UPDATE exam_attempts SET answers = ?, essay_answers = ?, total_score = ?, finished_at = NOW(), is_completed = true WHERE id = ?");
         $stmt->execute([json_encode($new_answers), json_encode($new_essay_answers), $total_score, $attempt['id']]);
         
-        // Update leaderboard HANYA jika ini adalah first completed attempt
+        // Update leaderboard dan nilai HANYA jika ini adalah first completed attempt
         if ($completed_attempts_count === 0) {
             // Hitung total poin dari semua exam
             $stmt = $pdo->prepare("
