@@ -621,55 +621,9 @@ document.addEventListener('DOMContentLoaded', function() {
         );
         antiCheat.enable();
         
-        setupAntiCheat();
-        
         setInterval(autoSave, 60000);
     });
 });
-
-function setupAntiCheat() {
-    let cheatingWarnings = 0;
-    const MAX_WARNINGS = 3;
-    
-    document.addEventListener('visibilitychange', function() {
-        if (document.hidden && !isUploadingFile) {
-            cheatingWarnings++;
-            if (cheatingWarnings >= MAX_WARNINGS) {
-                alert('⚠️ TERDETEKSI KECURANGAN!\n\nAnda telah keluar dari halaman ujian sebanyak ' + MAX_WARNINGS + ' kali.\nUjian akan ditutup secara otomatis.');
-                document.getElementById('examForm').submit();
-            } else {
-                alert('⚠️ PERINGATAN KECURANGAN!\n\nJangan keluar dari halaman ujian!\nPeringatan: ' + cheatingWarnings + '/' + MAX_WARNINGS);
-            }
-        }
-    });
-    
-    document.addEventListener('contextmenu', function(e) {
-        if (!e.target.classList.contains('allow-file-upload')) {
-            e.preventDefault();
-            alert('⛔ Klik kanan dinonaktifkan selama ujian!');
-        }
-    });
-    
-    document.addEventListener('keydown', function(e) {
-        if ((e.ctrlKey || e.metaKey) && (e.key === 'c' || e.key === 'C' || e.key === 'v' || e.key === 'V')) {
-            if (!e.target.classList.contains('allow-file-upload')) {
-                e.preventDefault();
-                alert('⛔ Copy-paste dinonaktifkan selama ujian!');
-            }
-        }
-        
-        if (e.key === 'PrintScreen' || (e.ctrlKey && e.shiftKey && e.key === 's')) {
-            e.preventDefault();
-            cheatingWarnings++;
-            if (cheatingWarnings >= MAX_WARNINGS) {
-                alert('⚠️ TERDETEKSI SCREENSHOT!\n\nUjian akan ditutup secara otomatis.');
-                document.getElementById('examForm').submit();
-            } else {
-                alert('⚠️ Screenshot terdeteksi!\nPeringatan: ' + cheatingWarnings + '/' + MAX_WARNINGS);
-            }
-        }
-    });
-}
 
 function scrollToQuestion(questionNum) {
     const element = document.getElementById('question-' + questionNum);
