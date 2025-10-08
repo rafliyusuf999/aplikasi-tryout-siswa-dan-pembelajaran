@@ -15,28 +15,30 @@
                     if($user['role'] == 'admin'): ?>
                         <li><a href="<?php echo url('admin/dashboard.php'); ?>" onclick="closeMobileMenu()">Dashboard</a></li>
                         <li><a href="<?php echo url('admin/students.php'); ?>" onclick="closeMobileMenu()">Siswa</a></li>
-                        <li><a href="<?php echo url('admin/teachers.php'); ?>" onclick="closeMobileMenu()">Mentor</a></li>
-                        <li><a href="<?php echo url('admin/exams.php'); ?>" onclick="closeMobileMenu()">TO</a></li>
+                        <li><a href="<?php echo url('admin/exams.php'); ?>" onclick="closeMobileMenu()">Try Out</a></li>
                         <li><a href="<?php echo url('admin/payments.php'); ?>" onclick="closeMobileMenu()">Pembayaran</a></li>
                     <?php elseif($user['role'] == 'teacher'): ?>
                         <li><a href="<?php echo url('teacher/dashboard.php'); ?>" onclick="closeMobileMenu()">Dashboard</a></li>
-                        <li><a href="<?php echo url('teacher/exams.php'); ?>" onclick="closeMobileMenu()">TO Saya</a></li>
-                        <li><a href="<?php echo url('teacher/students.php'); ?>" onclick="closeMobileMenu()">Hasil Siswa</a></li>
+                        <li><a href="<?php echo url('teacher/exams.php'); ?>" onclick="closeMobileMenu()">Try Out</a></li>
                         <li><a href="<?php echo url('admin/payments.php'); ?>" onclick="closeMobileMenu()">Pembayaran</a></li>
                     <?php else: ?>
                         <li><a href="<?php echo url('student/dashboard.php'); ?>" onclick="closeMobileMenu()">Dashboard</a></li>
-                        <li><a href="<?php echo url('student/exams.php'); ?>" onclick="closeMobileMenu()">Daftar TO</a></li>
+                        <li><a href="<?php echo url('student/exams.php'); ?>" onclick="closeMobileMenu()">Try Out</a></li>
                     <?php endif; ?>
                     <li><a href="<?php echo url('leaderboards.php'); ?>" onclick="closeMobileMenu()">Peringkat</a></li>
-                    <li><a href="<?php echo url('profile.php'); ?>" onclick="closeMobileMenu()">Profil</a></li>
                     <li class="user-profile">
                         <div class="profile-info">
                             <?php if(!empty($user['profile_photo'])): ?>
-                            <img src="<?php echo url('storage/uploads/profiles/' . $user['profile_photo']); ?>" alt="<?php echo htmlspecialchars($user['full_name']); ?>" class="profile-photo-nav">
+                            <a href="<?php echo url('profile.php'); ?>" style="display: flex; align-items: center; gap: 0.75rem; text-decoration: none;">
+                                <img src="<?php echo url('storage/uploads/profiles/' . $user['profile_photo']); ?>" alt="<?php echo htmlspecialchars($user['full_name']); ?>" class="profile-photo-nav">
+                                <span class="profile-name"><?php echo htmlspecialchars($user['full_name']); ?></span>
+                            </a>
                             <?php else: ?>
-                            <div class="profile-photo-placeholder"><?php echo strtoupper(substr($user['full_name'], 0, 1)); ?></div>
+                            <a href="<?php echo url('profile.php'); ?>" style="display: flex; align-items: center; gap: 0.75rem; text-decoration: none;">
+                                <div class="profile-photo-placeholder"><?php echo strtoupper(substr($user['full_name'], 0, 1)); ?></div>
+                                <span class="profile-name"><?php echo htmlspecialchars($user['full_name']); ?></span>
+                            </a>
                             <?php endif; ?>
-                            <span class="profile-name"><?php echo htmlspecialchars($user['full_name']); ?></span>
                         </div>
                     </li>
                     <li><a href="<?php echo url('logout.php'); ?>" onclick="closeMobileMenu()">Logout</a></li>

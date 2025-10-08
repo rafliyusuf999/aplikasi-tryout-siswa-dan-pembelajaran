@@ -502,15 +502,15 @@ function acceptSecurityWarning() {
 }
 
 class ExamTimer {
-    constructor(durationMinutes, onTimeUp) {
-        this.duration = durationMinutes * 60;
-        this.remaining = this.duration;
+    constructor(durationSeconds, onTimeUp) {
+        this.duration = durationSeconds;
+        this.remaining = durationSeconds;
         this.onTimeUp = onTimeUp;
         this.interval = null;
         this.element = null;
     }
 
-    start(elementId) {
+    startRealtime(elementId) {
         this.element = document.getElementById(elementId);
         if (!this.element) return;
 
@@ -552,6 +552,10 @@ class ExamTimer {
                 }
             }
         }, 1000);
+    }
+
+    start(elementId) {
+        this.startRealtime(elementId);
     }
 
     stop() {

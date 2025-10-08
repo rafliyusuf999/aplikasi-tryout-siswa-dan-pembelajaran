@@ -35,6 +35,13 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
         redirect('register.php');
     }
     
+    $stmt = $pdo->prepare("SELECT id FROM users WHERE phone_number = ?");
+    $stmt->execute([$phone_number]);
+    if($stmt->fetch()) {
+        setFlash('Nomor HP sudah terdaftar!', 'danger');
+        redirect('register.php');
+    }
+    
     if(!isset($_FILES['profile_photo']) || $_FILES['profile_photo']['error'] !== UPLOAD_ERR_OK) {
         setFlash('Foto profil wajib diupload!', 'danger');
         redirect('register.php');

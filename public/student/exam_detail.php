@@ -462,6 +462,12 @@ body {
     border-color: #4CAF50;
 }
 
+.nav-item.doubtful {
+    background: #FFC107;
+    color: white;
+    border-color: #FFC107;
+}
+
 .nav-item.active {
     border-color: var(--primary-color);
     background: var(--primary-color);
@@ -536,6 +542,12 @@ body {
                             </label>
                             <?php endif; ?>
                         <?php endforeach; ?>
+                        <div style="margin-top: 1rem;">
+                            <label style="display: inline-flex; align-items: center; gap: 0.5rem; cursor: pointer; padding: 0.5rem; background: #fff3cd; border-radius: 6px;">
+                                <input type="checkbox" class="doubtful-checkbox" data-question-num="<?php echo ($index + 1); ?>" onchange="toggleDoubtful(this)">
+                                <span>⚠️ Ragu-ragu dengan jawaban ini</span>
+                            </label>
+                        </div>
                     <?php else: ?>
                         <textarea name="essay_<?php echo $question['id']; ?>" class="form-control allow-file-upload" rows="6" placeholder="Tulis jawaban Anda di sini..." data-question-num="<?php echo ($index + 1); ?>" oninput="updateNavigation()"><?php echo htmlspecialchars($essay_answers[$question['id']] ?? ''); ?></textarea>
                         <div style="margin-top: 0.5rem; color: #666; font-size: 0.9rem;">💡 Atau upload file gambar jawaban Anda di bawah</div>
@@ -624,6 +636,10 @@ body {
                         <div style="width: 20px; height: 20px; background: #4CAF50; border-radius: 3px;"></div>
                         <span>Terjawab</span>
                     </div>
+                    <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.3rem;">
+                        <div style="width: 20px; height: 20px; background: #FFC107; border-radius: 3px;"></div>
+                        <span>Ragu-ragu</span>
+                    </div>
                     <div style="display: flex; align-items: center; gap: 0.5rem;">
                         <div style="width: 20px; height: 20px; border: 2px solid #ddd; border-radius: 3px;"></div>
                         <span>Belum Dijawab</span>
@@ -644,8 +660,8 @@ document.addEventListener('DOMContentLoaded', function() {
     setupScrollTracking();
     
     showSecurityWarningModal(() => {
-        examTimer = new ExamTimer(<?php echo max(1, round($remaining / 60)); ?>, handleTimeUp);
-        examTimer.start('timer-display');
+        examTimer = new ExamTimer(<?php echo max(1, $remaining); ?>, handleTimeUp);
+        examTimer.startRealtime('timer-display');
         
         antiCheat = new AntiCheat(
             handleCheatingWarning,
@@ -668,6 +684,18 @@ function scrollToQuestion(questionNum) {
     }
 }
 
+function toggleDoubtful(checkbox) {
+    const questionNum = checkbox.getAttribute('data-question-num');
+    const navItem = document.querySelector('.nav-item[data-question="' + questionNum + '"]');
+    
+    if (checkbox.checked) {
+        navItem.classList.add('doubtful');
+        navItem.classList.remove('answered');
+    } else {
+        updateNavigation();
+    }
+}
+
 function updateNavigation() {
     document.querySelectorAll('.nav-item').forEach(item => {
         const questionNum = item.getAttribute('data-question');
@@ -676,11 +704,17 @@ function updateNavigation() {
         if (questionCard) {
             const radio = questionCard.querySelector('input[type="radio"]:checked');
             const textarea = questionCard.querySelector('textarea');
+            const doubtfulCheckbox = questionCard.querySelector('.doubtful-checkbox');
             
-            if (radio || (textarea && textarea.value.trim().length > 0)) {
+            if (doubtfulCheckbox && doubtfulCheckbox.checked) {
+                item.classList.add('doubtful');
+                item.classList.remove('answered');
+            } else if (radio || (textarea && textarea.value.trim().length > 0)) {
                 item.classList.add('answered');
+                item.classList.remove('doubtful');
             } else {
                 item.classList.remove('answered');
+                item.classList.remove('doubtful');
             }
         }
     });

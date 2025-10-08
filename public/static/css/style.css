@@ -240,35 +240,15 @@ body::before {
 
 .btn {
     display: inline-block;
-    padding: 0.75rem 2rem;
+    padding: 0.5rem 1.25rem;
     border: none;
-    border-radius: 25px;
-    font-size: 1rem;
+    border-radius: 6px;
+    font-size: 0.9rem;
     font-weight: 600;
     text-decoration: none;
     cursor: pointer;
-    transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-    position: relative;
-    overflow: hidden;
-}
-
-.btn::before {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 0;
-    height: 0;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.2);
-    transform: translate(-50%, -50%);
-    transition: width 0.6s, height 0.6s;
-}
-
-.btn:hover::before {
-    width: 300px;
-    height: 300px;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .btn-primary {
@@ -277,13 +257,8 @@ body::before {
 }
 
 .btn-primary:hover {
-    transform: translateY(-5px) scale(1.02);
-    box-shadow: var(--shadow-hover);
-}
-
-.btn-primary:active {
-    transform: translateY(-2px) scale(0.98);
-    box-shadow: 0 4px 15px rgba(139, 21, 56, 0.2);
+    opacity: 0.9;
+    box-shadow: 0 4px 12px rgba(139, 21, 56, 0.3);
 }
 
 .btn-secondary {
@@ -295,8 +270,6 @@ body::before {
 .btn-secondary:hover {
     background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
     color: white;
-    transform: translateY(-5px) scale(1.02);
-    box-shadow: var(--shadow-hover);
 }
 
 .btn-danger {
@@ -305,8 +278,7 @@ body::before {
 }
 
 .btn-danger:hover {
-    transform: translateY(-5px) scale(1.02);
-    box-shadow: 0 8px 35px rgba(220, 53, 69, 0.3);
+    opacity: 0.9;
 }
 
 .btn-success {
@@ -315,8 +287,7 @@ body::before {
 }
 
 .btn-success:hover {
-    transform: translateY(-5px) scale(1.02);
-    box-shadow: 0 8px 35px rgba(40, 167, 69, 0.3);
+    opacity: 0.9;
 }
 
 .btn-warning {
@@ -325,8 +296,7 @@ body::before {
 }
 
 .btn-warning:hover {
-    transform: translateY(-5px) scale(1.02);
-    box-shadow: 0 8px 35px rgba(255, 193, 7, 0.3);
+    opacity: 0.9;
 }
 
 .btn-info {
@@ -335,8 +305,7 @@ body::before {
 }
 
 .btn-info:hover {
-    transform: translateY(-5px) scale(1.02);
-    box-shadow: 0 8px 35px rgba(23, 162, 184, 0.3);
+    opacity: 0.9;
 }
 
 .card {
@@ -1166,8 +1135,9 @@ select.form-control option {
     }
     
     .btn-sm {
-        min-height: 38px;
-        padding: 0.4rem 0.8rem;
+        min-height: 36px;
+        padding: 0.3rem 0.7rem;
+        font-size: 0.8rem;
     }
     
     input, select, textarea {
