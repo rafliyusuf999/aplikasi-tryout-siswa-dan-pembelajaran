@@ -144,9 +144,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     GROUP BY user_id
                 ) as scores
                 JOIN users ON scores.user_id = users.id
-                WHERE users.branch = ? AND scores.max_score > ?
+                WHERE users.inspira_branch = ? AND scores.max_score > ?
             ");
-            $stmt->execute([$exam_id, $user['branch'], $total_score]);
+            $stmt->execute([$exam_id, $user['inspira_branch'], $total_score]);
             $rank_in_branch = (int)$stmt->fetchColumn();
             
             // Hitung ranking global
