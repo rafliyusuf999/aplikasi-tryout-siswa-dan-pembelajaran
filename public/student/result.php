@@ -83,10 +83,45 @@ include '../../app/Views/includes/navbar.php';
     margin: 1rem 0;
 }
 
-.rank-1 { background: linear-gradient(135deg, #FFD700, #FFA500); color: white; }
-.rank-2 { background: linear-gradient(135deg, #C0C0C0, #A8A8A8); color: white; }
-.rank-3 { background: linear-gradient(135deg, #CD7F32, #B8860B); color: white; }
-.rank-other { background: linear-gradient(135deg, #6c757d, #5a6268); color: white; }
+.rank-1 { 
+    background: linear-gradient(135deg, #FFD700, #FFA500); 
+    color: white; 
+    animation: pulseGold 2s infinite;
+}
+.rank-2 { 
+    background: linear-gradient(135deg, #C0C0C0, #A8A8A8); 
+    color: white;
+    animation: pulseSilver 2s infinite;
+}
+.rank-3 { 
+    background: linear-gradient(135deg, #CD7F32, #B8860B); 
+    color: white;
+    animation: pulseBronze 2s infinite;
+}
+.rank-other { 
+    background: linear-gradient(135deg, #6c757d, #5a6268); 
+    color: white; 
+}
+
+.celebration-badge {
+    position: relative;
+    box-shadow: 0 8px 30px rgba(255, 215, 0, 0.5);
+}
+
+@keyframes pulseGold {
+    0%, 100% { box-shadow: 0 8px 30px rgba(255, 215, 0, 0.5); transform: scale(1); }
+    50% { box-shadow: 0 12px 40px rgba(255, 215, 0, 0.8); transform: scale(1.05); }
+}
+
+@keyframes pulseSilver {
+    0%, 100% { box-shadow: 0 8px 30px rgba(192, 192, 192, 0.5); transform: scale(1); }
+    50% { box-shadow: 0 12px 40px rgba(192, 192, 192, 0.8); transform: scale(1.05); }
+}
+
+@keyframes pulseBronze {
+    0%, 100% { box-shadow: 0 8px 30px rgba(205, 127, 50, 0.5); transform: scale(1); }
+    50% { box-shadow: 0 12px 40px rgba(205, 127, 50, 0.8); transform: scale(1.05); }
+}
 </style>
 
 <div class="container" style="margin-top: 2rem; margin-bottom: 2rem;">
@@ -102,11 +137,11 @@ include '../../app/Views/includes/navbar.php';
             
             <div style="margin: 2rem 0;">
                 <?php if ($rank == 1): ?>
-                    <div class="rank-badge rank-1">🥇 Peringkat 1</div>
+                    <div class="rank-badge rank-1 celebration-badge">🥇 Peringkat 1</div>
                 <?php elseif ($rank == 2): ?>
-                    <div class="rank-badge rank-2">🥈 Peringkat 2</div>
+                    <div class="rank-badge rank-2 celebration-badge">🥈 Peringkat 2</div>
                 <?php elseif ($rank == 3): ?>
-                    <div class="rank-badge rank-3">🥉 Peringkat 3</div>
+                    <div class="rank-badge rank-3 celebration-badge">🥉 Peringkat 3</div>
                 <?php else: ?>
                     <div class="rank-badge rank-other">Peringkat <?php echo $rank; ?></div>
                 <?php endif; ?>
@@ -115,6 +150,12 @@ include '../../app/Views/includes/navbar.php';
                     dari <?php echo $total_participants; ?> peserta
                 </p>
             </div>
+            
+            <?php if ($rank <= 3): ?>
+            <audio id="victorySound" autoplay>
+                <source src="<?php echo url('static/audio/victory.mp3'); ?>" type="audio/mpeg">
+            </audio>
+            <?php endif; ?>
             
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin: 2rem 0;">
                 <div class="card" style="text-align: center; padding: 1.5rem;">
