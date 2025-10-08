@@ -329,6 +329,16 @@ body::before {
     box-shadow: 0 8px 35px rgba(255, 193, 7, 0.3);
 }
 
+.btn-info {
+    background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);
+    color: white;
+}
+
+.btn-info:hover {
+    transform: translateY(-5px) scale(1.02);
+    box-shadow: 0 8px 35px rgba(23, 162, 184, 0.3);
+}
+
 .card {
     background: rgba(255, 255, 255, 0.1);
     backdrop-filter: blur(10px);
