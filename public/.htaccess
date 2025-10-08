@@ -1,14 +1,25 @@
-RewriteEngine On
+# Enable Rewrite Engine
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    
+    # Prevent directory listing
+    Options -Indexes
+    
+    # Handle uploads folder
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteRule ^storage/uploads/(.*)$ ../storage/uploads/$1 [L]
+    
+    # Handle static files  
+    RewriteRule ^static/(.*)$ static/$1 [L]
+    
+    # Route all other requests to index.php (for clean URLs)
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^(.*)$ index.php [QSA,L]
+</IfModule>
 
-# Prevent directory listing
-Options -Indexes
-
-# Handle uploads folder
-RewriteCond %{REQUEST_FILENAME} !-f
-RewriteRule ^storage/uploads/(.*)$ ../storage/uploads/$1 [L]
-
-# Handle static files
-RewriteRule ^static/(.*)$ static/$1 [L]
+# Set default index file
+DirectoryIndex index.php
 
 # Security headers
 <IfModule mod_headers.c>
@@ -18,9 +29,15 @@ RewriteRule ^static/(.*)$ static/$1 [L]
 </IfModule>
 
 # PHP security
-<IfModule mod_php7.c>
+<IfModule mod_php.c>
     php_flag display_errors Off
     php_value upload_max_filesize 16M
     php_value post_max_size 16M
     php_value max_execution_time 300
 </IfModule>
+
+# Block access to sensitive files
+<FilesMatch "\.(sql|md|env)$">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
