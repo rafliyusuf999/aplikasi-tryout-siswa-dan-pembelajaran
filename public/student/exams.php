@@ -165,7 +165,7 @@ include '../../app/Views/includes/navbar.php';
         </div>
         
         <?php if (count($exams) === 0): ?>
-        <div style="text-align: center; padding: 3rem; color: #999;">
+        <div style="text-align: center; padding: 3rem; color: #1a1a1a;">
             <p>Tidak ada Try Out tersedia</p>
         </div>
         <?php endif; ?>

@@ -60,37 +60,37 @@ include '../../app/Views/includes/navbar.php';
         
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
             <div>
-                <label style="font-weight: bold; color: #666;">Nama Lengkap:</label>
+                <label style="font-weight: bold; color: #1a1a1a;">Nama Lengkap:</label>
                 <p style="margin-top: 0.5rem;"><?php echo htmlspecialchars($student['full_name']); ?></p>
             </div>
             
             <div>
-                <label style="font-weight: bold; color: #666;">Email:</label>
+                <label style="font-weight: bold; color: #1a1a1a;">Email:</label>
                 <p style="margin-top: 0.5rem;"><?php echo htmlspecialchars($student['email']); ?></p>
             </div>
             
             <div>
-                <label style="font-weight: bold; color: #666;">Cabang:</label>
+                <label style="font-weight: bold; color: #1a1a1a;">Cabang:</label>
                 <p style="margin-top: 0.5rem;"><?php echo htmlspecialchars($student['inspira_branch'] ?? '-'); ?></p>
             </div>
             
             <div>
-                <label style="font-weight: bold; color: #666;">Kelas:</label>
+                <label style="font-weight: bold; color: #1a1a1a;">Kelas:</label>
                 <p style="margin-top: 0.5rem;"><?php echo htmlspecialchars($student['class_level'] ?? '-'); ?></p>
             </div>
             
             <div>
-                <label style="font-weight: bold; color: #666;">Sekolah:</label>
+                <label style="font-weight: bold; color: #1a1a1a;">Sekolah:</label>
                 <p style="margin-top: 0.5rem;"><?php echo htmlspecialchars($student['school_name'] ?? '-'); ?></p>
             </div>
             
             <div>
-                <label style="font-weight: bold; color: #666;">No. HP:</label>
+                <label style="font-weight: bold; color: #1a1a1a;">No. HP:</label>
                 <p style="margin-top: 0.5rem;"><?php echo htmlspecialchars($student['phone_number'] ?? '-'); ?></p>
             </div>
             
             <div>
-                <label style="font-weight: bold; color: #666;">Total Peringatan Curang:</label>
+                <label style="font-weight: bold; color: #1a1a1a;">Total Peringatan Curang:</label>
                 <p style="margin-top: 0.5rem;">
                     <?php if ($total_cheating > 0): ?>
                         <span class="badge badge-danger">⚠️ <?php echo $total_cheating; ?></span>
@@ -101,7 +101,7 @@ include '../../app/Views/includes/navbar.php';
             </div>
             
             <div>
-                <label style="font-weight: bold; color: #666;">Terdaftar Sejak:</label>
+                <label style="font-weight: bold; color: #1a1a1a;">Terdaftar Sejak:</label>
                 <p style="margin-top: 0.5rem;"><?php echo date('d M Y', strtotime($student['created_at'])); ?></p>
             </div>
         </div>
@@ -159,7 +159,7 @@ include '../../app/Views/includes/navbar.php';
             </table>
         </div>
         <?php else: ?>
-        <div style="text-align: center; padding: 2rem; color: #999;">
+        <div style="text-align: center; padding: 2rem; color: #1a1a1a;">
             <p>Siswa ini belum pernah mengikuti ujian</p>
         </div>
         <?php endif; ?>

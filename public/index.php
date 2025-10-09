@@ -61,17 +61,43 @@ include '../app/Views/includes/navbar.php';
 </div>
 
 <div class="card" style="margin-top: 3rem;" data-animate="fade-in">
-    <h2>Tentang Platform Kami</h2>
-    <p style="color: #1a1a1a; line-height: 1.8;">INSPIRANET adalah platform try out online yang dirancang khusus untuk membantu siswa mempersiapkan diri menghadapi ujian. Dengan sistem yang canggih dan anti-kecurangan, kami memastikan pengalaman ujian yang adil dan kompetitif.</p>
-    
-    <h3 style="margin-top: 2rem; color: #1a1a1a;">Fitur Unggulan:</h3>
-    <ul style="line-height: 2; color: #1a1a1a;">
-        <li>📊 Sistem Peringkat Cabang & Global</li>
-        <li>🔒 Anti-Kecurangan Ketat</li>
-        <li>💳 Pembayaran Try Out Premium</li>
-        <li>📈 Analisis Hasil Detail</li>
-        <li>👨‍🏫 Bimbingan Mentor</li>
-    </ul>
+    <h2 style="text-align: center;">Tentang Platform Kami</h2>
+    <p style="color: #1a1a1a; line-height: 1.8; text-align: center; max-width: 800px; margin: 0 auto;">INSPIRANET adalah platform try out online yang dirancang khusus untuk membantu siswa mempersiapkan diri menghadapi ujian. Dengan sistem yang canggih dan anti-kecurangan, kami memastikan pengalaman ujian yang adil dan kompetitif.</p>
+</div>
+
+<div class="card" style="margin-top: 2rem;" data-animate="fade-in">
+    <h2 style="text-align: center; margin-bottom: 2rem;">✨ Fitur Unggulan</h2>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; max-width: 900px; margin: 0 auto;">
+        <div style="background: linear-gradient(135deg, #EFF6FF 0%, #DBEAFE 100%); padding: 1.5rem; border-radius: 12px; border-left: 4px solid var(--primary-color); transition: transform 0.3s ease, box-shadow 0.3s ease;" onmouseover="this.style.transform='translateY(-5px)'; this.style.boxShadow='0 8px 25px rgba(59, 130, 246, 0.25)';" onmouseout="this.style.transform=''; this.style.boxShadow='';">
+            <div style="font-size: 2.5rem; text-align: center; margin-bottom: 0.75rem;">📊</div>
+            <h3 style="color: #1a1a1a; text-align: center; font-size: 1.1rem; margin-bottom: 0.5rem;">Peringkat Cabang & Global</h3>
+            <p style="color: #2d2d2d; text-align: center; font-size: 0.9rem; margin: 0; line-height: 1.6;">Sistem kompetisi yang adil antar cabang dan global</p>
+        </div>
+        
+        <div style="background: linear-gradient(135deg, #EFF6FF 0%, #DBEAFE 100%); padding: 1.5rem; border-radius: 12px; border-left: 4px solid var(--primary-color); transition: transform 0.3s ease, box-shadow 0.3s ease;" onmouseover="this.style.transform='translateY(-5px)'; this.style.boxShadow='0 8px 25px rgba(59, 130, 246, 0.25)';" onmouseout="this.style.transform=''; this.style.boxShadow='';">
+            <div style="font-size: 2.5rem; text-align: center; margin-bottom: 0.75rem;">🔒</div>
+            <h3 style="color: #1a1a1a; text-align: center; font-size: 1.1rem; margin-bottom: 0.5rem;">Anti-Kecurangan Ketat</h3>
+            <p style="color: #2d2d2d; text-align: center; font-size: 0.9rem; margin: 0; line-height: 1.6;">Proteksi copy-paste, screenshot, dan pindah tab</p>
+        </div>
+        
+        <div style="background: linear-gradient(135deg, #EFF6FF 0%, #DBEAFE 100%); padding: 1.5rem; border-radius: 12px; border-left: 4px solid var(--primary-color); transition: transform 0.3s ease, box-shadow 0.3s ease;" onmouseover="this.style.transform='translateY(-5px)'; this.style.boxShadow='0 8px 25px rgba(59, 130, 246, 0.25)';" onmouseout="this.style.transform=''; this.style.boxShadow='';">
+            <div style="font-size: 2.5rem; text-align: center; margin-bottom: 0.75rem;">💳</div>
+            <h3 style="color: #1a1a1a; text-align: center; font-size: 1.1rem; margin-bottom: 0.5rem;">Pembayaran Premium</h3>
+            <p style="color: #2d2d2d; text-align: center; font-size: 0.9rem; margin: 0; line-height: 1.6;">Akses try out premium dengan sistem pembayaran mudah</p>
+        </div>
+        
+        <div style="background: linear-gradient(135deg, #EFF6FF 0%, #DBEAFE 100%); padding: 1.5rem; border-radius: 12px; border-left: 4px solid var(--primary-color); transition: transform 0.3s ease, box-shadow 0.3s ease;" onmouseover="this.style.transform='translateY(-5px)'; this.style.boxShadow='0 8px 25px rgba(59, 130, 246, 0.25)';" onmouseout="this.style.transform=''; this.style.boxShadow='';">
+            <div style="font-size: 2.5rem; text-align: center; margin-bottom: 0.75rem;">📈</div>
+            <h3 style="color: #1a1a1a; text-align: center; font-size: 1.1rem; margin-bottom: 0.5rem;">Analisis Hasil Detail</h3>
+            <p style="color: #2d2d2d; text-align: center; font-size: 0.9rem; margin: 0; line-height: 1.6;">Lihat hasil lengkap dengan pembahasan soal</p>
+        </div>
+        
+        <div style="background: linear-gradient(135deg, #EFF6FF 0%, #DBEAFE 100%); padding: 1.5rem; border-radius: 12px; border-left: 4px solid var(--primary-color); transition: transform 0.3s ease, box-shadow 0.3s ease;" onmouseover="this.style.transform='translateY(-5px)'; this.style.boxShadow='0 8px 25px rgba(59, 130, 246, 0.25)';" onmouseout="this.style.transform=''; this.style.boxShadow='';">
+            <div style="font-size: 2.5rem; text-align: center; margin-bottom: 0.75rem;">👨‍🏫</div>
+            <h3 style="color: #1a1a1a; text-align: center; font-size: 1.1rem; margin-bottom: 0.5rem;">Bimbingan Mentor</h3>
+            <p style="color: #2d2d2d; text-align: center; font-size: 0.9rem; margin: 0; line-height: 1.6;">Didampingi mentor berpengalaman</p>
+        </div>
+    </div>
 </div>
 
 <?php include '../app/Views/includes/footer.php'; ?>

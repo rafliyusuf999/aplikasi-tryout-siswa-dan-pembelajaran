@@ -148,7 +148,7 @@ include '../../app/Views/includes/navbar.php';
 }
 
 .participants-count {
-    color: #666;
+    color: #1a1a1a;
     font-size: 0.9rem;
 }
 
@@ -180,12 +180,12 @@ include '../../app/Views/includes/navbar.php';
 }
 
 .stat-label {
-    color: #666;
+    color: #1a1a1a;
     font-size: 0.85rem;
 }
 
 .stat-date {
-    color: #999;
+    color: #1a1a1a;
     font-size: 0.75rem;
 }
 

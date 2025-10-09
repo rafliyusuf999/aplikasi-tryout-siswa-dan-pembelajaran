@@ -450,7 +450,7 @@ body {
     font-weight: bold;
     transition: all 0.3s;
     background: white;
-    color: #666;
+    color: #1a1a1a;
 }
 
 .nav-item:hover {
@@ -521,7 +521,7 @@ body {
                 <div class="question-card" id="question-<?php echo ($index + 1); ?>" data-question="<?php echo ($index + 1); ?>">
                     <div class="question-number">Soal #<?php echo ($index + 1); ?></div>
                     <?php if ($question['category']): ?>
-                        <div style="color: #666; margin-bottom: 0.5rem;"><em>Kategori: <?php echo htmlspecialchars($question['category']); ?></em></div>
+                        <div style="color: #1a1a1a; margin-bottom: 0.5rem;"><em>Kategori: <?php echo htmlspecialchars($question['category']); ?></em></div>
                     <?php endif; ?>
                     <div style="font-size: 1.1rem; margin-bottom: 1.5rem; line-height: 1.6;">
                         <?php echo nl2br(htmlspecialchars($question['question_text'])); ?>
@@ -552,7 +552,7 @@ body {
                         </div>
                     <?php else: ?>
                         <textarea name="essay_<?php echo $question['id']; ?>" class="form-control allow-file-upload" rows="6" placeholder="Tulis jawaban Anda di sini..." data-question-num="<?php echo ($index + 1); ?>" oninput="updateNavigation()"><?php echo htmlspecialchars($essay_answers[$question['id']] ?? ''); ?></textarea>
-                        <div style="margin-top: 0.5rem; color: #666; font-size: 0.9rem;">💡 Atau upload file gambar jawaban Anda di bawah</div>
+                        <div style="margin-top: 0.5rem; color: #1a1a1a; font-size: 0.9rem;">💡 Atau upload file gambar jawaban Anda di bawah</div>
                         <div style="margin-top: 0.5rem;">
                             <input type="file" 
                                    id="file_<?php echo $question['id']; ?>" 
@@ -633,7 +633,7 @@ body {
                     </div>
                     <?php endforeach; ?>
                 </div>
-                <div style="margin-top: 1rem; font-size: 0.85rem; color: #666;">
+                <div style="margin-top: 1rem; font-size: 0.85rem; color: #1a1a1a;">
                     <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.3rem;">
                         <div style="width: 20px; height: 20px; background: #4CAF50; border-radius: 3px;"></div>
                         <span>Terjawab</span>

@@ -238,11 +238,11 @@ include '../../app/Views/includes/navbar.php';
         <div style="text-align: center; margin: 1.5rem 0;">
             <img id="proofImage" src="" alt="Bukti Pembayaran" style="max-width: 100%; max-height: 500px; border: 2px solid #ddd; border-radius: 8px; display: none;">
             <div id="proofPdf" style="display: none;">
-                <p style="font-size: 1.2rem; color: #666; margin: 2rem 0;">📄 Bukti pembayaran berupa file PDF</p>
+                <p style="font-size: 1.2rem; color: #1a1a1a; margin: 2rem 0;">📄 Bukti pembayaran berupa file PDF</p>
                 <a id="proofPdfLink" href="" target="_blank" class="btn btn-info">Buka PDF di Tab Baru</a>
             </div>
             <div id="proofNone" style="display: none;">
-                <p style="font-size: 1.2rem; color: #666; margin: 2rem 0;">⚠️ Tidak ada bukti pembayaran yang diupload</p>
+                <p style="font-size: 1.2rem; color: #1a1a1a; margin: 2rem 0;">⚠️ Tidak ada bukti pembayaran yang diupload</p>
             </div>
         </div>
         <div id="proofActions" style="display: flex; gap: 1rem; justify-content: center; margin-top: 1.5rem;">

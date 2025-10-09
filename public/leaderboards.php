@@ -245,11 +245,11 @@ include '../app/Views/includes/navbar.php';
             </table>
         </div>
         <?php elseif ($exam_id): ?>
-        <div style="text-align: center; padding: 3rem; color: #999;">
+        <div style="text-align: center; padding: 3rem; color: #1a1a1a;">
             <p>Belum ada data peringkat untuk Try Out ini</p>
         </div>
         <?php else: ?>
-        <div style="text-align: center; padding: 3rem; color: #999;">
+        <div style="text-align: center; padding: 3rem; color: #1a1a1a;">
             <p>Silakan pilih Try Out untuk melihat peringkat</p>
         </div>
         <?php endif; ?>

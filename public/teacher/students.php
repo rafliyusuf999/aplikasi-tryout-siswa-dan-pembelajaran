@@ -135,7 +135,7 @@ include '../../app/Views/includes/navbar.php';
             </table>
         </div>
         <?php else: ?>
-        <div style="text-align: center; padding: 3rem; color: #999;">
+        <div style="text-align: center; padding: 3rem; color: #1a1a1a;">
             <p>Silakan pilih Try Out untuk melihat hasil siswa</p>
         </div>
         <?php endif; ?>
