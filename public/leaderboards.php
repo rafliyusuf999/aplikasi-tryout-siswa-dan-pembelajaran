@@ -35,9 +35,14 @@ if ($exam_id) {
                       JOIN users u ON ea.user_id = u.id
                       WHERE ea.exam_id = ? AND ea.is_completed = true 
                       AND u.inspira_branch = ?
+                      AND ea.id = (
+                          SELECT id FROM exam_attempts 
+                          WHERE exam_id = ? AND user_id = ea.user_id AND is_completed = true 
+                          ORDER BY finished_at ASC LIMIT 1
+                      )
                       ORDER BY ea.total_score DESC, ea.finished_at ASC";
             $stmt = $pdo->prepare($query);
-            $stmt->execute([$exam_id, $user['inspira_branch']]);
+            $stmt->execute([$exam_id, $user['inspira_branch'], $exam_id]);
         } else {
             $branch = $_GET['branch'] ?? '';
             if ($branch) {
@@ -46,17 +51,27 @@ if ($exam_id) {
                           JOIN users u ON ea.user_id = u.id
                           WHERE ea.exam_id = ? AND ea.is_completed = true 
                           AND u.inspira_branch = ?
+                          AND ea.id = (
+                              SELECT id FROM exam_attempts 
+                              WHERE exam_id = ? AND user_id = ea.user_id AND is_completed = true 
+                              ORDER BY finished_at ASC LIMIT 1
+                          )
                           ORDER BY ea.total_score DESC, ea.finished_at ASC";
                 $stmt = $pdo->prepare($query);
-                $stmt->execute([$exam_id, $branch]);
+                $stmt->execute([$exam_id, $branch, $exam_id]);
             } else {
                 $query = "SELECT ea.*, u.full_name, u.email, u.inspira_branch, u.profile_photo, u.class_level, u.school_name
                           FROM exam_attempts ea
                           JOIN users u ON ea.user_id = u.id
                           WHERE ea.exam_id = ? AND ea.is_completed = true
+                          AND ea.id = (
+                              SELECT id FROM exam_attempts 
+                              WHERE exam_id = ? AND user_id = ea.user_id AND is_completed = true 
+                              ORDER BY finished_at ASC LIMIT 1
+                          )
                           ORDER BY ea.total_score DESC, ea.finished_at ASC";
                 $stmt = $pdo->prepare($query);
-                $stmt->execute([$exam_id]);
+                $stmt->execute([$exam_id, $exam_id]);
             }
         }
     } else {
@@ -64,9 +79,14 @@ if ($exam_id) {
                   FROM exam_attempts ea
                   JOIN users u ON ea.user_id = u.id
                   WHERE ea.exam_id = ? AND ea.is_completed = true
+                  AND ea.id = (
+                      SELECT id FROM exam_attempts 
+                      WHERE exam_id = ? AND user_id = ea.user_id AND is_completed = true 
+                      ORDER BY finished_at ASC LIMIT 1
+                  )
                   ORDER BY ea.total_score DESC, ea.finished_at ASC";
         $stmt = $pdo->prepare($query);
-        $stmt->execute([$exam_id]);
+        $stmt->execute([$exam_id, $exam_id]);
     }
     
     $leaderboard = $stmt->fetchAll();
