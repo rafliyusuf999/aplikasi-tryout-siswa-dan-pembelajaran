@@ -374,7 +374,7 @@ body::before {
 }
 
 .card small {
-    color: #4a4a4a;
+    color: #1a1a1a;
     font-weight: 500;
 }
 
@@ -493,13 +493,13 @@ select.form-control option {
 }
 
 .text-muted {
-    color: #666666 !important;
+    color: #1a1a1a !important;
     font-size: 0.9rem;
     font-weight: 500;
 }
 
 .form-control::placeholder {
-    color: #999999;
+    color: #1a1a1a;
     font-weight: 400;
 }
 
@@ -665,7 +665,7 @@ select.form-control option {
 .close {
     font-size: 2rem;
     cursor: pointer;
-    color: #999;
+    color: #1a1a1a;
     transition: color 0.3s ease;
 }
 
