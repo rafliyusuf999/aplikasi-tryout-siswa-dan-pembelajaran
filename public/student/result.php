@@ -63,191 +63,290 @@ include '../../app/Views/includes/navbar.php';
     border-radius: 12px;
     padding: 2rem;
     margin-bottom: 2rem;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+}
+
+.profile-section {
+    text-align: center;
+    margin-bottom: 1.5rem;
+}
+
+.profile-photo {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid var(--primary-color);
+    margin-bottom: 0.5rem;
+}
+
+.profile-placeholder {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: var(--primary-color);
+    color: white;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 2rem;
+    border: 3px solid var(--primary-color);
+    margin-bottom: 0.5rem;
+}
+
+.profile-name {
+    font-weight: 600;
+    color: var(--text-dark);
+    font-size: 1rem;
+}
+
+.exam-title {
+    text-align: center;
+    color: var(--text-dark);
+    font-size: 1.5rem;
+    margin: 1rem 0;
 }
 
 .score-display {
-    font-size: 4rem;
+    font-size: 3.5rem;
     font-weight: bold;
     color: var(--primary-color);
     text-align: center;
-    margin: 2rem 0;
+    margin: 1.5rem 0;
+}
+
+.rank-section {
+    text-align: center;
+    margin: 1.5rem 0;
 }
 
 .rank-badge {
     display: inline-block;
-    padding: 1rem 2rem;
-    border-radius: 50px;
-    font-size: 1.5rem;
+    padding: 0.75rem 1.5rem;
+    border-radius: 25px;
+    font-size: 1.2rem;
     font-weight: bold;
-    margin: 1rem 0;
+    margin-bottom: 0.5rem;
 }
 
 .rank-1 { 
     background: #FFD700; 
     color: #1a1a1a; 
-    animation: pulseGold 2s infinite;
-    border: 3px solid #FFA500;
 }
 .rank-2 { 
     background: #C0C0C0; 
     color: #1a1a1a;
-    animation: pulseSilver 2s infinite;
-    border: 3px solid #A8A8A8;
 }
 .rank-3 { 
     background: #CD7F32; 
     color: white;
-    animation: pulseBronze 2s infinite;
-    border: 3px solid #B8860B;
 }
 .rank-other { 
     background: var(--primary-color); 
     color: white; 
-    border: 3px solid var(--secondary-color);
 }
 
-.celebration-badge {
-    position: relative;
-    box-shadow: 0 8px 30px rgba(255, 215, 0, 0.5);
+.participants-count {
+    color: #666;
+    font-size: 0.9rem;
 }
 
-@keyframes pulseGold {
-    0%, 100% { box-shadow: 0 8px 30px rgba(255, 215, 0, 0.5); transform: scale(1); }
-    50% { box-shadow: 0 12px 40px rgba(255, 215, 0, 0.8); transform: scale(1.05); }
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 1rem;
+    margin: 2rem 0;
 }
 
-@keyframes pulseSilver {
-    0%, 100% { box-shadow: 0 8px 30px rgba(192, 192, 192, 0.5); transform: scale(1); }
-    50% { box-shadow: 0 12px 40px rgba(192, 192, 192, 0.8); transform: scale(1.05); }
+.stat-card {
+    background: #f8f9fa;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 1rem;
+    text-align: center;
 }
 
-@keyframes pulseBronze {
-    0%, 100% { box-shadow: 0 8px 30px rgba(205, 127, 50, 0.5); transform: scale(1); }
-    50% { box-shadow: 0 12px 40px rgba(205, 127, 50, 0.8); transform: scale(1.05); }
+.stat-icon {
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.stat-value {
+    font-size: 1.3rem;
+    font-weight: bold;
+    color: var(--text-dark);
+    margin: 0.3rem 0;
+}
+
+.stat-label {
+    color: #666;
+    font-size: 0.85rem;
+}
+
+.stat-date {
+    color: #999;
+    font-size: 0.75rem;
+}
+
+@media (max-width: 768px) {
+    .result-card {
+        padding: 1.5rem;
+    }
+    
+    .score-display {
+        font-size: 2.5rem;
+    }
+    
+    .exam-title {
+        font-size: 1.2rem;
+    }
+    
+    .rank-badge {
+        font-size: 1rem;
+        padding: 0.6rem 1.2rem;
+    }
+    
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.75rem;
+    }
+    
+    .stat-value {
+        font-size: 1.1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .result-card {
+        padding: 1rem;
+    }
+    
+    .profile-photo, .profile-placeholder {
+        width: 60px;
+        height: 60px;
+        font-size: 1.5rem;
+    }
+    
+    .score-display {
+        font-size: 2rem;
+    }
 }
 </style>
 
 <div class="container" style="margin-top: 2rem; margin-bottom: 2rem;">
     <div class="result-card">
-        <h1 style="text-align: center; margin-bottom: 2rem;">🎉 Hasil Try Out</h1>
+        <h1 style="text-align: center; margin-bottom: 1.5rem; color: var(--primary-color);">🎉 Hasil Try Out</h1>
         
-        <div style="text-align: center;">
-            <div style="margin-bottom: 1.5rem;">
-                <?php if(!empty($user['profile_photo'])): ?>
+        <div class="profile-section">
+            <?php if(!empty($user['profile_photo'])): ?>
                 <img src="<?php echo url('storage/uploads/profiles/' . $user['profile_photo']); ?>" 
                      alt="<?php echo htmlspecialchars($user['full_name']); ?>" 
-                     style="width: 100px; height: 100px; border-radius: 50%; object-fit: cover; border: 4px solid var(--primary-color); box-shadow: 0 4px 15px rgba(139, 21, 56, 0.3);">
-                <?php else: ?>
-                <div style="width: 100px; height: 100px; border-radius: 50%; background: var(--primary-color); color: white; display: inline-flex; align-items: center; justify-content: center; font-weight: bold; font-size: 2.5rem; border: 4px solid var(--primary-color); box-shadow: 0 4px 15px rgba(139, 21, 56, 0.3);">
+                     class="profile-photo">
+            <?php else: ?>
+                <div class="profile-placeholder">
                     <?php echo strtoupper(substr($user['full_name'], 0, 1)); ?>
                 </div>
-                <?php endif; ?>
-                <div style="margin-top: 0.5rem; font-weight: 600; color: var(--text-dark);">
-                    <?php echo htmlspecialchars($user['full_name']); ?>
-                </div>
+            <?php endif; ?>
+            <div class="profile-name">
+                <?php echo htmlspecialchars($user['full_name']); ?>
             </div>
-            
-            <h2><?php echo htmlspecialchars($attempt['exam_title']); ?></h2>
-            
-            <div class="score-display">
-                <?php echo number_format($attempt['total_score'], 1); ?>
-            </div>
-            
-            <div style="margin: 2rem 0;">
-                <?php if ($rank == 1): ?>
-                    <div class="rank-badge rank-1 celebration-badge">🥇 Peringkat 1</div>
-                <?php elseif ($rank == 2): ?>
-                    <div class="rank-badge rank-2 celebration-badge">🥈 Peringkat 2</div>
-                <?php elseif ($rank == 3): ?>
-                    <div class="rank-badge rank-3 celebration-badge">🥉 Peringkat 3</div>
-                <?php else: ?>
-                    <div class="rank-badge rank-other">Peringkat <?php echo $rank; ?></div>
-                <?php endif; ?>
-                
-                <p style="margin-top: 1rem; color: #666;">
-                    dari <?php echo $total_participants; ?> peserta
-                </p>
-            </div>
-            
-            <?php if ($rank <= 3): ?>
-            <audio id="victorySound" autoplay>
-                <source src="<?php echo url('static/audio/victory.mp3'); ?>" type="audio/mpeg">
-            </audio>
+        </div>
+        
+        <h2 class="exam-title"><?php echo htmlspecialchars($attempt['exam_title']); ?></h2>
+        
+        <div class="score-display">
+            <?php echo number_format($attempt['total_score'], 1); ?>
+        </div>
+        
+        <div class="rank-section">
+            <?php if ($rank == 1): ?>
+                <div class="rank-badge rank-1">🥇 Peringkat 1</div>
+            <?php elseif ($rank == 2): ?>
+                <div class="rank-badge rank-2">🥈 Peringkat 2</div>
+            <?php elseif ($rank == 3): ?>
+                <div class="rank-badge rank-3">🥉 Peringkat 3</div>
+            <?php else: ?>
+                <div class="rank-badge rank-other">Peringkat <?php echo $rank; ?></div>
             <?php endif; ?>
             
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin: 2rem 0;">
-                <div class="card" style="text-align: center; padding: 1.5rem; background: #f8f9fa; border: 2px solid var(--primary-color);">
-                    <div style="font-size: 2rem; color: var(--primary-color);">📝</div>
-                    <div style="font-size: 1.5rem; font-weight: bold; color: var(--text-dark);"><?php echo $attempt['total_questions']; ?></div>
-                    <div style="color: #666;">Total Soal</div>
-                </div>
-                
-                <div class="card" style="text-align: center; padding: 1.5rem; background: #f8f9fa; border: 2px solid var(--primary-color);">
-                    <div style="font-size: 2rem; color: var(--primary-color);">▶️</div>
-                    <div style="font-size: 1.5rem; font-weight: bold; color: var(--text-dark);">
-                        <?php 
-                        $start_dt = new DateTime($attempt['started_at'], new DateTimeZone('Asia/Jakarta'));
-                        echo $start_dt->format('H:i');
-                        ?>
-                    </div>
-                    <div style="color: #666; font-size: 0.85rem;">
-                        <?php echo $start_dt->format('d/m/Y'); ?>
-                    </div>
-                    <div style="color: #666; margin-top: 0.3rem;">Waktu Mulai</div>
-                </div>
-                
-                <div class="card" style="text-align: center; padding: 1.5rem; background: #f8f9fa; border: 2px solid var(--primary-color);">
-                    <div style="font-size: 2rem; color: var(--primary-color);">⏹️</div>
-                    <div style="font-size: 1.5rem; font-weight: bold; color: var(--text-dark);">
-                        <?php 
-                        if ($attempt['finished_at']) {
-                            $end_dt = new DateTime($attempt['finished_at'], new DateTimeZone('Asia/Jakarta'));
-                            echo $end_dt->format('H:i');
-                        } else {
-                            echo '-';
-                        }
-                        ?>
-                    </div>
-                    <div style="color: #666; font-size: 0.85rem;">
-                        <?php echo $attempt['finished_at'] ? $end_dt->format('d/m/Y') : ''; ?>
-                    </div>
-                    <div style="color: #666; margin-top: 0.3rem;">Waktu Selesai</div>
-                </div>
-                
-                <div class="card" style="text-align: center; padding: 1.5rem; background: #f8f9fa; border: 2px solid var(--primary-color);">
-                    <div style="font-size: 2rem; color: var(--primary-color);">⏱️</div>
-                    <div style="font-size: 1.5rem; font-weight: bold; color: var(--text-dark);">
-                        <?php 
-                        if ($attempt['finished_at']) {
-                            $start = new DateTime($attempt['started_at']);
-                            $end = new DateTime($attempt['finished_at']);
-                            $diff = $start->diff($end);
-                            echo $diff->h . 'j ' . $diff->i . 'm';
-                        } else {
-                            echo '-';
-                        }
-                        ?>
-                    </div>
-                    <div style="color: #666;">Durasi Pengerjaan</div>
-                </div>
-                
-                <div class="card" style="text-align: center; padding: 1.5rem; background: #f8f9fa; border: 2px solid var(--primary-color);">
-                    <div style="font-size: 2rem;">
-                        <?php echo $attempt['cheating_warnings'] > 0 ? '⚠️' : '✅'; ?>
-                    </div>
-                    <div style="font-size: 1.5rem; font-weight: bold; color: var(--text-dark);">
-                        <?php echo $attempt['cheating_warnings']; ?>
-                    </div>
-                    <div style="color: #666;">Peringatan</div>
-                </div>
+            <div class="participants-count">
+                dari <?php echo $total_participants; ?> peserta
+            </div>
+        </div>
+            
+        <?php if ($rank <= 3): ?>
+        <audio id="victorySound" autoplay>
+            <source src="<?php echo url('static/audio/victory.mp3'); ?>" type="audio/mpeg">
+        </audio>
+        <?php endif; ?>
+        
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon">📝</div>
+                <div class="stat-value"><?php echo $attempt['total_questions']; ?></div>
+                <div class="stat-label">Total Soal</div>
             </div>
             
-            <?php if ($attempt['cheating_warnings'] > 0): ?>
-            <div style="background: #fff3cd; border: 1px solid #ffc107; border-radius: 8px; padding: 1rem; margin: 1rem 0;">
-                <strong>⚠️ Perhatian:</strong> Terdeteksi <?php echo $attempt['cheating_warnings']; ?> peringatan kecurangan selama ujian.
+            <div class="stat-card">
+                <div class="stat-icon">▶️</div>
+                <div class="stat-value">
+                    <?php 
+                    $start_dt = new DateTime($attempt['started_at'], new DateTimeZone('Asia/Jakarta'));
+                    echo $start_dt->format('H:i');
+                    ?>
+                </div>
+                <div class="stat-date"><?php echo $start_dt->format('d/m/Y'); ?></div>
+                <div class="stat-label">Waktu Mulai</div>
             </div>
-            <?php endif; ?>
+            
+            <div class="stat-card">
+                <div class="stat-icon">⏹️</div>
+                <div class="stat-value">
+                    <?php 
+                    if ($attempt['finished_at']) {
+                        $end_dt = new DateTime($attempt['finished_at'], new DateTimeZone('Asia/Jakarta'));
+                        echo $end_dt->format('H:i');
+                    } else {
+                        echo '-';
+                    }
+                    ?>
+                </div>
+                <div class="stat-date"><?php echo $attempt['finished_at'] ? $end_dt->format('d/m/Y') : ''; ?></div>
+                <div class="stat-label">Waktu Selesai</div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon">⏱️</div>
+                <div class="stat-value">
+                    <?php 
+                    if ($attempt['finished_at']) {
+                        $start = new DateTime($attempt['started_at']);
+                        $end = new DateTime($attempt['finished_at']);
+                        $diff = $start->diff($end);
+                        echo $diff->h . 'j ' . $diff->i . 'm';
+                    } else {
+                        echo '-';
+                    }
+                    ?>
+                </div>
+                <div class="stat-label">Durasi</div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <?php echo $attempt['cheating_warnings'] > 0 ? '⚠️' : '✅'; ?>
+                </div>
+                <div class="stat-value"><?php echo $attempt['cheating_warnings']; ?></div>
+                <div class="stat-label">Peringatan</div>
+            </div>
+        </div>
+            
+        <?php if ($attempt['cheating_warnings'] > 0): ?>
+        <div style="background: #fff3cd; border: 1px solid #ffc107; border-radius: 8px; padding: 1rem; margin: 1rem 0; text-align: center;">
+            <strong>⚠️ Perhatian:</strong> Terdeteksi <?php echo $attempt['cheating_warnings']; ?> peringatan kecurangan selama ujian.
+        </div>
+        <?php endif; ?>
             
             <?php if ($is_second_attempt && !empty($questions_with_answers)): ?>
             <div style="margin-top: 2rem;">
@@ -325,16 +424,15 @@ include '../../app/Views/includes/navbar.php';
                 </div>
                 <?php endforeach; ?>
             </div>
-            <?php endif; ?>
-            
-            <div style="margin-top: 2rem;">
-                <a href="<?php echo url('student/exams.php'); ?>" class="btn btn-primary">
-                    📚 Kembali ke Daftar TO
-                </a>
-                <a href="<?php echo url('leaderboards.php'); ?>" class="btn btn-secondary">
-                    🏆 Lihat Peringkat
-                </a>
-            </div>
+        <?php endif; ?>
+        
+        <div style="margin-top: 2rem; text-align: center; display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+            <a href="<?php echo url('student/exams.php'); ?>" class="btn btn-primary">
+                📚 Kembali ke Daftar TO
+            </a>
+            <a href="<?php echo url('leaderboards.php'); ?>" class="btn btn-secondary">
+                🏆 Lihat Peringkat
+            </a>
         </div>
     </div>
 </div>
