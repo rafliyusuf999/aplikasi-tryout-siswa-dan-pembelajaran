@@ -84,23 +84,27 @@ include '../../app/Views/includes/navbar.php';
 }
 
 .rank-1 { 
-    background: linear-gradient(135deg, #FFD700, #FFA500); 
-    color: white; 
+    background: #FFD700; 
+    color: #1a1a1a; 
     animation: pulseGold 2s infinite;
+    border: 3px solid #FFA500;
 }
 .rank-2 { 
-    background: linear-gradient(135deg, #C0C0C0, #A8A8A8); 
-    color: white;
+    background: #C0C0C0; 
+    color: #1a1a1a;
     animation: pulseSilver 2s infinite;
+    border: 3px solid #A8A8A8;
 }
 .rank-3 { 
-    background: linear-gradient(135deg, #CD7F32, #B8860B); 
+    background: #CD7F32; 
     color: white;
     animation: pulseBronze 2s infinite;
+    border: 3px solid #B8860B;
 }
 .rank-other { 
-    background: linear-gradient(135deg, #6c757d, #5a6268); 
+    background: var(--primary-color); 
     color: white; 
+    border: 3px solid var(--secondary-color);
 }
 
 .celebration-badge {
@@ -129,6 +133,21 @@ include '../../app/Views/includes/navbar.php';
         <h1 style="text-align: center; margin-bottom: 2rem;">🎉 Hasil Try Out</h1>
         
         <div style="text-align: center;">
+            <div style="margin-bottom: 1.5rem;">
+                <?php if(!empty($user['profile_photo'])): ?>
+                <img src="<?php echo url('storage/uploads/profiles/' . $user['profile_photo']); ?>" 
+                     alt="<?php echo htmlspecialchars($user['full_name']); ?>" 
+                     style="width: 100px; height: 100px; border-radius: 50%; object-fit: cover; border: 4px solid var(--primary-color); box-shadow: 0 4px 15px rgba(139, 21, 56, 0.3);">
+                <?php else: ?>
+                <div style="width: 100px; height: 100px; border-radius: 50%; background: var(--primary-color); color: white; display: inline-flex; align-items: center; justify-content: center; font-weight: bold; font-size: 2.5rem; border: 4px solid var(--primary-color); box-shadow: 0 4px 15px rgba(139, 21, 56, 0.3);">
+                    <?php echo strtoupper(substr($user['full_name'], 0, 1)); ?>
+                </div>
+                <?php endif; ?>
+                <div style="margin-top: 0.5rem; font-weight: 600; color: var(--text-dark);">
+                    <?php echo htmlspecialchars($user['full_name']); ?>
+                </div>
+            </div>
+            
             <h2><?php echo htmlspecialchars($attempt['exam_title']); ?></h2>
             
             <div class="score-display">
@@ -158,17 +177,17 @@ include '../../app/Views/includes/navbar.php';
             <?php endif; ?>
             
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin: 2rem 0;">
-                <div class="card" style="text-align: center; padding: 1.5rem;">
+                <div class="card" style="text-align: center; padding: 1.5rem; background: #f8f9fa; border: 2px solid var(--primary-color);">
                     <div style="font-size: 2rem; color: var(--primary-color);">📝</div>
-                    <div style="font-size: 1.5rem; font-weight: bold;"><?php echo $attempt['total_questions']; ?></div>
+                    <div style="font-size: 1.5rem; font-weight: bold; color: var(--text-dark);"><?php echo $attempt['total_questions']; ?></div>
                     <div style="color: #666;">Total Soal</div>
                 </div>
                 
-                <div class="card" style="text-align: center; padding: 1.5rem;">
+                <div class="card" style="text-align: center; padding: 1.5rem; background: #f8f9fa; border: 2px solid var(--primary-color);">
                     <div style="font-size: 2rem; color: var(--primary-color);">▶️</div>
-                    <div style="font-size: 1.2rem; font-weight: bold;">
+                    <div style="font-size: 1.5rem; font-weight: bold; color: var(--text-dark);">
                         <?php 
-                        $start_dt = new DateTime($attempt['started_at']);
+                        $start_dt = new DateTime($attempt['started_at'], new DateTimeZone('Asia/Jakarta'));
                         echo $start_dt->format('H:i');
                         ?>
                     </div>
@@ -178,12 +197,12 @@ include '../../app/Views/includes/navbar.php';
                     <div style="color: #666; margin-top: 0.3rem;">Waktu Mulai</div>
                 </div>
                 
-                <div class="card" style="text-align: center; padding: 1.5rem;">
+                <div class="card" style="text-align: center; padding: 1.5rem; background: #f8f9fa; border: 2px solid var(--primary-color);">
                     <div style="font-size: 2rem; color: var(--primary-color);">⏹️</div>
-                    <div style="font-size: 1.2rem; font-weight: bold;">
+                    <div style="font-size: 1.5rem; font-weight: bold; color: var(--text-dark);">
                         <?php 
                         if ($attempt['finished_at']) {
-                            $end_dt = new DateTime($attempt['finished_at']);
+                            $end_dt = new DateTime($attempt['finished_at'], new DateTimeZone('Asia/Jakarta'));
                             echo $end_dt->format('H:i');
                         } else {
                             echo '-';
@@ -196,9 +215,9 @@ include '../../app/Views/includes/navbar.php';
                     <div style="color: #666; margin-top: 0.3rem;">Waktu Selesai</div>
                 </div>
                 
-                <div class="card" style="text-align: center; padding: 1.5rem;">
+                <div class="card" style="text-align: center; padding: 1.5rem; background: #f8f9fa; border: 2px solid var(--primary-color);">
                     <div style="font-size: 2rem; color: var(--primary-color);">⏱️</div>
-                    <div style="font-size: 1.5rem; font-weight: bold;">
+                    <div style="font-size: 1.5rem; font-weight: bold; color: var(--text-dark);">
                         <?php 
                         if ($attempt['finished_at']) {
                             $start = new DateTime($attempt['started_at']);
@@ -213,11 +232,11 @@ include '../../app/Views/includes/navbar.php';
                     <div style="color: #666;">Durasi Pengerjaan</div>
                 </div>
                 
-                <div class="card" style="text-align: center; padding: 1.5rem;">
+                <div class="card" style="text-align: center; padding: 1.5rem; background: #f8f9fa; border: 2px solid var(--primary-color);">
                     <div style="font-size: 2rem;">
                         <?php echo $attempt['cheating_warnings'] > 0 ? '⚠️' : '✅'; ?>
                     </div>
-                    <div style="font-size: 1.5rem; font-weight: bold;">
+                    <div style="font-size: 1.5rem; font-weight: bold; color: var(--text-dark);">
                         <?php echo $attempt['cheating_warnings']; ?>
                     </div>
                     <div style="color: #666;">Peringatan</div>

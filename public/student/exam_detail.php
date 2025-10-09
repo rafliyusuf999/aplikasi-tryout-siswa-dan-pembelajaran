@@ -659,20 +659,23 @@ document.addEventListener('DOMContentLoaded', function() {
     updateNavigation();
     setupScrollTracking();
     
-    showSecurityWarningModal(() => {
-        examTimer = new ExamTimer(<?php echo max(1, $remaining); ?>, handleTimeUp);
-        examTimer.startRealtime('timer-display');
-        
-        antiCheat = new AntiCheat(
-            handleCheatingWarning,
-            '<?php echo url('logout.php'); ?>',
-            null,
-            <?php echo $attempt['id']; ?>
-        );
-        antiCheat.enable();
-        
-        setInterval(autoSave, 60000);
-    });
+    showSecurityWarningModal(
+        function() {
+            examTimer = new ExamTimer(<?php echo max(1, $remaining); ?>, handleTimeUp);
+            examTimer.startRealtime('timer-display');
+            
+            antiCheat = new AntiCheat(
+                handleCheatingWarning,
+                '<?php echo url('logout.php'); ?>',
+                null,
+                <?php echo $attempt['id']; ?>
+            );
+            antiCheat.enable();
+            
+            setInterval(autoSave, 60000);
+        },
+        <?php echo $exam['duration_minutes']; ?>
+    );
 });
 
 function scrollToQuestion(questionNum) {

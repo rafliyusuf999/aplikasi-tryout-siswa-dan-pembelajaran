@@ -381,13 +381,23 @@ class AntiCheat {
 
 let securityWarningCallback = null;
 
-function showSecurityWarningModal(callback) {
+function showSecurityWarningModal(callback, durationMinutes = null) {
     securityWarningCallback = callback;
     
     const modal = document.createElement('div');
     modal.id = 'securityWarningModal';
     modal.className = 'modal';
     modal.style.display = 'block';
+    
+    const durationHtml = durationMinutes ? `
+        <div style="background: linear-gradient(135deg, #8B1538 0%, #C94060 100%); color: white; padding: 15px; border-radius: 8px; margin-bottom: 20px; text-align: center;">
+            <div style="font-size: 2.5rem; margin-bottom: 0.5rem;">⏱️</div>
+            <div style="font-size: 1.1rem; font-weight: bold; margin-bottom: 0.3rem;">Durasi Ujian</div>
+            <div style="font-size: 2rem; font-weight: bold;">${durationMinutes} Menit</div>
+            <div style="font-size: 0.9rem; opacity: 0.9; margin-top: 0.3rem;">Waktu akan berjalan setelah Anda setuju</div>
+        </div>
+    ` : '';
+    
     modal.innerHTML = `
         <div class="modal-content" style="max-width: 600px; margin: 20px auto; max-height: 90vh; overflow-y: auto;">
             <div class="modal-header" style="background: linear-gradient(135deg, #dc3545 0%, #c82333 100%); color: white; padding: 20px;">
@@ -395,6 +405,7 @@ function showSecurityWarningModal(callback) {
                 <p style="margin: 8px 0 0 0; font-size: 0.9rem; text-align: center; opacity: 0.95;">Proteksi copy-paste, screenshot, dan pindah tab selama ujian</p>
             </div>
             <div class="modal-body" style="padding: 25px;">
+                ${durationHtml}
                 <div style="text-align: left; line-height: 1.8;">
                     <h3 style="color: #dc3545; margin-bottom: 20px; font-size: 1.2rem;">⚠️ Peraturan Selama Ujian:</h3>
                     <ul style="list-style: none; padding: 0;">
@@ -546,10 +557,7 @@ class ExamTimer {
 
             if (this.remaining <= 0) {
                 this.stop();
-                alert('⏰ WAKTU HABIS!\n\nUjian akan otomatis diselesaikan dan Anda akan keluar.');
-                if (this.onTimeUp) {
-                    this.onTimeUp();
-                }
+                this.showTimeUpNotification();
             }
         }, 1000);
     }
@@ -563,6 +571,78 @@ class ExamTimer {
             clearInterval(this.interval);
             this.interval = null;
         }
+    }
+
+    showTimeUpNotification() {
+        const notification = document.createElement('div');
+        notification.id = 'timeUpNotification';
+        notification.innerHTML = `
+            <div style="
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                background: linear-gradient(135deg, #8B1538 0%, #C94060 100%);
+                color: white;
+                padding: 2.5rem 3rem;
+                border-radius: 20px;
+                box-shadow: 0 20px 60px rgba(139, 21, 56, 0.5);
+                z-index: 10000;
+                text-align: center;
+                animation: fadeInScale 0.3s ease-out;
+                min-width: 350px;
+            ">
+                <div style="font-size: 4rem; margin-bottom: 1rem;">⏰</div>
+                <div style="font-size: 1.8rem; font-weight: bold; margin-bottom: 1rem;">WAKTU HABIS!</div>
+                <div style="font-size: 1.1rem; opacity: 0.95;">Ujian akan otomatis diselesaikan...</div>
+                <div id="countdown" style="font-size: 3rem; font-weight: bold; margin-top: 1rem;">3</div>
+            </div>
+            <div style="
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.7);
+                z-index: 9999;
+                animation: fadeIn 0.3s ease-out;
+            "></div>
+        `;
+
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes fadeInScale {
+                from {
+                    opacity: 0;
+                    transform: translate(-50%, -50%) scale(0.8);
+                }
+                to {
+                    opacity: 1;
+                    transform: translate(-50%, -50%) scale(1);
+                }
+            }
+            @keyframes fadeIn {
+                from { opacity: 0; }
+                to { opacity: 1; }
+            }
+        `;
+        document.head.appendChild(style);
+        document.body.appendChild(notification);
+
+        let countdown = 3;
+        const countdownElement = notification.querySelector('#countdown');
+        
+        const countdownInterval = setInterval(() => {
+            countdown--;
+            if (countdown > 0) {
+                countdownElement.textContent = countdown;
+            } else {
+                clearInterval(countdownInterval);
+                if (this.onTimeUp) {
+                    this.onTimeUp();
+                }
+            }
+        }, 1000);
     }
 }
 
