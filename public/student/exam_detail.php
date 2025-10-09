@@ -511,7 +511,7 @@ body {
     <div class="exam-container">
         <div class="questions-section">
             <h1><?php echo htmlspecialchars($exam['title']); ?></h1>
-            <p style="color: rgba(255,255,255,0.9); margin-bottom: 1.5rem;"><?php echo htmlspecialchars($exam['description']); ?></p>
+            <p style="color: #1a1a1a; margin-bottom: 1.5rem;"><?php echo htmlspecialchars($exam['description']); ?></p>
             
             <form method="POST" id="examForm">
                 <?php echo csrf(); ?>
