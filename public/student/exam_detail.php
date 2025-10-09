@@ -309,8 +309,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-$started_at = new DateTime($attempt['started_at']);
-$now = new DateTime();
+$started_at = new DateTime($attempt['started_at'], new DateTimeZone('UTC'));
+$now = new DateTime('now', new DateTimeZone('UTC'));
 $elapsed = $now->getTimestamp() - $started_at->getTimestamp();
 $remaining = ($exam['duration_minutes'] * 60) - $elapsed;
 

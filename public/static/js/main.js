@@ -42,21 +42,21 @@ class LogoAnimation {
                 const x = centerX + Math.cos(node.currentAngle) * radius;
                 const y = centerY + Math.sin(node.currentAngle) * radius;
 
-                ctx.strokeStyle = 'rgba(139, 21, 56, 0.3)';
+                ctx.strokeStyle = 'rgba(59, 130, 246, 0.3)';
                 ctx.lineWidth = 1;
                 ctx.beginPath();
                 ctx.moveTo(centerX, centerY);
                 ctx.lineTo(x, y);
                 ctx.stroke();
 
-                ctx.fillStyle = '#8B1538';
+                ctx.fillStyle = '#3B82F6';
                 ctx.beginPath();
                 ctx.arc(x, y, 3 + node.pulse, 0, Math.PI * 2);
                 ctx.fill();
             });
 
-            ctx.fillStyle = '#8B1538';
-            ctx.strokeStyle = '#A52A4A';
+            ctx.fillStyle = '#3B82F6';
+            ctx.strokeStyle = '#60A5FA';
             ctx.lineWidth = 2;
             const boxSize = 20;
             ctx.fillRect(centerX - boxSize / 2, centerY - boxSize / 2, boxSize, boxSize);
@@ -395,7 +395,7 @@ function showSecurityWarningModal(callback, durationMinutes = null) {
     modal.style.display = 'block';
     
     const durationHtml = durationMinutes ? `
-        <div style="background: linear-gradient(135deg, #8B1538 0%, #C94060 100%); color: white; padding: 15px; border-radius: 8px; margin-bottom: 20px; text-align: center;">
+        <div style="background: linear-gradient(135deg, #3B82F6 0%, #60A5FA 100%); color: white; padding: 15px; border-radius: 8px; margin-bottom: 20px; text-align: center;">
             <div style="font-size: 2.5rem; margin-bottom: 0.5rem;">⏱️</div>
             <div style="font-size: 1.1rem; font-weight: bold; margin-bottom: 0.3rem;">Durasi Ujian</div>
             <div style="font-size: 2rem; font-weight: bold;">${durationMinutes} Menit</div>
@@ -587,11 +587,11 @@ class ExamTimer {
                 top: 50%;
                 left: 50%;
                 transform: translate(-50%, -50%);
-                background: linear-gradient(135deg, #8B1538 0%, #C94060 100%);
+                background: linear-gradient(135deg, #3B82F6 0%, #60A5FA 100%);
                 color: white;
                 padding: 2.5rem 3rem;
                 border-radius: 20px;
-                box-shadow: 0 20px 60px rgba(139, 21, 56, 0.5);
+                box-shadow: 0 20px 60px rgba(59, 130, 246, 0.5);
                 z-index: 10000;
                 text-align: center;
                 animation: fadeInScale 0.3s ease-out;

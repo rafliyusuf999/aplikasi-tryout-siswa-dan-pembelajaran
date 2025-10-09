@@ -1,14 +1,14 @@
 :root {
-    --primary-color: #8B1538;
-    --secondary-color: #A52A4A;
-    --accent-color: #C94060;
-    --dark-color: #4A0E1F;
-    --light-color: #FFE5EC;
-    --text-dark: #2C1810;
+    --primary-color: #60A5FA;
+    --secondary-color: #3B82F6;
+    --accent-color: #93C5FD;
+    --dark-color: #1E40AF;
+    --light-color: #EFF6FF;
+    --text-dark: #1E3A8A;
     --text-light: #FFFFFF;
-    --shadow: 0 4px 20px rgba(139, 21, 56, 0.15);
-    --shadow-hover: 0 8px 35px rgba(139, 21, 56, 0.25);
-    --shadow-active: 0 12px 45px rgba(139, 21, 56, 0.35);
+    --shadow: 0 4px 20px rgba(59, 130, 246, 0.15);
+    --shadow-hover: 0 8px 35px rgba(59, 130, 246, 0.25);
+    --shadow-active: 0 12px 45px rgba(59, 130, 246, 0.35);
 }
 
 * {
@@ -19,8 +19,8 @@
 
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: #0f0c29;
-    background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+    background: #E0F2FE;
+    background: linear-gradient(135deg, #E0F2FE, #BAE6FD, #7DD3FC);
     color: var(--text-dark);
     min-height: 100vh;
     position: relative;
@@ -35,9 +35,9 @@ body::before {
     width: 100%;
     height: 100%;
     background: 
-        radial-gradient(circle at 20% 50%, rgba(139, 21, 56, 0.3) 0%, transparent 50%),
-        radial-gradient(circle at 80% 80%, rgba(165, 42, 74, 0.3) 0%, transparent 50%),
-        radial-gradient(circle at 40% 20%, rgba(201, 64, 96, 0.2) 0%, transparent 50%);
+        radial-gradient(circle at 20% 50%, rgba(96, 165, 250, 0.3) 0%, transparent 50%),
+        radial-gradient(circle at 80% 80%, rgba(59, 130, 246, 0.3) 0%, transparent 50%),
+        radial-gradient(circle at 40% 20%, rgba(147, 197, 253, 0.2) 0%, transparent 50%);
     animation: gradientShift 15s ease infinite;
     z-index: -1;
 }
@@ -57,7 +57,7 @@ body::before {
 }
 
 .navbar {
-    background: rgba(139, 21, 56, 0.95);
+    background: rgba(59, 130, 246, 0.95);
     backdrop-filter: blur(10px);
     padding: 1rem 0;
     box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
@@ -196,7 +196,7 @@ body::before {
     backdrop-filter: blur(10px);
     border-radius: 20px;
     border: 1px solid rgba(255, 255, 255, 0.2);
-    box-shadow: 0 8px 32px 0 rgba(139, 21, 56, 0.37);
+    box-shadow: 0 8px 32px 0 rgba(59, 130, 246, 0.37);
     margin-bottom: 3rem;
     position: relative;
     overflow: hidden;
@@ -224,7 +224,7 @@ body::before {
     color: #ffffff;
     margin-bottom: 1rem;
     animation: fadeInDown 0.8s ease;
-    text-shadow: 0 0 20px rgba(139, 21, 56, 0.8), 0 0 40px rgba(165, 42, 74, 0.6);
+    text-shadow: 0 0 20px rgba(59, 130, 246, 0.8), 0 0 40px rgba(96, 165, 250, 0.6);
     position: relative;
     z-index: 1;
 }
@@ -258,7 +258,7 @@ body::before {
 
 .btn-primary:hover {
     opacity: 0.9;
-    box-shadow: 0 4px 12px rgba(139, 21, 56, 0.3);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
 }
 
 .btn-secondary {
@@ -339,14 +339,14 @@ body::before {
 
 .card:hover {
     transform: translateY(-8px) scale(1.02);
-    box-shadow: 0 12px 40px 0 rgba(139, 21, 56, 0.5);
-    border-color: rgba(139, 21, 56, 0.5);
+    box-shadow: 0 12px 40px 0 rgba(59, 130, 246, 0.5);
+    border-color: rgba(59, 130, 246, 0.5);
 }
 
 .card h2 {
     color: #ffffff;
     margin-bottom: 1rem;
-    text-shadow: 0 0 10px rgba(139, 21, 56, 0.5);
+    text-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
 }
 
 .stats-grid {
@@ -357,9 +357,9 @@ body::before {
 }
 
 .stat-card {
-    background: rgba(139, 21, 56, 0.3);
+    background: rgba(59, 130, 246, 0.3);
     backdrop-filter: blur(10px);
-    border: 2px solid rgba(139, 21, 56, 0.5);
+    border: 2px solid rgba(59, 130, 246, 0.5);
     color: white;
     padding: 2.5rem 2rem;
     border-radius: 20px;
@@ -377,7 +377,7 @@ body::before {
     left: -50%;
     width: 200%;
     height: 200%;
-    background: linear-gradient(45deg, transparent, rgba(139, 21, 56, 0.5), transparent);
+    background: linear-gradient(45deg, transparent, rgba(59, 130, 246, 0.5), transparent);
     transform: rotate(0deg);
     transition: transform 0.8s ease;
 }
@@ -388,9 +388,9 @@ body::before {
 
 .stat-card:hover {
     transform: translateY(-15px) scale(1.08);
-    box-shadow: 0 20px 60px rgba(139, 21, 56, 0.6);
-    border-color: rgba(201, 64, 96, 0.8);
-    background: rgba(139, 21, 56, 0.5);
+    box-shadow: 0 20px 60px rgba(59, 130, 246, 0.6);
+    border-color: rgba(96, 165, 250, 0.8);
+    background: rgba(59, 130, 246, 0.5);
 }
 
 .stat-icon {
@@ -460,7 +460,7 @@ select.form-control option {
 .form-control:focus {
     outline: none;
     border-color: var(--primary-color);
-    box-shadow: 0 0 0 4px rgba(139, 21, 56, 0.15);
+    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15);
     transform: translateY(-2px);
     background: rgba(255, 255, 255, 0.15);
 }
@@ -478,7 +478,7 @@ select.form-control option {
 }
 
 .table th {
-    background: rgba(139, 21, 56, 0.6);
+    background: rgba(59, 130, 246, 0.6);
     color: white;
     padding: 1rem;
     text-align: left;
@@ -496,7 +496,7 @@ select.form-control option {
 }
 
 .table tr:hover {
-    background: rgba(139, 21, 56, 0.3);
+    background: rgba(59, 130, 246, 0.3);
     transform: translateX(5px);
 }
 
@@ -604,7 +604,7 @@ select.form-control option {
     color: white;
     padding: 1.5rem;
     border-radius: 15px;
-    box-shadow: 0 8px 25px rgba(139, 21, 56, 0.3);
+    box-shadow: 0 8px 25px rgba(59, 130, 246, 0.3);
     font-size: 1.5rem;
     font-weight: bold;
     z-index: 1000;
@@ -664,7 +664,7 @@ select.form-control option {
 
 .leaderboard-item:hover {
     transform: translateX(10px);
-    box-shadow: 0 4px 20px rgba(139, 21, 56, 0.15);
+    box-shadow: 0 4px 20px rgba(59, 130, 246, 0.15);
 }
 
 .rank-badge {
@@ -786,12 +786,12 @@ select.form-control option {
     }
     
     .navbar {
-        background: rgba(139, 21, 56, 1);
+        background: rgba(59, 130, 246, 1);
     }
     
     .stat-card {
-        background: linear-gradient(135deg, rgba(139, 21, 56, 0.85) 0%, rgba(165, 42, 74, 0.85) 100%);
-        border: 2px solid rgba(139, 21, 56, 0.9);
+        background: linear-gradient(135deg, rgba(59, 130, 246, 0.85) 0%, rgba(96, 165, 250, 0.85) 100%);
+        border: 2px solid rgba(59, 130, 246, 0.9);
     }
     
     .card {
@@ -953,12 +953,12 @@ select.form-control option {
 
 @media (max-width: 480px) {
     .navbar {
-        background: #8B1538;
+        background: #3B82F6;
     }
     
     .stat-card {
-        background: linear-gradient(135deg, #8B1538 0%, #A52A4A 100%);
-        border: 2px solid #8B1538;
+        background: linear-gradient(135deg, #60A5FA 0%, #3B82F6 100%);
+        border: 2px solid #60A5FA;
     }
     
     .navbar-brand {
@@ -1317,10 +1317,10 @@ select.form-control option {
 
 @keyframes glow {
     0%, 100% {
-        box-shadow: 0 0 5px rgba(139, 21, 56, 0.5);
+        box-shadow: 0 0 5px rgba(59, 130, 246, 0.5);
     }
     50% {
-        box-shadow: 0 0 20px rgba(139, 21, 56, 0.8);
+        box-shadow: 0 0 20px rgba(59, 130, 246, 0.8);
     }
 }
 
