@@ -2,14 +2,7 @@
 
 ## Overview
 
-INSPIRANET OFFICIAL TO is an online exam platform designed for high school students (grades 10-12 and alumni) preparing for UTBK (Indonesia's university entrance exam). The platform provides secure, fair online testing across multiple branches with comprehensive anti-cheating measures and branch-based leaderboards.
-
-**Core Purpose:** Deliver a trustworthy online testing platform with strict anti-cheating protections, fair competition through branch-separated leaderboards, and comprehensive exam management for administrators and teachers.
-
-**Target Users:** 
-- Students (grades 10, 11, 12, and alumni)
-- Teachers (exam creators)
-- Administrators (system managers)
+INSPIRANET OFFICIAL TO is an online exam platform for high school students (grades 10-12 and alumni) preparing for Indonesia's UTBK university entrance exam. It provides secure, fair online testing with comprehensive anti-cheating measures and branch-based leaderboards, aiming to deliver a trustworthy platform with fair competition and efficient exam management.
 
 ## User Preferences
 
@@ -18,216 +11,72 @@ Preferred communication style: Simple, everyday language.
 ## System Architecture
 
 ### Web Framework & Backend
-- **PHP** - Native PHP untuk backend dan server-side logic
-- **MySQL/PDO** - Database dengan prepared statements untuk security
-- **PHP Session** - Native session management dengan security hardening
-- **BCrypt** - Password hashing dengan cost 12
-
-**Design Rationale:** PHP native cocok untuk shared hosting, mudah di-deploy, dan mendukung semua fitur yang dibutuhkan tanpa dependency kompleks.
+- **PHP** for server-side logic.
+- **PDO** for database interaction with prepared statements.
+- **PHP Session** for native session management with security hardening.
+- **BCrypt** for password hashing (cost 12).
+- **Design Rationale:** Native PHP is chosen for ease of deployment on shared hosting and minimal dependencies.
 
 ### Database Schema
-- **MySQL** - Production-ready database dengan InnoDB engine
-- **Core Tables:**
-  - `users` - Multi-role system (admin, teacher, student) dengan branch assignment dan profile photo
-  - `exams` - Metadata TO termasuk premium status dan pricing
-  - `questions` - Soal multiple-choice dan essay dengan foto
-  - `exam_attempts` - Tracking submissions, cheating warnings, dan essay answers (JSON)
-  - `payments` - Payment processing dengan admin approval
-  - `leaderboards` - Dual ranking (branch-specific dan global)
-  - `payment_settings` - QRIS image, payment instructions, bank account details
-
-**Design Rationale:** MySQL cocok untuk shared hosting, mendukung concurrent access, dan memiliki foreign key constraints dengan cascade delete. PDO prepared statements memastikan security dari SQL injection.
+- **PostgreSQL** as the primary database.
+- **Core Tables:** `users` (multi-role), `exams` (metadata, premium status), `questions` (multiple-choice, essay), `exam_attempts` (submissions, cheating warnings), `payments` (processing, admin approval), `leaderboards` (branch-specific and global), `payment_settings` (QRIS, instructions).
+- **Design Rationale:** PostgreSQL for production readiness, concurrent access, and foreign key constraints.
 
 ### Authentication & Authorization
-- Role-based access control (RBAC) with three user types:
-  - **Admin:** Full system control, user management, payment approval, question management
-  - **Teacher:** Exam creation, question management untuk TO sendiri, view hasil siswa
-  - **Student:** Exam participation, payment submission, leaderboard access, profile management
-- **PHP Session Management dengan Security Hardening:**
-  - Session regeneration saat login (prevent session fixation)
-  - Session token untuk extra security
-  - IP address validation (detect session hijacking)
-  - Secure cookie settings (httponly, samesite=Lax, secure on HTTPS)
-- **CSRF Protection:**
-  - CSRF token di semua form POST
-  - Verification sebelum proses data
-- **Password Security:**
-  - BCrypt hashing dengan cost 12
-  - password_hash() dan password_verify()
-
-**Design Rationale:** PHP native session dengan hardening lengkap, CSRF protection di semua form, dan strong password hashing memastikan aplikasi aman dari common web vulnerabilities.
+- **Role-Based Access Control (RBAC)** with Admin, Teacher, and Student roles.
+- **PHP Native Session Management:** Includes session regeneration, token validation, IP address validation, and secure cookie settings.
+- **CSRF Protection:** CSRF tokens on all POST forms.
+- **Password Security:** BCrypt hashing using `password_hash()` and `password_verify()`.
+- **Design Rationale:** Comprehensive native PHP security features protect against common web vulnerabilities.
 
 ### Branch Competition System
-- **4 Branches:** Inspiranet_Cakrawala 1-4
-- **Dual Leaderboard Architecture:**
-  - Branch-specific rankings for fair local competition
-  - Global rankings across all branches
-- Students assigned to specific branches during registration
-
-**Design Rationale:** Separate branch leaderboards ensure fair competition within smaller groups while global leaderboards provide overall achievement visibility. This increases motivation through achievable local rankings.
+- Supports **4 distinct branches** (Inspiranet_Cakrawala 1-4).
+- **Dual Leaderboards:** Branch-specific for local competition and global for overall ranking.
+- **Design Rationale:** Fosters motivation through fair competition within smaller groups and visible overall achievement.
 
 ### Anti-Cheating Architecture
-- **Enhanced Security Measures:**
-  - Auto-logout on copy attempt (immediate session termination)
-  - Auto-restart exam on tab/window switching (all answers cleared)
-  - Security warning modal before exam start (explains rules)
-  - Screenshot blocking and right-click prevention
-  - Real-time timer enforcement
-  - Cheating warnings tracked per exam attempt
-
-**Design Rationale:** Multi-layered client-side protection with strict enforcement (auto-logout and auto-restart) creates strong barriers to common cheating methods. Security modal ensures students are aware of consequences before starting.
+- **Client-Side Protections:** Auto-logout on copy attempt, auto-restart exam on tab/window switching (clears answers), security warning modal, screenshot blocking, right-click prevention.
+- **Real-time Timer Enforcement:** Strict time limits.
+- **Tracking:** Cheating warnings logged per exam attempt.
+- **Design Rationale:** Multi-layered client-side enforcement creates strong barriers against common cheating methods.
 
 ### Payment & Premium Content
-- Two-tier exam system: Free and Premium
-- **Dual Payment Workflows:**
-  1. **Student-Initiated:** Student uploads payment proof → Admin reviews and approves/rejects → Access granted
-  2. **Admin-Initiated:** Admin directly creates approved payment for any student and premium exam
-- **Payment Settings Management:**
-  - Admin can configure QRIS payment image
-  - Customizable payment instructions and bank account details
-  - Settings displayed dynamically on student payment page
-- File upload handling with Werkzeug's secure_filename
-
-**Design Rationale:** Flexible payment system supports both student uploads and direct admin management for scholarships or special cases. Configurable payment settings eliminate hardcoded payment details and allow easy updates via admin interface.
+- Supports **Free and Premium exams**.
+- **Dual Payment Workflows:** Student-initiated (upload proof, admin approval) and Admin-initiated (direct approval).
+- **Configurable Payment Settings:** Admin can upload QRIS images and set bank details.
+- **File Upload Handling:** Secure filename processing for payment proofs.
+- **Design Rationale:** Flexible system accommodates various payment scenarios and customizable payment information.
 
 ### Frontend Architecture
-- **PHP Templates** - Server-side rendering dengan include system
-- **Custom CSS** dengan CSS variables untuk theming dan responsive design
-- **Vanilla JavaScript** untuk interactivity, anti-cheat enforcement, dan async file uploads
-- **Fully Responsive Design** using CSS Grid dan Flexbox:
-  - Desktop: 1024px and above
-  - Tablet: 768px - 1023px
-  - Mobile: Below 768px
-- **Enhanced User Interface:**
-  - Navbar dengan profile photo dan user name
-  - Profile management page untuk semua user
-  - Countdown timer dengan format HH:MM:SS
-  - Visual question status indicators (grey=unanswered, green=answered, yellow=doubtful)
-  - Leaderboard dengan trophy icons untuk top 3
-  - Combined highest score dari premium dan free exams
-
-**Design Rationale:** PHP includes untuk reusable components (header, navbar, footer). Vanilla JS mengurangi dependency. Responsive design optimal untuk semua device.
+- **PHP Templates:** Server-side rendering with an include system.
+- **Custom CSS:** With CSS variables for theming and responsive design (light blue theme).
+- **Vanilla JavaScript:** For interactivity, anti-cheat enforcement, and async operations.
+- **Fully Responsive Design:** Optimized for desktop, tablet, and mobile using CSS Grid and Flexbox.
+- **Enhanced UI Elements:** Profile photo in navbar, countdown timer (HH:MM:SS), visual question status (grey=unanswered, green=answered, yellow=doubtful), leaderboard with trophy icons, combined highest scores.
+- **Design Rationale:** PHP includes for modularity, vanilla JS for performance, and responsive design for broad device compatibility. A consistent light blue theme enhances readability and user experience.
 
 ### File Structure
-- `config/` - Konfigurasi aplikasi
-  - `database.php` - PDO database connection
-  - `auth.php` - Session management & authentication helpers
-  - `helpers.php` - Utility functions (flash, upload, sanitize, dll)
-  - `config.php` - Main config dengan session hardening
-  - `schema.sql` - MySQL database schema
-- `app/Views/includes/` - Reusable template components
-  - `header.php` - HTML head dan opening tags
-  - `navbar.php` - Navigation bar dengan profile photo
-  - `footer.php` - Footer dan closing tags
-- `public/` - Document root (web accessible)
-  - `index.php` - Homepage
-  - `login.php`, `register.php`, `logout.php` - Auth pages
-  - `profile.php` - User profile management
-  - `admin/` - Admin pages (dashboard, students, teachers, exams, dll)
-  - `teacher/` - Teacher pages (dashboard, exams, questions, dll)
-  - `student/` - Student pages (dashboard, exams, payment, dll)
-  - `api/` - API endpoints untuk AJAX
-  - `static/` - CSS, JS, images
-  - `.htaccess` - Apache routing & security
-- `storage/uploads/` - File uploads (profiles, payments, answers, payment)
-
-## Recent Changes (October 2025)
-
-### October 8, 2025 - Exam UX Enhancements & Bug Fixes
-- **Ragu-ragu (Doubtful) Question Marking** - New feature for students:
-  - Students can mark questions they're uncertain about with a checkbox
-  - Visual indicators in navigation sidebar: Yellow badge for doubtful, Green for answered, Grey for unanswered
-  - Toggle functionality: unchecking removes doubtful status and reverts to normal answered/blank logic
-- **Real-time Timer Fix** - Eliminated timer delay issues:
-  - Timer now uses server-provided seconds (not client-calculated minutes)
-  - New `startRealtime()` method in ExamTimer class for accurate countdown
-  - Countdown displays HH:MM:SS format without delays
-  - Backward compatibility maintained with `start()` method
-- **Button & UI Refinements**:
-  - Reduced button sizes for cleaner, more compact interface
-  - `.btn-sm` padding reduced from 0.4rem/0.8rem to 0.3rem/0.7rem
-  - Removed distracting scale/translateY animations, replaced with subtle opacity changes
-  - Improved responsive design for mobile (min-height 36px for btn-sm)
-- **Navbar Simplification**:
-  - Removed redundant menu items (e.g., "Mentor" for admin, "Hasil Siswa" for teacher)
-  - Unified "TO" → "Try Out" naming convention
-  - Profile photo and name now clickable and directly links to profile page
-  - Cleaner navigation structure for all user roles
-- **Phone Number Validation** - Added unique constraint:
-  - Registration now checks for duplicate phone numbers before submission
-  - Prevents multiple accounts with same phone number
-  - Validation occurs before file upload processing
-- **Security Verification**:
-  - Confirmed no answer leakage before exam completion
-  - Anti-cheat mechanisms still fully functional
-  - Second attempt scoring logic preserved correctly
-
-### October 8, 2025 - Major Bug Fixes & UX Improvements
-- **Fixed SQL Syntax Errors** - Converted all PostgreSQL-specific syntax to SQLite-compatible:
-  - Replaced `?::boolean` with standard `?` placeholders
-  - Changed boolean values from 'true'/'false' strings to 1/0 integers
-  - Replaced `ILIKE` with `LIKE` for case-insensitive searches
-  - Fixed in: exams.php (admin & teacher), students.php, teachers.php, payments.php
-- **Victory Music Feature** - Added celebratory audio for top 3 rankings:
-  - Auto-play victory music when student achieves rank 1, 2, or 3
-  - Animated pulsing effects for ranking badges (gold, silver, bronze)
-  - Enhanced visual feedback with glowing shadows
-- **cPanel Hosting Optimization**:
-  - Verified folder structure is properly configured
-  - .htaccess redirects working correctly
-  - index.php redirect to public folder functional
-  - All paths using proper url() helper function
-
-### Database Migration
-- **Migrated from MySQL to PostgreSQL to SQLite** - Using local SQLite database
-- **Schema converted** - All tables migrated with proper data types
-- **Boolean fields fixed** - `is_premium`, `is_active`, `is_completed` now use INTEGER type (0/1)
-- **Data permanency** - All data stored in database file (persistent across sessions)
-
-### Payment System Updates
-- **Removed pending tab** - Default view is now "approved" payments
-- **Added Payment Settings page** - `/admin/payment_settings.php` for QRIS & bank config
-- **QRIS upload** - Admin can upload/update QRIS payment image
-- **Bank account configuration** - Admin can set bank name, account number, and account holder
-
-### Questions Management
-- **Added Questions page** - `/admin/questions.php` for managing exam questions
-- **Multiple choice & essay** - Support for both question types
-- **Category tagging** - Questions can be categorized (Math, Science, etc.)
-
-### Bug Fixes
-- **SQL syntax errors fixed** - All queries updated for SQLite compatibility
-- **Redirect function improved** - Absolute path handling to prevent double path issues
-- **Mobile responsive** - iPhone/Safari specific CSS fixes for animations
+- `config/`: Application configuration (database, auth, helpers, main config, schema).
+- `app/Views/includes/`: Reusable template components (header, navbar, footer).
+- `public/`: Document root with entry points for various user roles (`admin/`, `teacher/`, `student/`), authentication pages, API endpoints, and static assets.
+- `storage/uploads/`: For file uploads (profiles, payments, answers, QRIS).
 
 ## External Dependencies
 
 ### PHP Requirements
-- **PHP 8.2+** - Core language
-- **PDO PostgreSQL Extension** - Database connectivity (changed from MySQL)
-- **GD atau Imagick** - Image processing (optional)
-- **Apache/Nginx** - Web server
+- **PHP 8.2+**
+- **PDO PostgreSQL Extension**
+- **GD atau Imagick** (optional, for image processing)
+- **Apache/Nginx** (web server)
 
 ### Storage
-- **PostgreSQL Database** - Replit managed database (Neon-backed)
-- **File Uploads:**
-  - Payment proof images: `storage/uploads/payments/` (max 16MB)
-  - QRIS payment image: `storage/uploads/payment/` (admin-configurable)
-  - Student profile photos: `storage/uploads/profiles/` (displayed in navbar)
-  - Essay answer photos: `storage/uploads/answers/`
+- **PostgreSQL Database** (Replit managed, Neon-backed).
+- **File Uploads:** Stored locally in `storage/uploads/` for payment proofs, QRIS images, student profile photos, and essay answer photos.
 
 ### Environment Configuration
-- **Database credentials** di `config/database.php`:
-  - DB_HOST (default: localhost)
-  - DB_USER (default: root)
-  - DB_PASS (default: '')
-  - DB_NAME (default: inspiranet_db)
-- **Admin account default:**
-  - Email: admin@gmail.com
-  - Password: inspiranetgacor25
+- **Database credentials** in `config/database.php` (DB_HOST, DB_USER, DB_PASS, DB_NAME).
+- **Default Admin Account:** Email: admin@gmail.com, Password: inspiranetgacor25.
 
 ### Deployment
-- Cocok untuk **shared hosting** (cPanel, DirectAdmin, dll)
-- Cocok untuk **VPS** dengan Apache/Nginx
-- Mudah di-deploy tanpa complex dependencies
-- Database import via phpMyAdmin atau MySQL CLI
+- Designed for **shared hosting** (cPanel, DirectAdmin) or **VPS** with Apache/Nginx.
+- Easy to deploy with minimal dependencies.
