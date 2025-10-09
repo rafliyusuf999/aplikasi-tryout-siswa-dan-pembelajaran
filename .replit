@@ -10,10 +10,6 @@ packages = ["mysql80"]
 localPort = 5000
 externalPort = 80
 
-[[ports]]
-localPort = 45537
-externalPort = 3001
-
 [workflows]
 runButton = "Project"
 
