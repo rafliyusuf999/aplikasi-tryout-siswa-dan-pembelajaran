@@ -292,7 +292,8 @@ include '../../app/Views/includes/navbar.php';
                 <div class="stat-icon">▶️</div>
                 <div class="stat-value">
                     <?php 
-                    $start_dt = new DateTime($attempt['started_at'], new DateTimeZone('Asia/Jakarta'));
+                    $start_dt = new DateTime($attempt['started_at'], new DateTimeZone('UTC'));
+                    $start_dt->setTimezone(new DateTimeZone('Asia/Jakarta'));
                     echo $start_dt->format('H:i');
                     ?>
                 </div>
@@ -305,7 +306,8 @@ include '../../app/Views/includes/navbar.php';
                 <div class="stat-value">
                     <?php 
                     if ($attempt['finished_at']) {
-                        $end_dt = new DateTime($attempt['finished_at'], new DateTimeZone('Asia/Jakarta'));
+                        $end_dt = new DateTime($attempt['finished_at'], new DateTimeZone('UTC'));
+                        $end_dt->setTimezone(new DateTimeZone('Asia/Jakarta'));
                         echo $end_dt->format('H:i');
                     } else {
                         echo '-';
@@ -321,8 +323,8 @@ include '../../app/Views/includes/navbar.php';
                 <div class="stat-value">
                     <?php 
                     if ($attempt['finished_at']) {
-                        $start = new DateTime($attempt['started_at'], new DateTimeZone('Asia/Jakarta'));
-                        $end = new DateTime($attempt['finished_at'], new DateTimeZone('Asia/Jakarta'));
+                        $start = new DateTime($attempt['started_at'], new DateTimeZone('UTC'));
+                        $end = new DateTime($attempt['finished_at'], new DateTimeZone('UTC'));
                         $diff = $start->diff($end);
                         echo $diff->h . 'j ' . $diff->i . 'm';
                     } else {

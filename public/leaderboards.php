@@ -227,8 +227,8 @@ include '../app/Views/includes/navbar.php';
                         <td style="white-space: nowrap;">
                             <?php 
                             if ($entry['finished_at']) {
-                                $start = new DateTime($entry['started_at']);
-                                $end = new DateTime($entry['finished_at']);
+                                $start = new DateTime($entry['started_at'], new DateTimeZone('UTC'));
+                                $end = new DateTime($entry['finished_at'], new DateTimeZone('UTC'));
                                 $diff = $start->diff($end);
                                 echo $diff->h . 'j ' . $diff->i . 'm';
                             } else {
