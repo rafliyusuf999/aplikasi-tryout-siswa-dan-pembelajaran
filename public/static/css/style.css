@@ -983,12 +983,16 @@ select.form-control option {
     }
     
     .btn {
-        padding: 0.6rem 1.2rem;
-        font-size: 0.9rem;
+        padding: 0.75rem 1.2rem;
+        font-size: 1rem;
+        min-height: 44px;
+        touch-action: manipulation;
     }
     
-    .form-control {
-        font-size: 16px;
+    .form-control, input, select, textarea {
+        font-size: 16px !important;
+        min-height: 44px;
+        padding: 0.75rem;
     }
     
     .question-card h4 {
@@ -1001,11 +1005,13 @@ select.form-control option {
         padding: 1rem;
         max-height: calc(100vh - 30px);
         overflow-y: auto !important;
+        -webkit-overflow-scrolling: touch;
     }
     
     .modal {
         padding: 10px 0;
         overflow-y: auto !important;
+        -webkit-overflow-scrolling: touch;
     }
     
     table {
@@ -1045,6 +1051,30 @@ select.form-control option {
         width: 32px;
         height: 32px;
         font-size: 0.85rem;
+    }
+    
+    .option-item {
+        min-height: 44px;
+        padding: 1rem;
+        font-size: 1rem;
+    }
+    
+    .option-item input[type="radio"] {
+        width: 20px;
+        height: 20px;
+        min-width: 20px;
+        min-height: 20px;
+    }
+    
+    .nav-item {
+        min-width: 44px;
+        min-height: 44px;
+        font-size: 1rem;
+    }
+    
+    .badge {
+        font-size: 0.9rem;
+        padding: 0.4rem 0.6rem;
     }
 }
 

@@ -321,8 +321,8 @@ include '../../app/Views/includes/navbar.php';
                 <div class="stat-value">
                     <?php 
                     if ($attempt['finished_at']) {
-                        $start = new DateTime($attempt['started_at']);
-                        $end = new DateTime($attempt['finished_at']);
+                        $start = new DateTime($attempt['started_at'], new DateTimeZone('Asia/Jakarta'));
+                        $end = new DateTime($attempt['finished_at'], new DateTimeZone('Asia/Jakarta'));
                         $diff = $start->diff($end);
                         echo $diff->h . 'j ' . $diff->i . 'm';
                     } else {

@@ -88,6 +88,9 @@ class AntiCheat {
         this.attemptId = attemptId;
         this.isUploadingFile = false;
         this.visibilityTimeout = null;
+        this.isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+        this.isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        this.tabSwitchDelay = this.isMobile ? 7000 : 5000;
     }
 
     enable() {
@@ -213,7 +216,8 @@ class AntiCheat {
 
     handleVisibilityChange() {
         if (this.enabled && document.hidden && !this.isUploadingFile) {
-            console.log('⚠️ Tab/Window tidak terlihat - menunggu 3 detik...');
+            const delaySeconds = Math.floor(this.tabSwitchDelay / 1000);
+            console.log(`⚠️ Tab/Window tidak terlihat - menunggu ${delaySeconds} detik...`);
             
             if (this.visibilityTimeout) {
                 clearTimeout(this.visibilityTimeout);
@@ -221,10 +225,10 @@ class AntiCheat {
             
             this.visibilityTimeout = setTimeout(() => {
                 if (document.hidden && this.enabled && !this.isUploadingFile) {
-                    console.log('❌ Masih tidak terlihat setelah 3 detik - LOGOUT!');
+                    console.log(`❌ Masih tidak terlihat setelah ${delaySeconds} detik - LOGOUT!`);
                     this.triggerLogout('Terdeteksi pindah tab/aplikasi terlalu lama! Anda akan dikeluarkan dari ujian.');
                 }
-            }, 3000);
+            }, this.tabSwitchDelay);
         } else if (!document.hidden && this.visibilityTimeout) {
             console.log('✓ Tab kembali terlihat - batalkan timeout');
             clearTimeout(this.visibilityTimeout);
@@ -234,7 +238,8 @@ class AntiCheat {
 
     handleWindowBlur() {
         if (this.enabled && !this.isUploadingFile) {
-            console.log('⚠️ Window blur terdeteksi - menunggu 3 detik...');
+            const delaySeconds = Math.floor(this.tabSwitchDelay / 1000);
+            console.log(`⚠️ Window blur terdeteksi - menunggu ${delaySeconds} detik...`);
             
             if (this.visibilityTimeout) {
                 clearTimeout(this.visibilityTimeout);
@@ -242,10 +247,10 @@ class AntiCheat {
             
             this.visibilityTimeout = setTimeout(() => {
                 if (!document.hasFocus() && this.enabled && !this.isUploadingFile) {
-                    console.log('❌ Window masih blur setelah 3 detik - LOGOUT!');
+                    console.log(`❌ Window masih blur setelah ${delaySeconds} detik - LOGOUT!`);
                     this.triggerLogout('Terdeteksi pindah window/aplikasi terlalu lama! Anda akan dikeluarkan dari ujian.');
                 }
-            }, 3000);
+            }, this.tabSwitchDelay);
         }
     }
     
@@ -414,8 +419,8 @@ function showSecurityWarningModal(callback, durationMinutes = null) {
                             <small style="color: #666; line-height: 1.6;">Jika terdeteksi mencoba copy, Anda akan OTOMATIS LOGOUT</small>
                         </li>
                         <li style="margin-bottom: 15px; padding: 12px; background: #f8f9fa; border-radius: 8px; border-left: 4px solid #dc3545;">
-                            <strong style="font-size: 1rem;">🚫 DILARANG PINDAH TAB/WINDOW (LEBIH DARI 3 DETIK)</strong><br>
-                            <small style="color: #666; line-height: 1.6;">Jika pindah tab lebih dari 3 detik, Anda akan OTOMATIS LOGOUT</small>
+                            <strong style="font-size: 1rem;">🚫 DILARANG PINDAH TAB/WINDOW TERLALU LAMA</strong><br>
+                            <small style="color: #666; line-height: 1.6;">Jika pindah tab/aplikasi terlalu lama (Desktop: 5 detik, Mobile: 7 detik), Anda akan OTOMATIS LOGOUT</small>
                         </li>
                         <li style="margin-bottom: 15px; padding: 12px; background: #f8f9fa; border-radius: 8px; border-left: 4px solid #dc3545;">
                             <strong style="font-size: 1rem;">🚫 DILARANG SCREENSHOT</strong><br>

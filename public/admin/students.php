@@ -7,6 +7,7 @@ $pdo = getDB();
 $pageTitle = 'Kelola Siswa';
 
 $search = $_GET['search'] ?? '';
+$filter_cheating = $_GET['filter_cheating'] ?? '';
 $query = "SELECT u.*, 
           COALESCE(SUM(ea.cheating_warnings), 0) as total_cheating 
           FROM users u
@@ -15,7 +16,11 @@ $query = "SELECT u.*,
 if ($search) {
     $query .= " AND (u.full_name LIKE :search OR u.email LIKE :search OR u.inspira_branch LIKE :search)";
 }
-$query .= " GROUP BY u.id ORDER BY u.created_at DESC";
+$query .= " GROUP BY u.id";
+if ($filter_cheating === 'yes') {
+    $query .= " HAVING total_cheating > 0";
+}
+$query .= " ORDER BY u.created_at DESC";
 
 $stmt = $pdo->prepare($query);
 if ($search) {
@@ -123,8 +128,12 @@ include '../../app/Views/includes/navbar.php';
     <h1>Kelola Siswa</h1>
     
     <div class="card" style="margin-top: 1.5rem;">
-        <form method="GET" style="display: flex; gap: 1rem; margin-bottom: 1.5rem;">
-            <input type="text" name="search" value="<?php echo htmlspecialchars($search); ?>" placeholder="Cari siswa..." class="form-control" style="flex: 1;">
+        <form method="GET" style="display: flex; gap: 1rem; margin-bottom: 1.5rem; flex-wrap: wrap; align-items: center;">
+            <input type="text" name="search" value="<?php echo htmlspecialchars($search); ?>" placeholder="Cari siswa..." class="form-control" style="flex: 1; min-width: 200px;">
+            <select name="filter_cheating" class="form-control" style="width: auto;">
+                <option value="">Semua Status</option>
+                <option value="yes" <?php echo $filter_cheating === 'yes' ? 'selected' : ''; ?>>⚠️ Hanya Yang Curang</option>
+            </select>
             <button type="submit" class="btn btn-primary">Cari</button>
             <a href="<?php echo url('admin/students.php'); ?>" class="btn btn-secondary">Reset</a>
         </form>
@@ -160,9 +169,9 @@ include '../../app/Views/includes/navbar.php';
                         <td><?php echo htmlspecialchars($student['school_name'] ?? '-'); ?></td>
                         <td>
                             <?php if ($student['total_cheating'] > 0): ?>
-                                <span class="badge badge-danger">⚠️ <?php echo $student['total_cheating']; ?></span>
+                                <span class="badge badge-danger" style="font-size: 1rem; padding: 0.5rem 0.75rem; font-weight: bold; background: linear-gradient(135deg, #dc3545 0%, #c82333 100%); animation: pulse 2s infinite;">⚠️ <?php echo $student['total_cheating']; ?> Pelanggaran</span>
                             <?php else: ?>
-                                <span class="badge badge-success">✓ Bersih</span>
+                                <span class="badge badge-success" style="padding: 0.4rem 0.6rem;">✓ Bersih</span>
                             <?php endif; ?>
                         </td>
                         <td>

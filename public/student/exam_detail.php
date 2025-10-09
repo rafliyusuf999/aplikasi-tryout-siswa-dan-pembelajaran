@@ -152,58 +152,54 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt = $pdo->prepare("UPDATE exam_attempts SET answers = ?, essay_answers = ?, total_score = ?, finished_at = datetime('now'), is_completed = 1 WHERE id = ?");
         $stmt->execute([json_encode($new_answers), json_encode($new_essay_answers), $total_score, $attempt['id']]);
         
-        // Update leaderboard dan nilai HANYA jika ini adalah first completed attempt
-        if ($completed_attempts_count === 0) {
-            // Hitung total poin dari semua exam
-            $stmt = $pdo->prepare("
-                SELECT COALESCE(SUM(total_score), 0) as combined_score
+        // Ambil nilai terbaik user untuk exam ini
+        $stmt = $pdo->prepare("
+            SELECT MAX(total_score) as best_score
+            FROM exam_attempts
+            WHERE exam_id = ? AND user_id = ? AND is_completed = true
+        ");
+        $stmt->execute([$exam_id, $user['id']]);
+        $best_score = (float)$stmt->fetchColumn();
+        
+        // Delete old leaderboard entry untuk exam ini (jika ada)
+        $stmt = $pdo->prepare("DELETE FROM leaderboards WHERE exam_id = ? AND user_id = ?");
+        $stmt->execute([$exam_id, $user['id']]);
+        
+        // Hitung ranking berdasarkan branch menggunakan nilai terbaik
+        $stmt = $pdo->prepare("
+            SELECT COUNT(*) + 1 as rank
+            FROM (
+                SELECT DISTINCT user_id, MAX(total_score) as max_score
                 FROM exam_attempts
-                WHERE user_id = ? AND is_completed = true
-            ");
-            $stmt->execute([$user['id']]);
-            $combined = $stmt->fetch();
-            $combined_score = (int)$combined['combined_score'];
-            
-            // Delete old leaderboard entry untuk exam ini (jika ada)
-            $stmt = $pdo->prepare("DELETE FROM leaderboards WHERE exam_id = ? AND user_id = ?");
-            $stmt->execute([$exam_id, $user['id']]);
-            
-            // Hitung ranking berdasarkan branch
-            $stmt = $pdo->prepare("
-                SELECT COUNT(*) + 1 as rank
-                FROM (
-                    SELECT DISTINCT user_id, MAX(total_score) as max_score
-                    FROM exam_attempts
-                    WHERE exam_id = ? AND is_completed = true
-                    GROUP BY user_id
-                ) as scores
-                JOIN users ON scores.user_id = users.id
-                WHERE users.inspira_branch = ? AND scores.max_score > ?
-            ");
-            $stmt->execute([$exam_id, $user['inspira_branch'], $total_score]);
-            $rank_in_branch = (int)$stmt->fetchColumn();
-            
-            // Hitung ranking global
-            $stmt = $pdo->prepare("
-                SELECT COUNT(*) + 1 as rank
-                FROM (
-                    SELECT DISTINCT user_id, MAX(total_score) as max_score
-                    FROM exam_attempts
-                    WHERE exam_id = ? AND is_completed = true
-                    GROUP BY user_id
-                ) as scores
-                WHERE scores.max_score > ?
-            ");
-            $stmt->execute([$exam_id, $total_score]);
-            $rank_global = (int)$stmt->fetchColumn();
-            
-            // Insert leaderboard entry
-            $stmt = $pdo->prepare("
-                INSERT INTO leaderboards (exam_id, user_id, total_score, rank_in_branch, rank_global, achieved_at)
-                VALUES (?, ?, ?, ?, ?, datetime('now'))
-            ");
-            $stmt->execute([$exam_id, $user['id'], $total_score, $rank_in_branch, $rank_global]);
-        }
+                WHERE exam_id = ? AND is_completed = true
+                GROUP BY user_id
+            ) as scores
+            JOIN users ON scores.user_id = users.id
+            WHERE users.inspira_branch = ? AND scores.max_score > ?
+        ");
+        $stmt->execute([$exam_id, $user['inspira_branch'], $best_score]);
+        $rank_in_branch = (int)$stmt->fetchColumn();
+        
+        // Hitung ranking global menggunakan nilai terbaik
+        $stmt = $pdo->prepare("
+            SELECT COUNT(*) + 1 as rank
+            FROM (
+                SELECT DISTINCT user_id, MAX(total_score) as max_score
+                FROM exam_attempts
+                WHERE exam_id = ? AND is_completed = true
+                GROUP BY user_id
+            ) as scores
+            WHERE scores.max_score > ?
+        ");
+        $stmt->execute([$exam_id, $best_score]);
+        $rank_global = (int)$stmt->fetchColumn();
+        
+        // Insert leaderboard entry dengan nilai terbaik
+        $stmt = $pdo->prepare("
+            INSERT INTO leaderboards (exam_id, user_id, total_score, rank_in_branch, rank_global, achieved_at)
+            VALUES (?, ?, ?, ?, ?, datetime('now'))
+        ");
+        $stmt->execute([$exam_id, $user['id'], $best_score, $rank_in_branch, $rank_global]);
         
         setFlash('Try Out berhasil diselesaikan!', 'success');
         redirect('student/result.php?id=' . $attempt['id']);
@@ -316,7 +312,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 $started_at = new DateTime($attempt['started_at']);
 $now = new DateTime();
 $elapsed = $now->getTimestamp() - $started_at->getTimestamp();
-$remaining = max(0, ($exam['duration_minutes'] * 60) - $elapsed);
+$remaining = ($exam['duration_minutes'] * 60) - $elapsed;
+
+if ($remaining <= 0) {
+    setFlash('⏰ Waktu ujian telah habis. Jawaban Anda telah disimpan otomatis.', 'warning');
+    redirect('student/result.php?id=' . $attempt['id']);
+    exit;
+}
 
 include '../../app/Views/includes/header.php';
 include '../../app/Views/includes/navbar.php';
@@ -659,9 +661,18 @@ document.addEventListener('DOMContentLoaded', function() {
     updateNavigation();
     setupScrollTracking();
     
+    const remainingSeconds = <?php echo (int)$remaining; ?>;
+    const warningShown = remainingSeconds <= 300;
+    
+    if (warningShown) {
+        const minutes = Math.floor(remainingSeconds / 60);
+        const seconds = remainingSeconds % 60;
+        alert(`⚠️ PERHATIAN!\n\nWaktu tersisa hanya ${minutes} menit ${seconds} detik!\n\nSegera selesaikan ujian Anda.`);
+    }
+    
     showSecurityWarningModal(
         function() {
-            examTimer = new ExamTimer(<?php echo max(1, $remaining); ?>, handleTimeUp);
+            examTimer = new ExamTimer(remainingSeconds, handleTimeUp);
             examTimer.startRealtime('timer-display');
             
             antiCheat = new AntiCheat(
