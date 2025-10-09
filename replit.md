@@ -10,10 +10,21 @@ INSPIRANET OFFICIAL TO is an online exam platform for high school students (grad
 - **Text Color Standardization:** All text colors throughout the application updated to black (#1a1a1a, #2d2d2d) for maximum readability and consistency
   - Updated all gray colors (#666, #999, #4a4a4a) to black in PHP files and CSS
   - Maintained white text only on dark backgrounds (navbar, stat-cards, modals) for proper contrast
+  - Button text colors standardized to white (#FFFFFF !important) with centered alignment
+  - All headings (H1, H2) changed from var(--primary-color) to black (#1a1a1a) across all pages
 - **Featured Section Redesign:** "Fitur Unggulan" section restructured with individual feature cards in responsive grid layout
   - Centered layout with max-width 900px
   - Each feature has own card with hover effects
   - Light blue gradient backgrounds (#EFF6FF → #DBEAFE)
+  - Payment feature card updated to "Try Out Gratis & Premium" to show both options
+- **Dashboard Improvements:** All dashboard headings centered and colored black for better readability
+  - Admin Dashboard: "👨‍💼 Admin Dashboard" centered and black
+  - Teacher Dashboard: "👨‍🏫 Dashboard Teacher" centered and black
+  - Student Dashboard: "📊 Dashboard Siswa" centered and black
+  - Quick Access buttons: White text on blue gradient with proper contrast
+- **Leaderboard Page Enhancements:** 
+  - Main heading "🏆 Peringkat Try Out" centered with black color
+  - Labels and sub-headings updated to black for consistency
 - **iOS Anti-Cheat Fix:** Developer Tools detection threshold increased from 160px to 300px for iOS devices to prevent false positives on iPhone
 - **Payment Photo Display Fix:** QRIS image path corrected from `uploads/payment/` to `storage/uploads/payment/`
 - **Footer Enhancement:** Copyright text styling improved with black color, bold font weight, and centered alignment

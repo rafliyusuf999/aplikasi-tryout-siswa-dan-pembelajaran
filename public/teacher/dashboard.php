@@ -38,7 +38,7 @@ include '../../app/Views/includes/navbar.php';
 ?>
 
 <div class="container" style="margin-top: 2rem;">
-    <h1 style="color: var(--primary-color); margin-bottom: 2rem;">👨‍🏫 Dashboard Teacher</h1>
+    <h1 style="color: #1a1a1a; margin-bottom: 2rem; text-align: center;">👨‍🏫 Dashboard Teacher</h1>
 
     <div class="stats-grid">
         <div class="stat-card">

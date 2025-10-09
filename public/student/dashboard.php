@@ -44,7 +44,7 @@ include '../../app/Views/includes/header.php';
 include '../../app/Views/includes/navbar.php';
 ?>
 
-<h1 style="color: var(--primary-color); margin-bottom: 2rem;">📊 Dashboard Siswa</h1>
+<h1 style="color: #1a1a1a; margin-bottom: 2rem; text-align: center;">📊 Dashboard Siswa</h1>
 
 <div class="stats-grid">
     <div class="stat-card">

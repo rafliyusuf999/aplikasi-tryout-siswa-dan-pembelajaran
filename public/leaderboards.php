@@ -97,11 +97,11 @@ include '../app/Views/includes/navbar.php';
 ?>
 
 <div class="container" style="margin-top: 2rem;">
-    <h1 style="text-align: center; color: var(--primary-color); margin-bottom: 2rem;">🏆 Peringkat Try Out</h1>
+    <h1 style="text-align: center; color: #1a1a1a; margin-bottom: 2rem;">🏆 Peringkat Try Out</h1>
     
     <div class="card" style="margin-top: 1.5rem; padding: 2rem;">
         <div class="form-group" style="margin-bottom: 1.5rem;">
-            <label style="font-size: 1.1rem; font-weight: 600; color: var(--primary-color); margin-bottom: 0.75rem; display: block;">📋 Pilih Try Out</label>
+            <label style="font-size: 1.1rem; font-weight: 600; color: #1a1a1a; margin-bottom: 0.75rem; display: block;">📋 Pilih Try Out</label>
             <select id="exam_select" class="form-control" style="font-size: 1rem; padding: 0.75rem; border: 2px solid var(--primary-color); border-radius: 8px; transition: all 0.3s ease;" onchange="location.href='?exam_id=' + this.value + '&view=<?php echo $view_type; ?><?php echo isset($_GET['branch']) ? '&branch=' . urlencode($_GET['branch']) : ''; ?>'">
                 <option value="">-- Pilih Try Out --</option>
                 <?php foreach ($exams as $exam): ?>
@@ -143,13 +143,13 @@ include '../app/Views/includes/navbar.php';
         <?php endif; ?>
         
         <?php if ($exam_id && count($leaderboard) > 0): ?>
-        <h2 style="text-align: center; margin-bottom: 1.5rem; color: var(--primary-color); animation: fadeIn 0.5s ease-in;">
+        <h2 style="text-align: center; margin-bottom: 1.5rem; color: #1a1a1a; animation: fadeIn 0.5s ease-in;">
             <?php echo htmlspecialchars($exam_title); ?>
             <?php if ($view_type === 'branch'): ?>
                 <?php if ($user['role'] === 'student'): ?>
-                <br><small class="text-muted">(Cabang: <?php echo htmlspecialchars($user['inspira_branch']); ?>)</small>
+                <br><small style="color: #2d2d2d;">(Cabang: <?php echo htmlspecialchars($user['inspira_branch']); ?>)</small>
                 <?php elseif (isset($_GET['branch']) && $_GET['branch']): ?>
-                <br><small class="text-muted">(Cabang: <?php echo htmlspecialchars($_GET['branch']); ?>)</small>
+                <br><small style="color: #2d2d2d;">(Cabang: <?php echo htmlspecialchars($_GET['branch']); ?>)</small>
                 <?php endif; ?>
             <?php endif; ?>
         </h2>

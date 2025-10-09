@@ -236,7 +236,7 @@ include '../../app/Views/includes/navbar.php';
 
 <div class="container" style="margin-top: 2rem; margin-bottom: 2rem;">
     <div class="result-card">
-        <h1 style="text-align: center; margin-bottom: 1.5rem; color: var(--primary-color);">🎉 Hasil Try Out</h1>
+        <h1 style="text-align: center; margin-bottom: 1.5rem; color: #1a1a1a;">🎉 Hasil Try Out</h1>
         
         <div class="profile-section">
             <?php if(!empty($user['profile_photo'])): ?>
