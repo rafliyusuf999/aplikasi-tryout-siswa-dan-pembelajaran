@@ -4,6 +4,20 @@
 
 INSPIRANET OFFICIAL TO is an online exam platform for high school students (grades 10-12 and alumni) preparing for Indonesia's UTBK university entrance exam. It provides secure, fair online testing with comprehensive anti-cheating measures and branch-based leaderboards, aiming to deliver a trustworthy platform with fair competition and efficient exam management.
 
+## Recent Changes
+
+### 2025-10-09: UI/UX Improvements & Text Color Optimization
+- **Text Color Standardization:** All text colors throughout the application updated to black (#1a1a1a, #2d2d2d) for maximum readability and consistency
+  - Updated all gray colors (#666, #999, #4a4a4a) to black in PHP files and CSS
+  - Maintained white text only on dark backgrounds (navbar, stat-cards, modals) for proper contrast
+- **Featured Section Redesign:** "Fitur Unggulan" section restructured with individual feature cards in responsive grid layout
+  - Centered layout with max-width 900px
+  - Each feature has own card with hover effects
+  - Light blue gradient backgrounds (#EFF6FF → #DBEAFE)
+- **iOS Anti-Cheat Fix:** Developer Tools detection threshold increased from 160px to 300px for iOS devices to prevent false positives on iPhone
+- **Payment Photo Display Fix:** QRIS image path corrected from `uploads/payment/` to `storage/uploads/payment/`
+- **Footer Enhancement:** Copyright text styling improved with black color, bold font weight, and centered alignment
+
 ## User Preferences
 
 Preferred communication style: Simple, everyday language.
