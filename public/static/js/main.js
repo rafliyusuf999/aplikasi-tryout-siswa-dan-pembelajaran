@@ -171,7 +171,7 @@ class AntiCheat {
     checkDevTools() {
         if (!this.enabled) return;
         
-        const threshold = 160;
+        const threshold = this.isIOS ? 300 : 160;
         const widthThreshold = window.outerWidth - window.innerWidth > threshold;
         const heightThreshold = window.outerHeight - window.innerHeight > threshold;
         

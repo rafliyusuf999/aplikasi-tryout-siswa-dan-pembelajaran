@@ -109,7 +109,7 @@ include '../../app/Views/includes/navbar.php';
             <?php if ($payment_settings['qris_image']): ?>
             <div style="margin-bottom: 2rem;">
                 <h4>Scan QRIS</h4>
-                <img src="<?php echo url('uploads/payment/' . $payment_settings['qris_image']); ?>" alt="QRIS" style="max-width: 300px; border: 1px solid #ddd; padding: 10px; border-radius: 8px;">
+                <img src="<?php echo url('storage/uploads/payment/' . $payment_settings['qris_image']); ?>" alt="QRIS" style="max-width: 300px; border: 1px solid #ddd; padding: 10px; border-radius: 8px;">
             </div>
             <?php endif; ?>
             

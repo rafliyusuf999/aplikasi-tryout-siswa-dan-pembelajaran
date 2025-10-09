@@ -62,10 +62,10 @@ include '../app/Views/includes/navbar.php';
 
 <div class="card" style="margin-top: 3rem;" data-animate="fade-in">
     <h2>Tentang Platform Kami</h2>
-    <p style="color: rgba(255,255,255,0.9); line-height: 1.8;">INSPIRANET adalah platform try out online yang dirancang khusus untuk membantu siswa mempersiapkan diri menghadapi ujian. Dengan sistem yang canggih dan anti-kecurangan, kami memastikan pengalaman ujian yang adil dan kompetitif.</p>
+    <p style="color: #1a1a1a; line-height: 1.8;">INSPIRANET adalah platform try out online yang dirancang khusus untuk membantu siswa mempersiapkan diri menghadapi ujian. Dengan sistem yang canggih dan anti-kecurangan, kami memastikan pengalaman ujian yang adil dan kompetitif.</p>
     
-    <h3 style="margin-top: 2rem; color: #ffd700;">Fitur Unggulan:</h3>
-    <ul style="line-height: 2; color: rgba(255,255,255,0.9);">
+    <h3 style="margin-top: 2rem; color: #1a1a1a;">Fitur Unggulan:</h3>
+    <ul style="line-height: 2; color: #1a1a1a;">
         <li>📊 Sistem Peringkat Cabang & Global</li>
         <li>🔒 Anti-Kecurangan Ketat</li>
         <li>💳 Pembayaran Try Out Premium</li>
