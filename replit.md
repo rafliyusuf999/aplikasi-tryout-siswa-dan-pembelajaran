@@ -53,7 +53,8 @@ Preferred communication style: Simple, everyday language.
 - **Vanilla JavaScript:** For interactivity, anti-cheat enforcement, and async operations.
 - **Fully Responsive Design:** Optimized for desktop, tablet, and mobile using CSS Grid and Flexbox.
 - **Enhanced UI Elements:** Profile photo in navbar, countdown timer (HH:MM:SS), visual question status (grey=unanswered, green=answered, yellow=doubtful), leaderboard with trophy icons, combined highest scores.
-- **Design Rationale:** PHP includes for modularity, vanilla JS for performance, and responsive design for broad device compatibility. A consistent light blue theme enhances readability and user experience.
+- **Typography & Accessibility:** Dark text (#1a1a1a, #2d2d2d) on light backgrounds for maximum readability, white text on dark components (navbar, stat-cards, modals). Bold font weights (600-800) for headings and important text. All times displayed in WIB (Asia/Jakarta) timezone.
+- **Design Rationale:** PHP includes for modularity, vanilla JS for performance, and responsive design for broad device compatibility. A consistent light blue theme with high-contrast text ensures excellent readability across all devices.
 
 ### File Structure
 - `config/`: Application configuration (database, auth, helpers, main config, schema).
