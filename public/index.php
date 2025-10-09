@@ -82,8 +82,8 @@ include '../app/Views/includes/navbar.php';
         
         <div style="background: linear-gradient(135deg, #EFF6FF 0%, #DBEAFE 100%); padding: 1.5rem; border-radius: 12px; border-left: 4px solid var(--primary-color); transition: transform 0.3s ease, box-shadow 0.3s ease;" onmouseover="this.style.transform='translateY(-5px)'; this.style.boxShadow='0 8px 25px rgba(59, 130, 246, 0.25)';" onmouseout="this.style.transform=''; this.style.boxShadow='';">
             <div style="font-size: 2.5rem; text-align: center; margin-bottom: 0.75rem;">💳</div>
-            <h3 style="color: #1a1a1a; text-align: center; font-size: 1.1rem; margin-bottom: 0.5rem;">Pembayaran Premium</h3>
-            <p style="color: #2d2d2d; text-align: center; font-size: 0.9rem; margin: 0; line-height: 1.6;">Akses try out premium dengan sistem pembayaran mudah</p>
+            <h3 style="color: #1a1a1a; text-align: center; font-size: 1.1rem; margin-bottom: 0.5rem;">Try Out Gratis & Premium</h3>
+            <p style="color: #2d2d2d; text-align: center; font-size: 0.9rem; margin: 0; line-height: 1.6;">Tersedia try out gratis dan premium dengan sistem pembayaran mudah</p>
         </div>
         
         <div style="background: linear-gradient(135deg, #EFF6FF 0%, #DBEAFE 100%); padding: 1.5rem; border-radius: 12px; border-left: 4px solid var(--primary-color); transition: transform 0.3s ease, box-shadow 0.3s ease;" onmouseover="this.style.transform='translateY(-5px)'; this.style.boxShadow='0 8px 25px rgba(59, 130, 246, 0.25)';" onmouseout="this.style.transform=''; this.style.boxShadow='';">
