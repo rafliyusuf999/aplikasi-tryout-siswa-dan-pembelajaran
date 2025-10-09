@@ -174,7 +174,7 @@ include '../app/Views/includes/navbar.php';
                     $rank = 1;
                     foreach ($leaderboard as $entry): 
                         $is_current_user = ($entry['user_id'] == $user['id']);
-                        $row_class = $is_current_user ? 'style="background: rgba(139, 21, 56, 0.1);"' : '';
+                        $row_class = $is_current_user ? 'style="background: rgba(59, 130, 246, 0.1);"' : '';
                     ?>
                     <tr <?php echo $row_class; ?>>
                         <td style="font-size: 1.5rem; font-weight: bold;">
