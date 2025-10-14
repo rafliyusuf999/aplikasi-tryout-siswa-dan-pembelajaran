@@ -22,6 +22,10 @@ INSPIRANET OFFICIAL TO is an online exam platform for high school students (grad
   - Each section shows up to 3 latest tryouts with quick access buttons
   - Payment status and attempt count properly displayed
   - Direct links to "Lihat Semua" for complete tryout lists
+- **Scoring Fix:** Fixed scoring system to be case-insensitive
+  - Students answering 'a', 'A', ' a ', ' A ' all get points if correct answer is 'A'
+  - Prevents scoring issues caused by letter case differences
+  - Trims whitespace to ensure accurate comparison
 
 ### 2025-10-09: UI/UX Improvements & Text Color Optimization
 - **Text Color Standardization:** All text colors throughout the application updated to black (#1a1a1a, #2d2d2d) for maximum readability and consistency
