@@ -65,6 +65,7 @@ CREATE TABLE IF NOT EXISTS exam_attempts (
     started_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     finished_at DATETIME,
     total_score REAL DEFAULT 0,
+    correct_count INTEGER DEFAULT 0,
     is_completed INTEGER DEFAULT 0,
     answers TEXT,
     essay_answers TEXT,

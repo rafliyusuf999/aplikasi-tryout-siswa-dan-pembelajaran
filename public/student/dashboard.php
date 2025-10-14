@@ -39,6 +39,31 @@ $stmt = $pdo->prepare("
 $stmt->execute([$user['id']]);
 $recent_attempts = $stmt->fetchAll();
 
+// Get free tryouts
+$stmt = $pdo->prepare("
+    SELECT e.*, 
+    (SELECT COUNT(*) FROM exam_attempts WHERE exam_id = e.id AND user_id = ?) as attempt_count
+    FROM exams e
+    WHERE e.is_active = true AND e.is_premium = false
+    ORDER BY e.created_at DESC
+    LIMIT 3
+");
+$stmt->execute([$user['id']]);
+$free_tryouts = $stmt->fetchAll();
+
+// Get premium tryouts
+$stmt = $pdo->prepare("
+    SELECT e.*, 
+    (SELECT COUNT(*) FROM exam_attempts WHERE exam_id = e.id AND user_id = ?) as attempt_count,
+    (SELECT status FROM payments WHERE exam_id = e.id AND user_id = ? ORDER BY created_at DESC LIMIT 1) as payment_status
+    FROM exams e
+    WHERE e.is_active = true AND e.is_premium = true
+    ORDER BY e.created_at DESC
+    LIMIT 3
+");
+$stmt->execute([$user['id'], $user['id']]);
+$premium_tryouts = $stmt->fetchAll();
+
 $pageTitle = 'Dashboard Siswa - INSPIRANET';
 include '../../app/Views/includes/header.php';
 include '../../app/Views/includes/navbar.php';
@@ -72,6 +97,74 @@ include '../../app/Views/includes/navbar.php';
         <a href="<?php echo url('leaderboards.php'); ?>" class="btn btn-primary" style="text-decoration: none; text-align: center;">🏆 Lihat Peringkat</a>
         <a href="<?php echo url('profile.php'); ?>" class="btn btn-primary" style="text-decoration: none; text-align: center;">👤 Edit Profil</a>
     </div>
+</div>
+
+<!-- Free Tryouts Section -->
+<div class="card" style="margin-top: 2rem; background: linear-gradient(135deg, #E8F5E9 0%, #C8E6C9 100%); border: 2px solid #4CAF50;">
+    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem;">
+        <h2 style="color: #2E7D32; margin: 0;">🆓 Try Out Gratis</h2>
+        <a href="<?php echo url('student/exams.php?filter=free'); ?>" class="btn btn-secondary" style="font-size: 0.9rem;">Lihat Semua</a>
+    </div>
+    
+    <?php if(count($free_tryouts) > 0): ?>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem;">
+        <?php foreach($free_tryouts as $tryout): ?>
+        <div style="background: white; border-radius: 8px; padding: 1.25rem; border: 1px solid #A5D6A7;">
+            <h3 style="color: #1a1a1a; font-size: 1.1rem; margin-bottom: 0.5rem;"><?php echo htmlspecialchars($tryout['title']); ?></h3>
+            <p style="color: #2d2d2d; font-size: 0.85rem; margin-bottom: 0.75rem;">
+                ⏱️ <?php echo $tryout['duration_minutes']; ?> menit | 📝 <?php echo $tryout['total_questions']; ?> soal
+            </p>
+            <?php if($tryout['attempt_count'] > 0): ?>
+            <span class="badge badge-success" style="margin-bottom: 0.75rem;">✓ Sudah Dikerjakan <?php echo $tryout['attempt_count']; ?>x</span>
+            <?php endif; ?>
+            <a href="<?php echo url('student/exam_detail.php?id=' . $tryout['id']); ?>" class="btn btn-primary" style="width: 100%; margin-top: 0.5rem;">
+                <?php echo $tryout['attempt_count'] > 0 ? 'Kerjakan Lagi' : 'Mulai TO'; ?>
+            </a>
+        </div>
+        <?php endforeach; ?>
+    </div>
+    <?php else: ?>
+    <p style="text-align: center; color: #2d2d2d; padding: 2rem;">Belum ada Try Out gratis tersedia</p>
+    <?php endif; ?>
+</div>
+
+<!-- Premium Tryouts Section -->
+<div class="card" style="margin-top: 2rem; background: linear-gradient(135deg, #FFF9C4 0%, #FFE082 100%); border: 2px solid #FFA000;">
+    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem;">
+        <h2 style="color: #F57C00; margin: 0;">💎 Try Out Premium</h2>
+        <a href="<?php echo url('student/exams.php?filter=premium'); ?>" class="btn btn-secondary" style="font-size: 0.9rem;">Lihat Semua</a>
+    </div>
+    
+    <?php if(count($premium_tryouts) > 0): ?>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem;">
+        <?php foreach($premium_tryouts as $tryout): 
+            $can_access = ($tryout['payment_status'] === 'approved');
+        ?>
+        <div style="background: white; border-radius: 8px; padding: 1.25rem; border: 1px solid #FFB74D;">
+            <h3 style="color: #1a1a1a; font-size: 1.1rem; margin-bottom: 0.5rem;"><?php echo htmlspecialchars($tryout['title']); ?></h3>
+            <p style="color: #2d2d2d; font-size: 0.85rem; margin-bottom: 0.75rem;">
+                ⏱️ <?php echo $tryout['duration_minutes']; ?> menit | 📝 <?php echo $tryout['total_questions']; ?> soal
+            </p>
+            <span class="badge badge-warning" style="margin-bottom: 0.75rem;">💎 Rp <?php echo number_format($tryout['price'], 0, ',', '.'); ?></span>
+            <?php if($tryout['attempt_count'] > 0): ?>
+            <span class="badge badge-success">✓ Sudah Dikerjakan <?php echo $tryout['attempt_count']; ?>x</span>
+            <?php endif; ?>
+            
+            <?php if($can_access): ?>
+            <a href="<?php echo url('student/exam_detail.php?id=' . $tryout['id']); ?>" class="btn btn-primary" style="width: 100%; margin-top: 0.5rem;">
+                <?php echo $tryout['attempt_count'] > 0 ? 'Kerjakan Lagi' : 'Mulai TO'; ?>
+            </a>
+            <?php elseif($tryout['payment_status'] === 'pending'): ?>
+            <button class="btn btn-secondary" style="width: 100%; margin-top: 0.5rem;" disabled>Menunggu Verifikasi</button>
+            <?php else: ?>
+            <a href="<?php echo url('student/pay.php?exam_id=' . $tryout['id']); ?>" class="btn btn-warning" style="width: 100%; margin-top: 0.5rem;">Bayar Sekarang</a>
+            <?php endif; ?>
+        </div>
+        <?php endforeach; ?>
+    </div>
+    <?php else: ?>
+    <p style="text-align: center; color: #2d2d2d; padding: 2rem;">Belum ada Try Out premium tersedia</p>
+    <?php endif; ?>
 </div>
 
 <?php if(count($recent_attempts) > 0): ?>

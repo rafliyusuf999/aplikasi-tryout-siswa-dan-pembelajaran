@@ -112,6 +112,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $new_answers = [];
         $new_essay_answers = [];
         $total_score = 0;
+        $correct_count = 0;
         
         $stmt = $pdo->prepare("SELECT essay_answers FROM exam_attempts WHERE id = ?");
         $stmt->execute([$attempt['id']]);
@@ -128,6 +129,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 // Hitung skor HANYA pada percobaan pertama
                 if ($completed_attempts_count === 0 && $answer === $question['correct_answer']) {
                     $total_score += $question['points'];
+                    $correct_count++;
                 }
             } else {
                 $essay_answer = $_POST["essay_$q_id"] ?? '';
@@ -144,13 +146,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         }
         
-        // Pada percobaan kedua, ambil skor dari percobaan pertama
+        // Pada percobaan kedua, ambil skor dan correct_count dari percobaan pertama
         if ($completed_attempts_count === 1 && $first_attempt) {
             $total_score = $first_attempt['total_score'];
+            $correct_count = $first_attempt['correct_count'];
         }
         
-        $stmt = $pdo->prepare("UPDATE exam_attempts SET answers = ?, essay_answers = ?, total_score = ?, finished_at = datetime('now'), is_completed = 1 WHERE id = ?");
-        $stmt->execute([json_encode($new_answers), json_encode($new_essay_answers), $total_score, $attempt['id']]);
+        $stmt = $pdo->prepare("UPDATE exam_attempts SET answers = ?, essay_answers = ?, total_score = ?, correct_count = ?, finished_at = datetime('now'), is_completed = 1 WHERE id = ?");
+        $stmt->execute([json_encode($new_answers), json_encode($new_essay_answers), $total_score, $correct_count, $attempt['id']]);
         
         // Ambil nilai terbaik user untuk exam ini
         $stmt = $pdo->prepare("

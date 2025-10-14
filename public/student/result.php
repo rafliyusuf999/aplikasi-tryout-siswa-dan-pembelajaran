@@ -283,39 +283,15 @@ include '../../app/Views/includes/navbar.php';
         
         <div class="stats-grid">
             <div class="stat-card">
+                <div class="stat-icon">✅</div>
+                <div class="stat-value"><?php echo $attempt['correct_count'] ?? 0; ?></div>
+                <div class="stat-label">Soal Benar</div>
+            </div>
+            
+            <div class="stat-card">
                 <div class="stat-icon">📝</div>
                 <div class="stat-value"><?php echo $attempt['total_questions']; ?></div>
                 <div class="stat-label">Total Soal</div>
-            </div>
-            
-            <div class="stat-card">
-                <div class="stat-icon">▶️</div>
-                <div class="stat-value">
-                    <?php 
-                    $start_dt = new DateTime($attempt['started_at'], new DateTimeZone('UTC'));
-                    $start_dt->setTimezone(new DateTimeZone('Asia/Jakarta'));
-                    echo $start_dt->format('H:i');
-                    ?>
-                </div>
-                <div class="stat-date"><?php echo $start_dt->format('d/m/Y'); ?></div>
-                <div class="stat-label">Waktu Mulai</div>
-            </div>
-            
-            <div class="stat-card">
-                <div class="stat-icon">⏹️</div>
-                <div class="stat-value">
-                    <?php 
-                    if ($attempt['finished_at']) {
-                        $end_dt = new DateTime($attempt['finished_at'], new DateTimeZone('UTC'));
-                        $end_dt->setTimezone(new DateTimeZone('Asia/Jakarta'));
-                        echo $end_dt->format('H:i');
-                    } else {
-                        echo '-';
-                    }
-                    ?>
-                </div>
-                <div class="stat-date"><?php echo $attempt['finished_at'] ? $end_dt->format('d/m/Y') : ''; ?></div>
-                <div class="stat-label">Waktu Selesai</div>
             </div>
             
             <div class="stat-card">
@@ -332,7 +308,20 @@ include '../../app/Views/includes/navbar.php';
                     }
                     ?>
                 </div>
-                <div class="stat-label">Durasi</div>
+                <div class="stat-label">Kecepatan Pengerjaan</div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon">▶️</div>
+                <div class="stat-value">
+                    <?php 
+                    $start_dt = new DateTime($attempt['started_at'], new DateTimeZone('UTC'));
+                    $start_dt->setTimezone(new DateTimeZone('Asia/Jakarta'));
+                    echo $start_dt->format('H:i');
+                    ?>
+                </div>
+                <div class="stat-date"><?php echo $start_dt->format('d/m/Y'); ?></div>
+                <div class="stat-label">Waktu Mulai</div>
             </div>
             
             <div class="stat-card">

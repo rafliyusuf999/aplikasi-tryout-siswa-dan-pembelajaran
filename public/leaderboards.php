@@ -165,6 +165,7 @@ include '../app/Views/includes/navbar.php';
                         <?php if ($view_type === 'global'): ?>
                         <th>Cabang/Provinsi</th>
                         <?php endif; ?>
+                        <th>Soal Benar</th>
                         <th>Nilai</th>
                         <th>Waktu</th>
                     </tr>
@@ -221,6 +222,9 @@ include '../app/Views/includes/navbar.php';
                             </span>
                         </td>
                         <?php endif; ?>
+                        <td style="font-size: 1.1rem; font-weight: 600; color: #28a745;">
+                            <?php echo $entry['correct_count'] ?? 0; ?>
+                        </td>
                         <td style="font-size: 1.25rem; font-weight: bold; color: var(--primary-color);">
                             <?php echo number_format($entry['total_score'], 1); ?>
                         </td>
