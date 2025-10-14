@@ -6,6 +6,23 @@ INSPIRANET OFFICIAL TO is an online exam platform for high school students (grad
 
 ## Recent Changes
 
+### 2025-10-14: Tryout System Enhancements
+- **Correct Answer Tracking:** Added `correct_count` column to track number of correct answers in exam attempts
+  - Schema updated to include correct_count in exam_attempts table
+  - Exam submission now calculates and saves number of correct answers
+  - Result page displays "Soal Benar" (correct answers count) as primary metric
+  - Kecepatan Pengerjaan (exam completion speed/duration) prominently displayed
+- **Leaderboard Improvements:** Enhanced leaderboard to show complete performance metrics
+  - Added "Soal Benar" column showing number of correct answers for each participant
+  - Speed/duration calculation properly displayed for all attempts
+  - Improved data visibility with color-coded correct answers (green)
+- **Dashboard Enhancement:** Added dedicated Premium and Free tryout cards
+  - Separate "Try Out Gratis" section with green gradient styling
+  - Separate "Try Out Premium" section with gold gradient styling
+  - Each section shows up to 3 latest tryouts with quick access buttons
+  - Payment status and attempt count properly displayed
+  - Direct links to "Lihat Semua" for complete tryout lists
+
 ### 2025-10-09: UI/UX Improvements & Text Color Optimization
 - **Text Color Standardization:** All text colors throughout the application updated to black (#1a1a1a, #2d2d2d) for maximum readability and consistency
   - Updated all gray colors (#666, #999, #4a4a4a) to black in PHP files and CSS
