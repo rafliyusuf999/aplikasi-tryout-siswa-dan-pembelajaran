@@ -531,7 +531,7 @@ body {
                     </div>
                     <?php if ($question['question_image']): ?>
                         <div style="margin-bottom: 1.5rem;">
-                            <img src="<?php echo url('storage/uploads/questions/' . $question['question_image']); ?>" 
+                            <img src="<?php echo url('uploads/questions/' . $question['question_image']); ?>" 
                                  alt="Gambar Soal" 
                                  style="max-width: 100%; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
                         </div>

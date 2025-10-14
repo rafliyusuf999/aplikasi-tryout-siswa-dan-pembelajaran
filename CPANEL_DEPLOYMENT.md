@@ -75,7 +75,7 @@ config/schema_sqlite.sql
 3. **Upload** semua file di atas ke lokasi yang sama di server
 4. **Buat folder baru** untuk upload gambar soal: 
    ```
-   storage/uploads/questions/
+   public/uploads/questions/
    ```
    Set permission ke 777 (atau 755)
 
@@ -96,7 +96,7 @@ config/schema_sqlite.sql
 ## File Permission yang Perlu Diset:
 
 ```
-storage/uploads/questions/     → 777 (atau 755)
+public/uploads/questions/      → 777 (atau 755)
 storage/uploads/answers/       → 777 (atau 755)
 storage/uploads/profiles/      → 777 (atau 755)
 storage/uploads/payments/      → 777 (atau 755)

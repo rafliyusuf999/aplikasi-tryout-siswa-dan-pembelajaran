@@ -44,7 +44,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             
             $question_image = null;
             if (isset($_FILES['question_image']) && $_FILES['question_image']['error'] === 0) {
-                $upload_dir = '../../storage/uploads/questions/';
+                $upload_dir = '../uploads/questions/';
                 if (!file_exists($upload_dir)) {
                     mkdir($upload_dir, 0777, true);
                 }
@@ -83,7 +83,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             
             $question_image = $_POST['existing_image'] ?? null;
             if (isset($_FILES['question_image']) && $_FILES['question_image']['error'] === 0) {
-                $upload_dir = '../../storage/uploads/questions/';
+                $upload_dir = '../uploads/questions/';
                 if (!file_exists($upload_dir)) {
                     mkdir($upload_dir, 0777, true);
                 }
