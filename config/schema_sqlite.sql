@@ -44,6 +44,7 @@ CREATE TABLE IF NOT EXISTS questions (
     question_type VARCHAR(20) NOT NULL,
     category VARCHAR(100),
     question_text TEXT NOT NULL,
+    question_image VARCHAR(255),
     option_a TEXT,
     option_b TEXT,
     option_c TEXT,

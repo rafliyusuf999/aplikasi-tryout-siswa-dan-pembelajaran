@@ -526,9 +526,16 @@ body {
                     <?php if ($question['category']): ?>
                         <div style="color: #1a1a1a; margin-bottom: 0.5rem;"><em>Kategori: <?php echo htmlspecialchars($question['category']); ?></em></div>
                     <?php endif; ?>
-                    <div style="font-size: 1.1rem; margin-bottom: 1.5rem; line-height: 1.6;">
+                    <div class="question-text" style="font-size: 1.1rem; margin-bottom: 1.5rem; line-height: 1.6;">
                         <?php echo nl2br(htmlspecialchars($question['question_text'])); ?>
                     </div>
+                    <?php if ($question['question_image']): ?>
+                        <div style="margin-bottom: 1.5rem;">
+                            <img src="<?php echo url('storage/uploads/questions/' . $question['question_image']); ?>" 
+                                 alt="Gambar Soal" 
+                                 style="max-width: 100%; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                        </div>
+                    <?php endif; ?>
                     
                     <?php if ($question['question_type'] === 'multiple_choice'): ?>
                         <?php 
@@ -871,6 +878,12 @@ async function uploadEssayFile(questionId, attemptId) {
         isUploadingFile = false;
     }
 }
+
+window.addEventListener('load', function() {
+    if (window.MathJax) {
+        MathJax.typesetPromise().catch(err => console.log('MathJax error:', err));
+    }
+});
 </script>
 
 <?php include '../../app/Views/includes/footer.php'; ?>

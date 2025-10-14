@@ -30,6 +30,55 @@ if ($search) {
 }
 $students = $stmt->fetchAll();
 
+if (isset($_GET['action']) && $_GET['action'] === 'export_csv') {
+    $branch = $_GET['branch'] ?? '';
+    
+    $query = "SELECT u.full_name, u.email, u.inspira_branch, u.class_level, u.school_name, u.phone_number,
+              COALESCE(SUM(ea.cheating_warnings), 0) as total_cheating 
+              FROM users u
+              LEFT JOIN exam_attempts ea ON u.id = ea.user_id
+              WHERE u.role = 'student'";
+    
+    if ($branch) {
+        $query .= " AND u.inspira_branch = :branch";
+    }
+    
+    $query .= " GROUP BY u.id ORDER BY u.full_name ASC";
+    
+    $stmt = $pdo->prepare($query);
+    if ($branch) {
+        $stmt->execute(['branch' => $branch]);
+    } else {
+        $stmt->execute();
+    }
+    $students = $stmt->fetchAll();
+    
+    $filename = 'siswa_' . ($branch ? sanitize($branch) . '_' : '') . date('Y-m-d_His') . '.csv';
+    
+    header('Content-Type: text/csv; charset=utf-8');
+    header('Content-Disposition: attachment; filename="' . $filename . '"');
+    
+    $output = fopen('php://output', 'w');
+    fprintf($output, chr(0xEF).chr(0xBB).chr(0xBF));
+    
+    fputcsv($output, ['Nama Lengkap', 'Email', 'Cabang', 'Kelas', 'Sekolah', 'No. Telepon', 'Total Pelanggaran']);
+    
+    foreach ($students as $student) {
+        fputcsv($output, [
+            $student['full_name'],
+            $student['email'],
+            $student['inspira_branch'] ?? '-',
+            $student['class_level'] ?? '-',
+            $student['school_name'] ?? '-',
+            $student['phone_number'] ?? '-',
+            $student['total_cheating']
+        ]);
+    }
+    
+    fclose($output);
+    exit;
+}
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     verifyCsrf();
     
@@ -140,6 +189,7 @@ include '../../app/Views/includes/navbar.php';
         
         <div style="display: flex; gap: 1rem; margin-bottom: 1.5rem; flex-wrap: wrap;">
             <button onclick="showAddModal()" class="btn btn-primary">+ Tambah Siswa</button>
+            <button onclick="showExportModal()" class="btn btn-success">📥 Export CSV</button>
             <button onclick="clearAllCheating()" class="btn btn-warning">🚫 Clear Curang All</button>
             <a href="<?php echo url('admin/cleanup_duplicates.php'); ?>" class="btn btn-info">🧹 Cleanup Duplikat</a>
             <a href="<?php echo url('admin/migrate_phone_unique.php'); ?>" class="btn btn-success">🚀 Migrasi Database</a>
@@ -314,6 +364,27 @@ include '../../app/Views/includes/navbar.php';
     </div>
 </div>
 
+<div id="exportModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeModal('exportModal')">&times;</span>
+        <h2>📥 Export Data Siswa ke CSV</h2>
+        <div style="margin: 1.5rem 0;">
+            <p>Pilih cabang untuk filter siswa, atau kosongkan untuk export semua siswa:</p>
+            <div class="form-group">
+                <label>Cabang Inspiranet</label>
+                <select id="export_branch" class="form-control">
+                    <option value="">Semua Cabang</option>
+                    <option value="Inspiranet_Cakrawala 1">Inspiranet_Cakrawala 1</option>
+                    <option value="Inspiranet_Cakrawala 2">Inspiranet_Cakrawala 2</option>
+                    <option value="Inspiranet_Cakrawala 3">Inspiranet_Cakrawala 3</option>
+                    <option value="Inspiranet_Cakrawala 4">Inspiranet_Cakrawala 4</option>
+                </select>
+            </div>
+        </div>
+        <button onclick="exportCSV()" class="btn btn-success">📥 Download CSV</button>
+    </div>
+</div>
+
 <script>
 function showAddModal() {
     document.getElementById('addModal').style.display = 'block';
@@ -379,6 +450,17 @@ function deleteAllStudents() {
 
 function viewProfile(id) {
     window.location.href = '<?php echo url('admin/student_profile.php?id='); ?>' + id;
+}
+
+function showExportModal() {
+    document.getElementById('exportModal').style.display = 'block';
+}
+
+function exportCSV() {
+    const branch = document.getElementById('export_branch').value;
+    const url = '<?php echo url('admin/students.php?action=export_csv'); ?>' + (branch ? '&branch=' + encodeURIComponent(branch) : '');
+    window.location.href = url;
+    closeModal('exportModal');
 }
 
 function closeModal(id) {

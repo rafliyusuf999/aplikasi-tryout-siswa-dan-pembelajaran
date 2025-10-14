@@ -268,10 +268,16 @@ class AntiCheat {
                 const formData = new FormData();
                 formData.append('action', 'mark_cheating');
                 
+                const csrfToken = document.querySelector('input[name="csrf_token"]');
+                if (csrfToken) {
+                    formData.append('csrf_token', csrfToken.value);
+                }
+                
                 await fetch(window.location.pathname, {
                     method: 'POST',
                     body: formData
                 });
+                console.log('Cheating attempt marked successfully');
             } catch (error) {
                 console.error('Failed to mark cheating:', error);
             }

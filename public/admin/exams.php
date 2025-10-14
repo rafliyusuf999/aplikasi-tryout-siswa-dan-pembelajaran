@@ -125,6 +125,7 @@ include '../../app/Views/includes/navbar.php';
                         <td>
                             <button onclick='editExam(<?php echo json_encode($exam); ?>)' class="btn btn-sm btn-primary">Edit</button>
                             <a href="<?php echo url('admin/questions.php?exam_id=' . $exam['id']); ?>" class="btn btn-sm btn-secondary">Soal</a>
+                            <a href="<?php echo url('admin/essay_answers.php?exam_id=' . $exam['id']); ?>" class="btn btn-sm btn-info">📝 Essay</a>
                             <form method="POST" style="display: inline;">
                                 <?php echo csrf(); ?>
                                 <input type="hidden" name="action" value="delete">

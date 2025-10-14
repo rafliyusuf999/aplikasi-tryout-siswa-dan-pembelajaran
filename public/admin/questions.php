@@ -42,12 +42,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $correct_answer = sanitize($_POST['correct_answer'] ?? '');
             $points = (int)($_POST['points'] ?? 1);
             
+            $question_image = null;
+            if (isset($_FILES['question_image']) && $_FILES['question_image']['error'] === 0) {
+                $upload_dir = '../../storage/uploads/questions/';
+                if (!file_exists($upload_dir)) {
+                    mkdir($upload_dir, 0777, true);
+                }
+                
+                $file_extension = strtolower(pathinfo($_FILES['question_image']['name'], PATHINFO_EXTENSION));
+                $question_image = 'question_' . time() . '_' . uniqid() . '.' . $file_extension;
+                move_uploaded_file($_FILES['question_image']['tmp_name'], $upload_dir . $question_image);
+            }
+            
             $stmt = $pdo->prepare("SELECT COALESCE(MAX(question_order), 0) + 1 as next_order FROM questions WHERE exam_id = ?");
             $stmt->execute([$exam_id]);
             $question_order = $stmt->fetchColumn();
             
-            $stmt = $pdo->prepare("INSERT INTO questions (exam_id, question_type, category, question_text, option_a, option_b, option_c, option_d, option_e, correct_answer, question_order, points) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-            $stmt->execute([$exam_id, $question_type, $category, $question_text, $option_a, $option_b, $option_c, $option_d, $option_e, $correct_answer, $question_order, $points]);
+            $stmt = $pdo->prepare("INSERT INTO questions (exam_id, question_type, category, question_text, question_image, option_a, option_b, option_c, option_d, option_e, correct_answer, question_order, points) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+            $stmt->execute([$exam_id, $question_type, $category, $question_text, $question_image, $option_a, $option_b, $option_c, $option_d, $option_e, $correct_answer, $question_order, $points]);
             
             $stmt = $pdo->prepare("UPDATE exams SET total_questions = (SELECT COUNT(*) FROM questions WHERE exam_id = ?) WHERE id = ?");
             $stmt->execute([$exam_id, $exam_id]);
@@ -69,8 +81,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $correct_answer = sanitize($_POST['correct_answer'] ?? '');
             $points = (int)($_POST['points'] ?? 1);
             
-            $stmt = $pdo->prepare("UPDATE questions SET question_type = ?, category = ?, question_text = ?, option_a = ?, option_b = ?, option_c = ?, option_d = ?, option_e = ?, correct_answer = ?, points = ? WHERE id = ?");
-            $stmt->execute([$question_type, $category, $question_text, $option_a, $option_b, $option_c, $option_d, $option_e, $correct_answer, $points, $id]);
+            $question_image = $_POST['existing_image'] ?? null;
+            if (isset($_FILES['question_image']) && $_FILES['question_image']['error'] === 0) {
+                $upload_dir = '../../storage/uploads/questions/';
+                if (!file_exists($upload_dir)) {
+                    mkdir($upload_dir, 0777, true);
+                }
+                
+                if ($question_image && file_exists($upload_dir . $question_image)) {
+                    unlink($upload_dir . $question_image);
+                }
+                
+                $file_extension = strtolower(pathinfo($_FILES['question_image']['name'], PATHINFO_EXTENSION));
+                $question_image = 'question_' . time() . '_' . uniqid() . '.' . $file_extension;
+                move_uploaded_file($_FILES['question_image']['tmp_name'], $upload_dir . $question_image);
+            }
+            
+            $stmt = $pdo->prepare("UPDATE questions SET question_type = ?, category = ?, question_text = ?, question_image = ?, option_a = ?, option_b = ?, option_c = ?, option_d = ?, option_e = ?, correct_answer = ?, points = ? WHERE id = ?");
+            $stmt->execute([$question_type, $category, $question_text, $question_image, $option_a, $option_b, $option_c, $option_d, $option_e, $correct_answer, $points, $id]);
             
             setFlash('Soal berhasil diupdate', 'success');
             redirect('admin/questions.php?exam_id=' . $exam_id);
@@ -150,7 +178,7 @@ include '../../app/Views/includes/navbar.php';
     <div class="modal-content" style="max-width: 800px;">
         <span class="close" onclick="closeModal('addModal')">&times;</span>
         <h2>Tambah Soal</h2>
-        <form method="POST">
+        <form method="POST" enctype="multipart/form-data">
             <?php echo csrf(); ?>
             <input type="hidden" name="action" value="add">
             <div class="form-group">
@@ -166,7 +194,14 @@ include '../../app/Views/includes/navbar.php';
             </div>
             <div class="form-group">
                 <label>Pertanyaan</label>
+                <div style="background: #e7f3ff; padding: 0.75rem; border-radius: 4px; margin-bottom: 0.5rem; font-size: 0.9rem;">
+                    <strong>💡 Tips LaTeX:</strong> Gunakan $ untuk inline: <code>$x^2 + y^2$</code> atau $$ untuk display: <code>$$\sqrt{(x_2 - x_1)^2 + (y_2 - y_1)^2}$$</code>
+                </div>
                 <textarea name="question_text" required class="form-control" rows="4"></textarea>
+            </div>
+            <div class="form-group">
+                <label>Gambar Soal (opsional)</label>
+                <input type="file" name="question_image" accept="image/*" class="form-control">
             </div>
             <div id="add_options_group">
                 <div class="form-group">
@@ -213,10 +248,11 @@ include '../../app/Views/includes/navbar.php';
     <div class="modal-content" style="max-width: 800px;">
         <span class="close" onclick="closeModal('editModal')">&times;</span>
         <h2>Edit Soal</h2>
-        <form method="POST">
+        <form method="POST" enctype="multipart/form-data">
             <?php echo csrf(); ?>
             <input type="hidden" name="action" value="edit">
             <input type="hidden" name="id" id="edit_id">
+            <input type="hidden" name="existing_image" id="edit_existing_image">
             <div class="form-group">
                 <label>Tipe Soal</label>
                 <select name="question_type" id="edit_question_type" required class="form-control" onchange="toggleOptions('edit')">
@@ -230,7 +266,15 @@ include '../../app/Views/includes/navbar.php';
             </div>
             <div class="form-group">
                 <label>Pertanyaan</label>
+                <div style="background: #e7f3ff; padding: 0.75rem; border-radius: 4px; margin-bottom: 0.5rem; font-size: 0.9rem;">
+                    <strong>💡 Tips LaTeX:</strong> Gunakan $ untuk inline: <code>$x^2 + y^2$</code> atau $$ untuk display: <code>$$\sqrt{(x_2 - x_1)^2 + (y_2 - y_1)^2}$$</code>
+                </div>
                 <textarea name="question_text" id="edit_question_text" required class="form-control" rows="4"></textarea>
+            </div>
+            <div class="form-group">
+                <label>Gambar Soal (opsional)</label>
+                <div id="edit_current_image" style="margin-bottom: 0.5rem;"></div>
+                <input type="file" name="question_image" accept="image/*" class="form-control">
             </div>
             <div id="edit_options_group">
                 <div class="form-group">
@@ -290,6 +334,15 @@ function editQuestion(question) {
     document.getElementById('edit_option_e').value = question.option_e || '';
     document.getElementById('edit_correct_answer').value = question.correct_answer || 'A';
     document.getElementById('edit_points').value = question.points;
+    document.getElementById('edit_existing_image').value = question.question_image || '';
+    
+    const currentImageDiv = document.getElementById('edit_current_image');
+    if (question.question_image) {
+        currentImageDiv.innerHTML = '<img src="<?php echo url('storage/uploads/questions/'); ?>' + question.question_image + '" style="max-width: 200px; border-radius: 4px;"><br><small>Gambar saat ini (upload baru untuk mengganti)</small>';
+    } else {
+        currentImageDiv.innerHTML = '';
+    }
+    
     toggleOptions('edit');
     document.getElementById('editModal').style.display = 'block';
 }
