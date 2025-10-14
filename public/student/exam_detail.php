@@ -126,8 +126,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $answer = $_POST["answer_$q_id"] ?? '';
                 $new_answers[$q_id] = $answer;
                 
-                // Hitung skor HANYA pada percobaan pertama
-                if ($completed_attempts_count === 0 && $answer === $question['correct_answer']) {
+                // Hitung skor HANYA pada percobaan pertama (case-insensitive comparison)
+                if ($completed_attempts_count === 0 && strtoupper(trim($answer)) === strtoupper(trim($question['correct_answer']))) {
                     $total_score += $question['points'];
                     $correct_count++;
                 }
